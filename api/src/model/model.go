@@ -9,13 +9,13 @@ type PgModel struct {
 }
 
 type Model interface {
-	Book(int64) Book
-	AllBooks() ([]Book, error)
-	AddBook(Book) (Book, error)
+	GetExampleGift(int64) ExampleGift
+	AllExampleGifts() ([]ExampleGift, error)
+	AddExampleGift(ExampleGift) (ExampleGift, error)
 }
 
-func (m *PgModel) Book(id int64) Book {
-	book, err := GetBookFromDB(m.Conn, id)
+func (m *PgModel) GetExampleGift(id int64) ExampleGift {
+	book, err := GetExampleGiftFromDB(m.Conn, id)
 
 	if err != nil {
 		panic(err)
@@ -24,21 +24,21 @@ func (m *PgModel) Book(id int64) Book {
 	return book
 }
 
-func (m *PgModel) AddBook(book Book) (Book, error) {
-	b, err := WriteBookToDb(m.Conn, book)
+func (m *PgModel) AddExampleGift(eg ExampleGift) (ExampleGift, error) {
+	b, err := WriteExampleGiftToDb(m.Conn, eg)
 
 	if err != nil {
-		return Book{}, err
+		return ExampleGift{}, err
 	}
 
 	return b, nil
 }
 
-func (m *PgModel) AllBooks() ([]Book, error) {
-	books, err := GetAllBooksFromDB(m.Conn)
+func (m *PgModel) AllExampleGifts() ([]ExampleGift, error) {
+	books, err := GetAllExampleGiftsFromDB(m.Conn)
 
 	if err != nil {
-		return []Book{}, err
+		return []ExampleGift{}, err
 	}
 	return books, nil
 }

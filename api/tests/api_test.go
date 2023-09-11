@@ -1,16 +1,16 @@
 package tests
 
 import (
+	c "CaitsCurates/backend/src/controller"
+	"CaitsCurates/backend/src/model"
 	"encoding/json"
 	"fmt"
-	c "generate/bootcamp/src/controller"
-	"generate/bootcamp/src/model"
+	"github.com/go-playground/assert/v2"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"testing"
 
-	"github.com/huandu/go-assert"
 	"github.com/jackc/pgx"
 )
 
@@ -18,9 +18,9 @@ func TestGetBooks(t *testing.T) {
 	db_url, exists := os.LookupEnv("DATABASE_URL")
 
 	cfg := pgx.ConnConfig{
-		User:     "postgres",
-		Database: "backendbootcamp",
-		Password: "password",
+		User:     "user",
+		Database: "CaitsDB",
+		Password: "pwd",
 		Host:     "127.0.0.1",
 		Port:     5432,
 	}
@@ -50,22 +50,22 @@ func TestGetBooks(t *testing.T) {
 
 	w := httptest.NewRecorder()
 
-	req, _ := http.NewRequest("GET", "/v1/books/1738", nil)
+	req, _ := http.NewRequest("GET", "/gifts/1", nil)
 
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, 200, w.Code)
 
-	var books model.Book
+	var gift model.ExampleGift
 
-	if e := json.Unmarshal(w.Body.Bytes(), &books); e != nil {
+	if e := json.Unmarshal(w.Body.Bytes(), &gift); e != nil {
 		panic(err)
 	}
 
-	test_book := model.Book{
-		BookId: 1738,
-		Title:  "The Lightning Thief",
-		Author: "Rick Riordan",
+	testBook := model.ExampleGift{
+		GiftId: 1,
+		Name:  "nice sweater",
+		Price: 50,
 	}
-	assert.Equal(t, test_book, books)
+	assert.Equal(t, testBook, gift)
 }

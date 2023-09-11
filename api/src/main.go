@@ -1,9 +1,10 @@
 package main
 
+
 import (
+	"CaitsCurates/backend/src/controller"
+	"CaitsCurates/backend/src/model"
 	"fmt"
-	"generate/bootcamp/src/controller"
-	"generate/bootcamp/src/model"
 	"os"
 
 	"github.com/jackc/pgx"
@@ -14,8 +15,8 @@ func main() {
 
 	cfg := pgx.ConnConfig{
 		User:     "postgres",
-		Database: "backendbootcamp",
-		Password: "password",
+		Database: db_url,
+		Password: "pwd",
 		Host:     "127.0.0.1",
 		Port:     5432,
 	}
@@ -24,6 +25,7 @@ func main() {
 		cfg, err = pgx.ParseConnectionString(db_url)
 
 		if err != nil {
+			print(db_url)
 			panic(err)
 		}
 	}
@@ -45,3 +47,4 @@ func main() {
 
 	c.Serve().Run(":8080")
 }
+

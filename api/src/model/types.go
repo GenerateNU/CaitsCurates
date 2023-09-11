@@ -1,12 +1,8 @@
 package model
 
-type Book struct {
-	BookId int64  `json:"id" db:"book_id"`
-	Title  string `json:"title" db:"title"`
-	Author string `json:"author" db:"author"`
+type ExampleGift struct {
+	GiftId int64  `json:"id" db:"gift_id"`
+	Name  string `json:"name" db:"name"`
+	Price int `json:"price" db:"price"`
 }
 
-type Student struct {
-	NUID int64  `json:"nuid" db:"nuid"`
-	Name string `json:"name" db:"name"`
-}
