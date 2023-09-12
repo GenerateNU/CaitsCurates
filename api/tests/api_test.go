@@ -14,7 +14,7 @@ import (
 	"github.com/jackc/pgx"
 )
 
-func TestGetBooks(t *testing.T) {
+func TestGetGifts(t *testing.T) {
 	db_url, exists := os.LookupEnv("DATABASE_URL")
 
 	cfg := pgx.ConnConfig{
@@ -62,10 +62,10 @@ func TestGetBooks(t *testing.T) {
 		panic(err)
 	}
 
-	testBook := model.ExampleGift{
+	testGift := model.ExampleGift{
 		GiftId: 1,
 		Name:  "nice sweater",
 		Price: 50,
 	}
-	assert.Equal(t, testBook, gift)
+	assert.Equal(t, testGift, gift)
 }

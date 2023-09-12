@@ -41,8 +41,6 @@ func (pg *PgController) Serve() *gin.Engine {
 
 	r.POST("/v1/addGift", func(c *gin.Context) {
 		var eg model.ExampleGift
-		fmt.Print(eg.GiftId)
-		fmt.Print("HHHHH\n\n\nHHHHH\n\n\nHHHH")
 		if err := c.BindJSON(&eg); err != nil {
 			c.JSON(http.StatusBadRequest,  "Failed to unmarshal book")
 			fmt.Print(err)
