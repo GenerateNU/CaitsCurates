@@ -22,8 +22,8 @@ func (pg *PgController) Serve() *gin.Engine {
 	r := gin.Default()
 
 	r.Use(cors.Default())
-	r.GET("/gifts/:giftId", func(c *gin.Context) {
-		id := c.Param("giftId")
+	r.GET("/gifts/:id", func(c *gin.Context) {
+		id := c.Param("id")
 		intId, err := strconv.Atoi(id)
 
 		if err != nil {
@@ -43,7 +43,7 @@ func (pg *PgController) Serve() *gin.Engine {
 		var eg model.ExampleGift
 		fmt.Print(c)
 		if err := c.BindJSON(&eg); err != nil {
-			c.JSON(http.StatusBadRequest,  "Failed to unmarshal gift")
+			c.JSON(http.StatusBadRequest, "Failed to unmarshal gift")
 
 			fmt.Print(err)
 
@@ -52,7 +52,7 @@ func (pg *PgController) Serve() *gin.Engine {
 		insertedGift, err := pg.AddExampleGift(eg)
 
 		if err != nil {
-			c.JSON(http.StatusBadRequest, eg.GiftId)
+			c.JSON(http.StatusBadRequest, eg.ID)
 			panic(err)
 		}
 

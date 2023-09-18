@@ -10,8 +10,6 @@ services:
       retries: 3
     ports:
       - "5433:5432"
-    volumes:
-      - ./src/migrations/testinit.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
       POSTGRES_DB: testdb
       POSTGRES_USER: testuser

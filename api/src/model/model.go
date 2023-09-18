@@ -1,11 +1,11 @@
 package model
 
 import (
-	"github.com/jackc/pgx"
+	"gorm.io/gorm"
 )
 
 type PgModel struct {
-	Conn *pgx.Conn
+	Conn *gorm.DB
 }
 
 type Model interface {

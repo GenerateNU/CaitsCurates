@@ -1,60 +1,31 @@
 package model
 
 import (
-	"fmt"
-	"strconv"
-
-	"github.com/jackc/pgx"
+	"gorm.io/gorm"
 )
 
-func WriteExampleGiftToDb(pool *pgx.Conn, eg ExampleGift) (ExampleGift, error) {
-	giftIdStr := strconv.FormatInt(eg.GiftId, 10)
-
-	err := pool.QueryRow(fmt.Sprintf("INSERT INTO examplegifts (gift_id, name, price) VALUES ('%s','%s', '%d') RETURNING gift_id;", giftIdStr, eg.Name, eg.Price)).Scan(&eg.GiftId)
-
-	if err != nil {
+// WriteExampleGiftToDb saves the ExampleGift and returns it
+func WriteExampleGiftToDb(db *gorm.DB, eg ExampleGift) (ExampleGift, error) {
+	if err := db.Create(&eg).Error; err != nil {
 		return ExampleGift{}, err
 	}
-
 	return eg, nil
 }
 
-func GetExampleGiftFromDB(pool *pgx.Conn, giftId int64) (ExampleGift, error) {
-	eg := ExampleGift{
-		GiftId: giftId,
+// GetExampleGiftFromDB fetches an ExampleGift by ID
+func GetExampleGiftFromDB(db *gorm.DB, id int64) (ExampleGift, error) {
+	var eg ExampleGift
+	if err := db.Where("id = ?", id).First(&eg).Error; err != nil {
+		return ExampleGift{}, err
 	}
-
-	var gid int
-	err := pool.QueryRow(fmt.Sprintf("SELECT gift_id, name, price FROM examplegifts where gift_id = '%d';", giftId)).Scan(&gid, &eg.Name, &eg.Price)
-
-	if err != nil {
-		panic(err)
-	}
-
 	return eg, nil
 }
 
-func GetAllExampleGiftsFromDB(pool *pgx.Conn) ([]ExampleGift, error) {
-	rows, err := pool.Query("SELECT  gift_id, name, price FROM examplegifts;")
-
-	if err != nil {
-		panic(err)
+// GetAllExampleGiftsFromDB fetches all ExampleGift
+func GetAllExampleGiftsFromDB(db *gorm.DB) ([]ExampleGift, error) {
+	var gifts []ExampleGift
+	if err := db.Find(&gifts).Error; err != nil {
+		return nil, err
 	}
-
-	results := []ExampleGift{}
-
-	defer rows.Close()
-
-	for rows.Next() {
-		eg := ExampleGift{}
-		err := rows.Scan(&eg.GiftId, &eg.Name, &eg.Price)
-
-		if err != nil {
-			panic(err)
-		}
-
-		results = append(results, eg)
-	}
-
-	return results, nil
+	return gifts, nil
 }

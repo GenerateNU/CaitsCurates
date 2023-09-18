@@ -9,8 +9,6 @@ services:
       timeout: 45s
       retries: 3
     restart: always
-    volumes:
-      - ./src/migrations/init.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
       POSTGRES_PASSWORD: password
       POSTGRES_USER: user

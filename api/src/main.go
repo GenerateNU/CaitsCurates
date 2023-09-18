@@ -4,42 +4,45 @@ import (
 	"CaitsCurates/backend/src/controller"
 	"CaitsCurates/backend/src/model"
 	"fmt"
+	"gorm.io/gorm/logger"
+	"log"
 	"os"
+	"time"
 
-	"github.com/jackc/pgx"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 func main() {
-	db_url, exists := os.LookupEnv("DATABASE_URL")
-	fmt.Print(exists)
-	cfg := pgx.ConnConfig{
-		User:     "user",
-		Database: "CaitsDB",
-		Password: "pwd",
-		Host:     "db-1",
-		Port:     5432,
+	dbURL, exists := os.LookupEnv("DATABASE_URL")
+	if !exists {
+		dbURL = "host=db user=user password=pwd dbname=CaitsDB port=5432 sslmode=disable"
 	}
-
-	var err error
-	if exists {
-		cfg, err = pgx.ParseConnectionString(db_url)
-
-		if err != nil {
-			print(db_url)
-			panic(err)
-		}
-	}
-
-	conn, err := pgx.Connect(cfg)
+	NewLogger := logger.New(
+		log.New(os.Stdout, "\r\n", log.LstdFlags),
+		logger.Config{
+			SlowThreshold: time.Second,
+			LogLevel:      logger.Info,
+			Colorful:      false,
+		},
+	)
+	db, err := gorm.Open(postgres.Open(dbURL), &gorm.Config{
+		Logger: NewLogger,
+	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
 		os.Exit(1)
 	}
+	// Auto migrate tables
+	err = db.AutoMigrate(&model.ExampleGift{})
 
-	defer conn.Close()
-
+	// Check for errors
+	if err != nil {
+		fmt.Println("Error auto-migrating:", err)
+		return
+	}
 	m := &model.PgModel{
-		Conn: conn,
+		Conn: db,
 	}
 	c := &controller.PgController{
 		Model: m,
@@ -47,4 +50,3 @@ func main() {
 
 	c.Serve().Run(":8080")
 }
-
