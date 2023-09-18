@@ -1,8 +1,8 @@
-version: '3.8'
+version: '3.9'
 
 services:
   db:
-    image: postgres
+    image: postgres:latest
     healthcheck:
       test: ["CMD","pg_isready","-U","user", "-d", "CaitsDB"]
       interval: 15s
@@ -12,18 +12,17 @@ services:
     volumes:
       - ./src/migrations/init.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
-      POSTGRES_PASSWORD: pwd
+      POSTGRES_PASSWORD: password
       POSTGRES_USER: user
       POSTGRES_DB: CaitsDB
     ports:
       - "5432:5432"
   api:
     build: .
+    environment:
+       DATABASE_URL: postgres://user:password@db:5432/CaitsDB
     ports:
       - "8080:8080"
-    environment:
-      - PORT=8080
-      - DATABASE_URL=postgres://user:pwd@db:5432/CaitsDB
     depends_on:
        db:
           condition: service_healthy

@@ -2,18 +2,14 @@ package tests
 
 import (
 	"database/sql"
-	"fmt"
 	"testing"
 
 	_ "github.com/lib/pq"
 )
 
 func TestDBConnection(t *testing.T) {
-	dbURL := fmt.Sprintf("postgres://%s:%s@localhost:5432/%s?sslmode=disable",
-		"user",
-		"pwd",
-		"CaitsDB",
-	)
+	dbURL :=  "user=testuser password=testpwd host=test-db port=5432 dbname=testdb sslmode=disable"
+
 
 	db, err := sql.Open("postgres", dbURL)
 	if err != nil {

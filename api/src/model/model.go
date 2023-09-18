@@ -15,30 +15,30 @@ type Model interface {
 }
 
 func (m *PgModel) GetExampleGift(id int64) ExampleGift {
-	book, err := GetExampleGiftFromDB(m.Conn, id)
+	gift, err := GetExampleGiftFromDB(m.Conn, id)
 
 	if err != nil {
 		panic(err)
 	}
 
-	return book
+	return gift
 }
 
 func (m *PgModel) AddExampleGift(eg ExampleGift) (ExampleGift, error) {
-	b, err := WriteExampleGiftToDb(m.Conn, eg)
+	g, err := WriteExampleGiftToDb(m.Conn, eg)
 
 	if err != nil {
 		return ExampleGift{}, err
 	}
 
-	return b, nil
+	return g, nil
 }
 
 func (m *PgModel) AllExampleGifts() ([]ExampleGift, error) {
-	books, err := GetAllExampleGiftsFromDB(m.Conn)
+	gifts, err := GetAllExampleGiftsFromDB(m.Conn)
 
 	if err != nil {
 		return []ExampleGift{}, err
 	}
-	return books, nil
+	return gifts, nil
 }

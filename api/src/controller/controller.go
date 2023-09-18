@@ -31,18 +31,20 @@ func (pg *PgController) Serve() *gin.Engine {
 		}
 		c.JSON(http.StatusOK, pg.GetExampleGift(int64(intId)))
 	})
-	r.GET("/v1/gifts/", func(c *gin.Context) {
-		books, err := pg.AllExampleGifts()
+	r.GET("/gifts", func(c *gin.Context) {
+		gifts, err := pg.AllExampleGifts()
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, "Oops")
 		}
-		c.JSON(http.StatusOK, books)
+		c.JSON(http.StatusOK, gifts)
 	})
 
-	r.POST("/v1/addGift", func(c *gin.Context) {
+	r.POST("/addGift", func(c *gin.Context) {
 		var eg model.ExampleGift
+		fmt.Print(c)
 		if err := c.BindJSON(&eg); err != nil {
-			c.JSON(http.StatusBadRequest,  "Failed to unmarshal book")
+			c.JSON(http.StatusBadRequest,  "Failed to unmarshal gift")
+
 			fmt.Print(err)
 
 			return

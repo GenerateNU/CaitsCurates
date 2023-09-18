@@ -1,6 +1,5 @@
 package main
 
-
 import (
 	"CaitsCurates/backend/src/controller"
 	"CaitsCurates/backend/src/model"
@@ -12,14 +11,15 @@ import (
 
 func main() {
 	db_url, exists := os.LookupEnv("DATABASE_URL")
-
+	fmt.Print(exists)
 	cfg := pgx.ConnConfig{
-		User:     "postgres",
-		Database: db_url,
+		User:     "user",
+		Database: "CaitsDB",
 		Password: "pwd",
-		Host:     "127.0.0.1",
+		Host:     "db-1",
 		Port:     5432,
 	}
+
 	var err error
 	if exists {
 		cfg, err = pgx.ParseConnectionString(db_url)

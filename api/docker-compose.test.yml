@@ -1,0 +1,25 @@
+version: '3.9'
+
+services:
+  test-db:
+    image: postgres:latest
+    healthcheck:
+      test: [ "CMD","pg_isready","-U","testuser", "-d", "testdb" ]
+      interval: 15s
+      timeout: 45s
+      retries: 3
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./src/migrations/testinit.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      POSTGRES_DB: testdb
+      POSTGRES_USER: testuser
+      POSTGRES_PASSWORD: testpwd
+  test-api:
+    build: .
+    environment:
+      TEST_DATABASE_URL: postgres://testuser:testpwd@test-db:5432/testdb
+    depends_on:
+      - test-db
+    command: [ "go", "test", "-v", "./..." ]
