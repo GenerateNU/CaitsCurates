@@ -5,17 +5,20 @@ import (
 	"CaitsCurates/backend/src/model"
 	"bytes"
 	"encoding/json"
+	"fmt"
+	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
+	"time"
+
 	"os"
 	"testing"
 
-	"github.com/go-playground/assert/v2"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-func TestAddGetGift(t *testing.T) {
+func TestAddExampleGift(t *testing.T) {
 	// Database setup
 	dsn := "host=test-db user=testuser password=testpwd dbname=testdb port=5433 sslmode=disable"
 	if dbURL, exists := os.LookupEnv("TEST_DATABASE_URL"); exists {
@@ -25,6 +28,7 @@ func TestAddGetGift(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Unable to connect to database: %v", err)
 	}
+	// Put auto migrations here
 	err = db.AutoMigrate(&model.ExampleGift{})
 	if err != nil {
 		panic("failed to migrate test database schema")
@@ -41,8 +45,7 @@ func TestAddGetGift(t *testing.T) {
 	// Test code
 	w := httptest.NewRecorder()
 	w1 := httptest.NewRecorder()
-	testGift := model.ExampleGift{
-		ID:    4,
+	testGift := model.ExampleGiftInput{
 		Name:  "nice sweater",
 		Price: 50,
 	}
@@ -63,9 +66,9 @@ func TestAddGetGift(t *testing.T) {
 	if e := json.Unmarshal(w.Body.Bytes(), &giftAdded); e != nil {
 		t.Fatalf("Error unmarshaling JSON: %v", e)
 	}
-	assert.Equal(t, testGift, giftAdded)
-
-	req1, err := http.NewRequest("GET", "/gifts/4", nil)
+	assert.Equal(t, testGift.Price, giftAdded.Price)
+	assert.Equal(t, uint(1), giftAdded.ID)
+	req1, err := http.NewRequest("GET", "/gifts/1", nil)
 	router.ServeHTTP(w1, req1)
 
 	assert.Equal(t, 200, w1.Code)
@@ -75,5 +78,58 @@ func TestAddGetGift(t *testing.T) {
 		t.Fatalf("Error unmarshaling JSON: %v", e)
 	}
 
-	assert.Equal(t, testGift, giftRetrieved)
+	assert.Equal(t, giftAdded.ID, giftRetrieved.ID)
+	assert.Equal(t, giftAdded.Name, giftRetrieved.Name)
+	assert.Equal(t, giftAdded.Price, giftRetrieved.Price)
+	assert.Equal(t, giftAdded.CreatedAt.In(time.UTC).Round(time.Millisecond),
+		giftRetrieved.CreatedAt.In(time.UTC).Round(time.Millisecond))
+}
+func TestGetExampleGift(t *testing.T) {
+	// Database setup
+	dsn := "host=test-db user=testuser password=testpwd dbname=testdb port=5433 sslmode=disable"
+	if dbURL, exists := os.LookupEnv("TEST_DATABASE_URL"); exists {
+		dsn = dbURL
+	}
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("Unable to connect to database: %v", err)
+	}
+	// Put auto migrations here
+	err = db.AutoMigrate(&model.ExampleGift{})
+	if err != nil {
+		panic("failed to migrate test database schema")
+	}
+	// Wrap the DB connection in a transaction
+	tx := db.Begin()
+	defer tx.Rollback()
+
+	// Create Model and Controller
+	m := &model.PgModel{Conn: tx}
+	c := &c.PgController{Model: m}
+	router := c.Serve()
+
+	// Test code
+	w := httptest.NewRecorder()
+	gift := model.ExampleGift{
+		Name:  "nice sweater",
+		Price: 50,
+	}
+	err = db.Create(&gift).Error
+	assert.NoError(t, err)
+	req1, err := http.NewRequest("GET", fmt.Sprintf("/gifts/%d", gift.ID), nil)
+	router.ServeHTTP(w, req1)
+
+	assert.Equal(t, 200, w.Code)
+
+	var giftRetrieved model.ExampleGift
+	if e := json.Unmarshal(w.Body.Bytes(), &giftRetrieved); e != nil {
+		t.Fatalf("Error unmarshaling JSON: %v", e)
+	}
+
+	assert.Equal(t, gift.ID, giftRetrieved.ID)
+	assert.Equal(t, gift.Name, giftRetrieved.Name)
+	assert.Equal(t, gift.Price, giftRetrieved.Price)
+	assert.Equal(t, gift.CreatedAt.In(time.UTC).Round(time.Millisecond),
+		giftRetrieved.CreatedAt.In(time.UTC).Round(time.Millisecond))
+
 }

@@ -5,7 +5,8 @@ import (
 )
 
 // WriteExampleGiftToDb saves the ExampleGift and returns it
-func WriteExampleGiftToDb(db *gorm.DB, eg ExampleGift) (ExampleGift, error) {
+func WriteExampleGiftToDb(db *gorm.DB, inputGift ExampleGiftInput) (ExampleGift, error) {
+	eg := ExampleGift{Name: inputGift.Name, Price: inputGift.Price}
 	if err := db.Create(&eg).Error; err != nil {
 		return ExampleGift{}, err
 	}

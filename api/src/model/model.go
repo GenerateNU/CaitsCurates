@@ -11,7 +11,7 @@ type PgModel struct {
 type Model interface {
 	GetExampleGift(int64) ExampleGift
 	AllExampleGifts() ([]ExampleGift, error)
-	AddExampleGift(ExampleGift) (ExampleGift, error)
+	AddExampleGift(ExampleGiftInput) (ExampleGift, error)
 }
 
 func (m *PgModel) GetExampleGift(id int64) ExampleGift {
@@ -24,14 +24,15 @@ func (m *PgModel) GetExampleGift(id int64) ExampleGift {
 	return gift
 }
 
-func (m *PgModel) AddExampleGift(eg ExampleGift) (ExampleGift, error) {
-	g, err := WriteExampleGiftToDb(m.Conn, eg)
+func (m *PgModel) AddExampleGift(inputGift ExampleGiftInput) (ExampleGift, error) {
+
+	createdGift, err := WriteExampleGiftToDb(m.Conn, inputGift)
 
 	if err != nil {
 		return ExampleGift{}, err
 	}
 
-	return g, nil
+	return createdGift, nil
 }
 
 func (m *PgModel) AllExampleGifts() ([]ExampleGift, error) {
