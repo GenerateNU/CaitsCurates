@@ -6,7 +6,13 @@ import (
 
 // WriteExampleGiftToDb saves the ExampleGift and returns it
 func WriteExampleGiftToDb(db *gorm.DB, inputGift ExampleGiftInput) (ExampleGift, error) {
-	eg := ExampleGift{Name: inputGift.Name, Price: inputGift.Price}
+	eg := ExampleGift{
+		Name: inputGift.Name,
+		Price: inputGift.Price,
+		Link: inputGift.Link,
+		Description: inputGift.Description,
+		Demographic: inputGift.Demographic,
+	}
 	if err := db.Create(&eg).Error; err != nil {
 		return ExampleGift{}, err
 	}

@@ -84,6 +84,7 @@ func TestAddExampleGift(t *testing.T) {
 	assert.Equal(t, giftAdded.CreatedAt.In(time.UTC).Round(time.Millisecond),
 		giftRetrieved.CreatedAt.In(time.UTC).Round(time.Millisecond))
 }
+
 func TestGetExampleGift(t *testing.T) {
 	// Database setup
 	dsn := "user=testuser password=testpwd host=localhost port=5433 dbname=testdb sslmode=disable"
