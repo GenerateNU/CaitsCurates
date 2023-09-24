@@ -143,5 +143,111 @@ func TestUserModel(t *testing.T) {
 	var count int64
 	db.Model(&model.User{}).Where("id = ?", updatedUser.ID).Count(&count)
 	assert.Equal(t, int64(0), count)
-
 }
+
+func TestAdminModel(t *testing.T) {
+	// This code should be the same for each test
+	dsn := "host=test-db user=testuser password=testpwd dbname=testdb port=5433 sslmode=disable"
+	if dbURL, exists := os.LookupEnv("TEST_DATABASE_URL"); exists {
+		dsn = dbURL
+	}
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("Unable to connect to database: %v", err)
+	}
+	// Put auto migrations here
+	err = db.AutoMigrate(&model.Admin{})
+	if err != nil {
+		panic("failed to migrate test database schema")
+	}
+	// Setup db rollback to revert db changes
+	tx := db.Begin()
+	defer tx.Rollback()
+
+	// Create Admin
+	admin := model.Admin{UserID: uint(1)}
+	err = db.Create(&admin).Error
+	assert.NoError(t, err)
+
+	// Check if Admin exists
+	var fetchedAdmin model.Admin
+	err = db.First(&fetchedAdmin, admin.ID).Error
+	assert.NoError(t, err)
+	assert.Equal(t, admin.ID, fetchedAdmin.ID)
+	assert.Equal(t, admin.UserID, fetchedAdmin.UserID)
+	assert.Equal(t, admin.CreatedAt.In(time.UTC).Round(time.Millisecond),
+		fetchedAdmin.CreatedAt.In(time.UTC).Round(time.Millisecond))
+
+	// Update Admin
+	err = db.Model(&fetchedAdmin).Update("UserID", uint(2)).Error
+	assert.NoError(t, err)
+
+	// Check if it's updated
+	var updatedAdmin model.Admin
+	err = db.First(&updatedAdmin, fetchedAdmin.ID).Error
+	assert.NoError(t, err)
+	assert.Equal(t, uint(2), updatedAdmin.UserID)
+
+	// Delete Admin
+	err = db.Delete(&updatedAdmin).Error
+	assert.NoError(t, err)
+
+	//  Check if it's user
+	var count int64
+	db.Model(&model.Admin{}).Where("id = ?", updatedAdmin.ID).Count(&count)
+	assert.Equal(t, int64(0), count)
+}
+
+func TestCustomerModel(t *testing.T) {
+	// This code should be the same for each test
+	dsn := "host=test-db user=testuser password=testpwd dbname=testdb port=5433 sslmode=disable"
+	if dbURL, exists := os.LookupEnv("TEST_DATABASE_URL"); exists {
+		dsn = dbURL
+	}
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("Unable to connect to database: %v", err)
+	}
+	// Put auto migrations here
+	err = db.AutoMigrate(&model.Customer{})
+	if err != nil {
+		panic("failed to migrate test database schema")
+	}
+	// Setup db rollback to revert db changes
+	tx := db.Begin()
+	defer tx.Rollback()
+
+	// Create customer
+	customer := model.Customer{UserID: uint(3)}
+	err = db.Create(&customer).Error
+	assert.NoError(t, err)
+
+	// Check if customer exists
+	var fetchedCustomer model.Customer
+	err = db.First(&fetchedCustomer, customer.ID).Error
+	assert.NoError(t, err)
+	assert.Equal(t, customer.ID, fetchedCustomer.ID)
+	assert.Equal(t, customer.UserID, fetchedCustomer.UserID)
+	assert.Equal(t, customer.CreatedAt.In(time.UTC).Round(time.Millisecond),
+	fetchedCustomer.CreatedAt.In(time.UTC).Round(time.Millisecond))
+
+	// Update customer
+	err = db.Model(&fetchedCustomer).Update("UserID", uint(4)).Error
+	assert.NoError(t, err)
+
+	// Check if it's updated
+	var updatedCustomer model.Customer
+	err = db.First(&updatedCustomer, fetchedCustomer.ID).Error
+	assert.NoError(t, err)
+	assert.Equal(t, uint(4), updatedCustomer.UserID)
+
+	// Delete customer
+	err = db.Delete(&updatedCustomer).Error
+	assert.NoError(t, err)
+
+	//  Check if it's user
+	var count int64
+	db.Model(&model.Customer{}).Where("id = ?", updatedCustomer.ID).Count(&count)
+	assert.Equal(t, int64(0), count)
+}
+
