@@ -87,3 +87,61 @@ func TestExampleGiftModel(t *testing.T) {
 	assert.Equal(t, int64(0), count)
 
 }
+
+
+func TestUserModel(t *testing.T) {
+	// This code should be the same for each test
+	dsn := "host=test-db user=testuser password=testpwd dbname=testdb port=5433 sslmode=disable"
+	if dbURL, exists := os.LookupEnv("TEST_DATABASE_URL"); exists {
+		dsn = dbURL
+	}
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("Unable to connect to database: %v", err)
+	}
+	// Put auto migrations here
+	err = db.AutoMigrate(&model.User{})
+	if err != nil {
+		panic("failed to migrate test database schema")
+	}
+	// Setup db rollback to revert db changes
+	tx := db.Begin()
+	defer tx.Rollback()
+
+	// Create User
+	user := model.User{Email: "tsai.me@northeastern.edu", FirstName: "Joey", LastName: "Tsai", Password: "dgeeg32"}
+	err = db.Create(&user).Error
+	assert.NoError(t, err)
+
+	// Check if user exists
+	var fetchedUser model.User
+	err = db.First(&fetchedUser, user.ID).Error
+	assert.NoError(t, err)
+	assert.Equal(t, user.ID, fetchedUser.ID)
+	assert.Equal(t, user.FirstName, fetchedUser.FirstName)
+	assert.Equal(t, user.LastName, fetchedUser.LastName)
+	assert.Equal(t, user.Email, fetchedUser.Email)
+	assert.Equal(t, user.Password, fetchedUser.Password)
+	assert.Equal(t, user.CreatedAt.In(time.UTC).Round(time.Millisecond),
+		fetchedUser.CreatedAt.In(time.UTC).Round(time.Millisecond))
+
+	// Update User
+	err = db.Model(&fetchedUser).Update("FirstName", "Dessy").Error
+	assert.NoError(t, err)
+
+	// Check if it's updated
+	var updatedUser model.User
+	err = db.First(&updatedUser, fetchedUser.ID).Error
+	assert.NoError(t, err)
+	assert.Equal(t, "Dessy", updatedUser.FirstName)
+
+	// Delete user
+	err = db.Delete(&updatedUser).Error
+	assert.NoError(t, err)
+
+	//  Check if it's user
+	var count int64
+	db.Model(&model.User{}).Where("id = ?", updatedUser.ID).Count(&count)
+	assert.Equal(t, int64(0), count)
+
+}
