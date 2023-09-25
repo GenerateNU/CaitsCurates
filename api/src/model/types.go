@@ -15,10 +15,10 @@ type ExampleGiftInput struct {
 
 type User struct {
 	gorm.Model
-	Email     string `binding:"required, email"`
-	FirstName string `binding:"required"`
-	LastName  string `binding:"required"`
-	Password  string `binding:"required" valid:"length(6|20)"`
+	Email     string `binding:"email"`
+	FirstName string 
+	LastName  string 
+	Password  string `valid:"length(6|20)"`
 }
 
 type UserInput struct {
@@ -30,7 +30,7 @@ type UserInput struct {
 
 type Customer struct {
 	gorm.Model
-	UserID uint `binding:"required"`
+	UserID uint 
 	//GiftCollections []ExampleGiftCollection
 	//GiftRequests    []ExampleGiftRequests
 }
@@ -43,7 +43,7 @@ type CustomerInput struct {
 
 type Admin struct {
 	gorm.Model
-	UserID uint `binding:"required"`
+	UserID uint
 }
 
 type AdminInput struct {
