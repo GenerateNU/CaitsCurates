@@ -2,7 +2,6 @@ package tests
 
 import (
 	"CaitsCurates/backend/src/model"
-	"google.golang.org/protobuf/types/known/timestamppb"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
@@ -58,7 +57,7 @@ func TestGiftModel(t *testing.T) {
 	err = db.Create(&gift).Error
 	assert.NoError(t, err)
 
-	// Check if user exists
+	// Check if Gift exists
 	var fetchedGift model.Gift
 	err = db.First(&fetchedGift, gift.ID).Error
 	assert.NoError(t, err)
@@ -71,27 +70,27 @@ func TestGiftModel(t *testing.T) {
 	assert.Equal(t, gift.CreatedAt.In(time.UTC).Round(time.Millisecond),
 		fetchedGift.CreatedAt.In(time.UTC).Round(time.Millisecond))
 
-	// Update User
+	// Update Gift
 	err = db.Model(&fetchedGift).Update("Name", "Slightly less cool older toy").Error
 	assert.NoError(t, err)
 
 	// Check if it's updated
-	var updatedGift model.User
+	var updatedGift model.Gift
 	err = db.First(&updatedGift, fetchedGift.ID).Error
 	assert.NoError(t, err)
-	assert.Equal(t, "Slightly less cool older toy", updatedGift.FirstName)
+	assert.Equal(t, "Slightly less cool older toy", updatedGift.Name)
 
-	// Delete user
+	// Delete Gift
 	err = db.Delete(&updatedGift).Error
 	assert.NoError(t, err)
 
-	//  Check if it's user
+	//  Check if it's Gift
 	var count int64
 	db.Model(&model.Gift{}).Where("id = ?", updatedGift.ID).Count(&count)
 	assert.Equal(t, int64(0), count)
 }
 
-func TestGiftRequest(t *testing.T) {
+func TestGiftRequestModel(t *testing.T) {
 	// This code should be the same for each test
 	dsn := "host=test-db user=testuser password=testpwd dbname=testdb port=5433 sslmode=disable"
 	if dbURL, exists := os.LookupEnv("TEST_DATABASE_URL"); exists {
@@ -102,7 +101,7 @@ func TestGiftRequest(t *testing.T) {
 		t.Fatalf("Unable to connect to database: %v", err)
 	}
 	// Put auto migrations here
-	err = db.AutoMigrate(&model.Gift{})
+	err = db.AutoMigrate(&model.GiftRequest{})
 	if err != nil {
 		panic("failed to migrate test database schema")
 	}
@@ -111,13 +110,20 @@ func TestGiftRequest(t *testing.T) {
 	defer tx.Rollback()
 
 	// Create Gift Request
-	var dateNeededBy = timestamppb.Timestamp{Seconds: 500000000}
-	giftRequest := model.GiftRequest{RecipientName: "Jacob", RecipientAge: 21, Occasion: [2]string{"Birthday", "Graduation"}, RecipientInterests: [3]string{"Board games", "Video games", "Other things"}, Budget: 500.00, DateNeeded: dateNeededBy}
+	var dateNeededBy = time.Now()
+	giftRequest := model.GiftRequest{
+		RecipientName: "Jacob", 
+	    RecipientAge: 21, 
+		Occasion: []string{"Birthday", "Graduation"},
+		RecipientInterests: []string{"Board games", "Video games", "Other things"}, 
+		BudgetMin: 0.00,
+		BudgetMax: 500.00, 
+		DateNeeded: dateNeededBy}
 
 	err = db.Create(&giftRequest).Error
 	assert.NoError(t, err)
 
-	// Check if user exists
+	// Check if Gift Request exists
 	var fetchedGiftRequest model.GiftRequest
 	err = db.First(&fetchedGiftRequest, giftRequest.ID).Error
 	assert.NoError(t, err)
@@ -130,7 +136,7 @@ func TestGiftRequest(t *testing.T) {
 	assert.Equal(t, giftRequest.CreatedAt.In(time.UTC).Round(time.Millisecond),
 		fetchedGiftRequest.CreatedAt.In(time.UTC).Round(time.Millisecond))
 
-	// Update User
+	// Update Gift Request
 	err = db.Model(&fetchedGiftRequest).Update("RecipientName", "Aidan").Error
 	assert.NoError(t, err)
 
@@ -140,11 +146,11 @@ func TestGiftRequest(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "Aidan", updatedGiftRequest.RecipientName)
 
-	// Delete user
+	// Delete Gift Request
 	err = db.Delete(&updatedGiftRequest).Error
 	assert.NoError(t, err)
 
-	//  Check if it's user
+	//  Check if it's Gift Request
 	var count int64
 	db.Model(&model.GiftRequest{}).Where("id = ?", updatedGiftRequest.ID).Count(&count)
 	assert.Equal(t, int64(0), count)
