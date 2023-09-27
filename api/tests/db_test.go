@@ -108,7 +108,7 @@ func TestUserModel(t *testing.T) {
 	defer tx.Rollback()
 
 	// Create User
-	user := model.User{Email: "tsai.me@northeastern.edu", FirstName: "Joey", LastName: "Tsai", Password: "dgeeg32"}
+	user := model.User{Email: "example@northeastern.edu", FirstName: "PersonFirstName", LastName: "PersonLastName", Password: "dgeeg32"}
 	err = db.Create(&user).Error
 	assert.NoError(t, err)
 
@@ -125,14 +125,14 @@ func TestUserModel(t *testing.T) {
 		fetchedUser.CreatedAt.In(time.UTC).Round(time.Millisecond))
 
 	// Update User
-	err = db.Model(&fetchedUser).Update("FirstName", "Dessy").Error
+	err = db.Model(&fetchedUser).Update("FirstName", "ChangeFirstName").Error
 	assert.NoError(t, err)
 
 	// Check if it's updated
 	var updatedUser model.User
 	err = db.First(&updatedUser, fetchedUser.ID).Error
 	assert.NoError(t, err)
-	assert.Equal(t, "Dessy", updatedUser.FirstName)
+	assert.Equal(t, "ChangeFirstName", updatedUser.FirstName)
 
 	// Delete user
 	err = db.Delete(&updatedUser).Error
@@ -142,6 +142,14 @@ func TestUserModel(t *testing.T) {
 	var count int64
 	db.Model(&model.User{}).Where("id = ?", updatedUser.ID).Count(&count)
 	assert.Equal(t, int64(0), count)
+}
+
+
+// Retrieve user list with eager loading credit card
+func GetAll(db *gorm.DB) ([]User, error) {
+	var users []User
+	err := db.Model(&User{}).Preload("CreditCard").Find(&users).Error
+	return users, err
 }
 
 func TestAdminModel(t *testing.T) {
@@ -159,14 +167,46 @@ func TestAdminModel(t *testing.T) {
 	if err != nil {
 		panic("failed to migrate test database schema")
 	}
+
+	// Put auto migrations here
+	err = db.AutoMigrate(&model.User{})
+	if err != nil {
+		panic("failed to migrate test database schema")
+	}
+
 	// Setup db rollback to revert db changes
 	tx := db.Begin()
 	defer tx.Rollback()
 
+	// Create User
+	user := model.User{Email: "example@northeastern.edu", FirstName: "PersonFirstName", LastName: "PersonLastName", Password: "dgeeg32"}
+	err = db.Create(&user).Error
+	assert.NoError(t, err)
+
 	// Create Admin
-	admin := model.Admin{UserID: uint(1)}
+	admin := model.Admin{UserID: uint(1), User:user}
 	err = db.Create(&admin).Error
 	assert.NoError(t, err)
+
+	// Check Relationship between Admin and User 
+	var admins []Admin
+	err := model.Admin.Preload("User").Find(&admins).Error
+	if err != nil {
+		panic("relationship failed")
+	}
+
+	// Check User information
+	adminUser := admins[0]
+	var fetchedUser model.User
+	err = db.First(&fetchedUser, user.ID).Error
+	assert.NoError(t, err)
+	assert.Equal(t, adminUser.ID, fetchedUser.ID)
+	assert.Equal(t, adminUser.FirstName, fetchedUser.FirstName)
+	assert.Equal(t, adminUser.LastName, fetchedUser.LastName)
+	assert.Equal(t, adminUser.Email, fetchedUser.Email)
+	assert.Equal(t, adminUser.Password, fetchedUser.Password)
+	assert.Equal(t, adminUser.CreatedAt.In(time.UTC).Round(time.Millisecond),
+		fetchedUser.CreatedAt.In(time.UTC).Round(time.Millisecond))
 
 	// Check if Admin exists
 	var fetchedAdmin model.Admin
@@ -191,7 +231,7 @@ func TestAdminModel(t *testing.T) {
 	err = db.Delete(&updatedAdmin).Error
 	assert.NoError(t, err)
 
-	//  Check if it's user
+	//  Check if it's admin
 	var count int64
 	db.Model(&model.Admin{}).Where("id = ?", updatedAdmin.ID).Count(&count)
 	assert.Equal(t, int64(0), count)
