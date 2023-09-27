@@ -112,12 +112,12 @@ func TestGiftRequestModel(t *testing.T) {
 	// Create Gift Request
 	var dateNeededBy = time.Now()
 	giftRequest := model.GiftRequest{
-		RecipientName: "Jacob", 
-	    RecipientAge: 21, 
+		RecipientName: "Jacob",
+	    RecipientAge: 21,
 		Occasion: []string{"Birthday", "Graduation"},
-		RecipientInterests: []string{"Board games", "Video games", "Other things"}, 
+		RecipientInterests: []string{"Board games", "Video games", "Other things"},
 		BudgetMin: 0.00,
-		BudgetMax: 500.00, 
+		BudgetMax: 500.00,
 		DateNeeded: dateNeededBy}
 
 	err = db.Create(&giftRequest).Error
@@ -248,7 +248,7 @@ func TestAdminModel(t *testing.T) {
 	err = db.Create(&admin).Error
 	assert.NoError(t, err)
 
-	// Check Relationship between Admin and User 
+	// Check Relationship between Admin and User
 	var admins []model.Admin
 	err = db.Model(&model.Admin{}).Preload("User").Find(&admins).Error
 	if err != nil {
@@ -333,7 +333,7 @@ func TestCustomerModel(t *testing.T) {
 	err = db.Create(&customer).Error
 	assert.NoError(t, err)
 
-	// Check Relationship between Customer and User 
+	// Check Relationship between Customer and User
 	var customers []model.Customer
 	err = db.Model(&model.Customer{}).Preload("User").Find(&customers).Error
 	if err != nil {
@@ -381,3 +381,4 @@ func TestCustomerModel(t *testing.T) {
 	db.Model(&model.Customer{}).Where("id = ?", updatedCustomer.ID).Count(&count)
 	assert.Equal(t, int64(0), count)
 }
+
