@@ -14,10 +14,3 @@ services:
       POSTGRES_DB: testdb
       POSTGRES_USER: testuser
       POSTGRES_PASSWORD: testpwd
-  test-api:
-    build: .
-    environment:
-      TEST_DATABASE_URL: postgres://testuser:testpwd@test-db:5432/testdb
-    depends_on:
-      - test-db
-    command: [ "go", "test", "-v", "./..." ]

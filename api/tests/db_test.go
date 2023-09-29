@@ -12,7 +12,7 @@ import (
 )
 
 func TestDBConnection(t *testing.T) {
-	dsn := "user=testuser password=testpwd host=test-db port=5432 dbname=testdb sslmode=disable"
+	dsn := "user=testuser password=testpwd host=localhost port=5433 dbname=testdb sslmode=disable"
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 	if err != nil {
@@ -34,7 +34,7 @@ func TestDBConnection(t *testing.T) {
 
 func TestExampleGiftModel(t *testing.T) {
 	// This code should be the same for each test
-	dsn := "host=test-db user=testuser password=testpwd dbname=testdb port=5433 sslmode=disable"
+	dsn := "user=testuser password=testpwd host=localhost port=5433 dbname=testdb sslmode=disable"
 	if dbURL, exists := os.LookupEnv("TEST_DATABASE_URL"); exists {
 		dsn = dbURL
 	}
@@ -88,10 +88,9 @@ func TestExampleGiftModel(t *testing.T) {
 
 }
 
-
 func TestUserModel(t *testing.T) {
 	// This code should be the same for each test
-	dsn := "host=test-db user=testuser password=testpwd dbname=testdb port=5433 sslmode=disable"
+	dsn := "user=testuser password=testpwd host=localhost port=5433 dbname=testdb sslmode=disable"
 	if dbURL, exists := os.LookupEnv("TEST_DATABASE_URL"); exists {
 		dsn = dbURL
 	}
@@ -147,7 +146,7 @@ func TestUserModel(t *testing.T) {
 
 func TestAdminModel(t *testing.T) {
 	// This code should be the same for each test
-	dsn := "host=test-db user=testuser password=testpwd dbname=testdb port=5433 sslmode=disable"
+	dsn := "user=testuser password=testpwd host=localhost port=5433 dbname=testdb sslmode=disable"
 	if dbURL, exists := os.LookupEnv("TEST_DATABASE_URL"); exists {
 		dsn = dbURL
 	}
@@ -200,7 +199,7 @@ func TestAdminModel(t *testing.T) {
 
 func TestCustomerModel(t *testing.T) {
 	// This code should be the same for each test
-	dsn := "host=test-db user=testuser password=testpwd dbname=testdb port=5433 sslmode=disable"
+	dsn := "user=testuser password=testpwd host=localhost port=5433 dbname=testdb sslmode=disable"
 	if dbURL, exists := os.LookupEnv("TEST_DATABASE_URL"); exists {
 		dsn = dbURL
 	}
@@ -229,7 +228,7 @@ func TestCustomerModel(t *testing.T) {
 	assert.Equal(t, customer.ID, fetchedCustomer.ID)
 	assert.Equal(t, customer.UserID, fetchedCustomer.UserID)
 	assert.Equal(t, customer.CreatedAt.In(time.UTC).Round(time.Millisecond),
-	fetchedCustomer.CreatedAt.In(time.UTC).Round(time.Millisecond))
+		fetchedCustomer.CreatedAt.In(time.UTC).Round(time.Millisecond))
 
 	// Update customer
 	err = db.Model(&fetchedCustomer).Update("UserID", uint(4)).Error
@@ -250,4 +249,3 @@ func TestCustomerModel(t *testing.T) {
 	db.Model(&model.Customer{}).Where("id = ?", updatedCustomer.ID).Count(&count)
 	assert.Equal(t, int64(0), count)
 }
-
