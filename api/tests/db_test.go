@@ -144,14 +144,6 @@ func TestUserModel(t *testing.T) {
 	assert.Equal(t, int64(0), count)
 }
 
-
-// Retrieve user list with eager loading credit card
-func GetAll(db *gorm.DB) ([]User, error) {
-	var users []User
-	err := db.Model(&User{}).Preload("CreditCard").Find(&users).Error
-	return users, err
-}
-
 func TestAdminModel(t *testing.T) {
 	// This code should be the same for each test
 	dsn := "user=testuser password=testpwd host=localhost port=5433 dbname=testdb sslmode=disable"
@@ -165,13 +157,13 @@ func TestAdminModel(t *testing.T) {
 	// Put auto migrations here
 	err = db.AutoMigrate(&model.Admin{})
 	if err != nil {
-		panic("failed to migrate test database schema")
+		panic("failed to migrate test admin database schema")
 	}
 
 	// Put auto migrations here
 	err = db.AutoMigrate(&model.User{})
 	if err != nil {
-		panic("failed to migrate test database schema")
+		panic("failed to migrate test user database schema")
 	}
 
 	// Setup db rollback to revert db changes
@@ -184,19 +176,19 @@ func TestAdminModel(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Create Admin
-	admin := model.Admin{UserID: uint(1), User:user}
+	admin := model.Admin{UserID: uint(1), User: user}
 	err = db.Create(&admin).Error
 	assert.NoError(t, err)
 
 	// Check Relationship between Admin and User 
-	var admins []Admin
-	err := model.Admin.Preload("User").Find(&admins).Error
+	var admins []model.Admin
+	err = db.Model(&model.Admin{}).Preload("User").Find(&admins).Error
 	if err != nil {
 		panic("relationship failed")
 	}
 
 	// Check User information
-	adminUser := admins[0]
+	adminUser := admins[0].User
 	var fetchedUser model.User
 	err = db.First(&fetchedUser, user.ID).Error
 	assert.NoError(t, err)
@@ -250,18 +242,50 @@ func TestCustomerModel(t *testing.T) {
 	// Put auto migrations here
 	err = db.AutoMigrate(&model.Customer{})
 	if err != nil {
-		panic("failed to migrate test database schema")
+		panic("failed to migrate test customer database schema")
 	}
+
+	// Put auto migrations here
+	err = db.AutoMigrate(&model.User{})
+	if err != nil {
+		panic("failed to migrate test user database schema")
+	}
+
 	// Setup db rollback to revert db changes
 	tx := db.Begin()
 	defer tx.Rollback()
 
-	// Create customer
-	customer := model.Customer{UserID: uint(3)}
+	// Create User
+	user := model.User{Email: "example@northeastern.edu", FirstName: "PersonFirstName", LastName: "PersonLastName", Password: "dgeeg32"}
+	err = db.Create(&user).Error
+	assert.NoError(t, err)
+
+	// Create Customer
+	customer := model.Customer{UserID: uint(1), User: user}
 	err = db.Create(&customer).Error
 	assert.NoError(t, err)
 
-	// Check if customer exists
+	// Check Relationship between Customer and User 
+	var customers []model.Customer
+	err = db.Model(&model.Customer{}).Preload("User").Find(&customers).Error
+	if err != nil {
+		panic("relationship failed")
+	}
+
+	// Check User information
+	customerUser := customers[0].User
+	var fetchedUser model.User
+	err = db.First(&fetchedUser, user.ID).Error
+	assert.NoError(t, err)
+	assert.Equal(t, customerUser.ID, fetchedUser.ID)
+	assert.Equal(t, customerUser.FirstName, fetchedUser.FirstName)
+	assert.Equal(t, customerUser.LastName, fetchedUser.LastName)
+	assert.Equal(t, customerUser.Email, fetchedUser.Email)
+	assert.Equal(t, customerUser.Password, fetchedUser.Password)
+	assert.Equal(t, customerUser.CreatedAt.In(time.UTC).Round(time.Millisecond),
+		fetchedUser.CreatedAt.In(time.UTC).Round(time.Millisecond))
+
+	// Check if Customer exists
 	var fetchedCustomer model.Customer
 	err = db.First(&fetchedCustomer, customer.ID).Error
 	assert.NoError(t, err)
@@ -270,17 +294,17 @@ func TestCustomerModel(t *testing.T) {
 	assert.Equal(t, customer.CreatedAt.In(time.UTC).Round(time.Millisecond),
 		fetchedCustomer.CreatedAt.In(time.UTC).Round(time.Millisecond))
 
-	// Update customer
-	err = db.Model(&fetchedCustomer).Update("UserID", uint(4)).Error
+	// Update Custoer
+	err = db.Model(&fetchedCustomer).Update("UserID", uint(2)).Error
 	assert.NoError(t, err)
 
 	// Check if it's updated
 	var updatedCustomer model.Customer
 	err = db.First(&updatedCustomer, fetchedCustomer.ID).Error
 	assert.NoError(t, err)
-	assert.Equal(t, uint(4), updatedCustomer.UserID)
+	assert.Equal(t, uint(2), updatedCustomer.UserID)
 
-	// Delete customer
+	// Delete Customer
 	err = db.Delete(&updatedCustomer).Error
 	assert.NoError(t, err)
 
