@@ -92,7 +92,7 @@ func TestGiftModel(t *testing.T) {
 
 func TestGiftRequestModel(t *testing.T) {
 	// This code should be the same for each test
-	dsn := "host=test-db user=testuser password=testpwd dbname=testdb port=5433 sslmode=disable"
+	dsn := "user=testuser password=testpwd host=localhost port=5433 dbname=testdb sslmode=disable"
 	if dbURL, exists := os.LookupEnv("TEST_DATABASE_URL"); exists {
 		dsn = dbURL
 	}
