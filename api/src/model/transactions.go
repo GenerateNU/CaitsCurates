@@ -104,3 +104,18 @@ func WriteGiftToDb(db *gorm.DB, inputGift Gift) (Gift, error) {
 	}
 	return inputGift, nil
 }
+func GetAllResponsesFromDB(db *gorm.DB) ([]GiftResponse, error) {
+	var response []GiftResponse
+	if err := db.Find(&response).Error; err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+
+func GetAllCollectionsFromDB(db *gorm.DB) ([]GiftCollection, error) {
+	var collections []GiftCollection
+	if err := db.Find(&collections).Error; err != nil {
+		return nil, err
+	}
+	return collections, nil
+}

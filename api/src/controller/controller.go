@@ -108,7 +108,28 @@ func (pg *PgController) Serve() *gin.Engine {
 		}
 		c.JSON(http.StatusOK, gifts)
 	})
-
+	////
+	r.GET("/gifts", func(c *gin.Context) {
+		gifts, err := pg.AllGifts()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, "Oops")
+		}
+		c.JSON(http.StatusOK, gifts)
+	})
+	r.GET("/giftresponses", func(c *gin.Context) {
+		responses, err := pg.AllGiftResponses()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, "Oops")
+		}
+		c.JSON(http.StatusOK, responses)
+	})
+	r.GET("/collections", func(c *gin.Context) {
+		collections, err := pg.AllCollections()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, "Oops")
+		}
+		c.JSON(http.StatusOK, collections)
+	})
 	r.POST("/addGift", func(c *gin.Context) {
 		var input model.Gift
 		fmt.Print(c)
