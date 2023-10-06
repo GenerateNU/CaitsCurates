@@ -67,16 +67,17 @@ func TestAddExampleGift(t *testing.T) {
 		t.Fatalf("Error unmarshaling JSON: %v", e)
 	}
 	assert.Equal(t, testGift.Price, giftAdded.Price)
-	assert.Equal(t, uint(1), giftAdded.ID)
-	req1, err := http.NewRequest("GET", "/gifts/1", nil)
+	req1, err := http.NewRequest("GET", fmt.Sprintf("/gifts/%d", giftAdded.ID), nil)
 	router.ServeHTTP(w1, req1)
 
 	assert.Equal(t, 200, w1.Code)
 
 	var giftRetrieved model.ExampleGift
+	var giftRetrievedDB model.ExampleGift
 	if e := json.Unmarshal(w1.Body.Bytes(), &giftRetrieved); e != nil {
 		t.Fatalf("Error unmarshaling JSON: %v", e)
 	}
+	err = tx.First(&giftRetrievedDB, giftRetrievedDB.ID).Error
 
 	assert.Equal(t, giftAdded.ID, giftRetrieved.ID)
 	assert.Equal(t, giftAdded.Name, giftRetrieved.Name)

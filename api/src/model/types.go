@@ -1,7 +1,9 @@
 package model
 
 import (
+	"github.com/lib/pq"
 	"gorm.io/gorm"
+	"time"
 )
 
 type ExampleGift struct {
@@ -27,21 +29,21 @@ type Gift struct {
 
 type GiftRequest struct {
 	gorm.Model
-	// Need to link to the customer for the customer ID
-	GiftResponseID uint
-	// RecipientName      string
-	// RecipientAge       uint
-	// Occasion           []string
-	// RecipientInterests []string
-	// BudgetMax          float64
-	// BudgetMin          float64
-	GiftResponse GiftResponse
-	// DateNeeded         time.Time
+	CustomerID         uint
+	GiftResponseID     *uint
+	RecipientName      string
+	RecipientAge       uint
+	Occasion           pq.StringArray `gorm:"type:text[]"`
+	RecipientInterests pq.StringArray `gorm:"type:text[]"`
+	BudgetMax          uint
+	BudgetMin          uint
+	GiftResponse       GiftResponse
+	DateNeeded         time.Time
 }
 
 type GiftCollection struct {
 	gorm.Model
-	//CustomerID int, fk
+	CustomerID     *uint
 	CollectionName string
 	Gifts          []*Gift `gorm:"many2many:gift_request_gifts;"`
 }
@@ -63,10 +65,10 @@ type User struct {
 
 type Customer struct {
 	gorm.Model
-	UserID uint
-	User   User
-	//GiftCollections []ExampleGiftCollection
-	//GiftRequests    []ExampleGiftRequests
+	UserID          uint
+	User            User
+	GiftCollections []*GiftCollection
+	GiftRequests    []*GiftRequest
 }
 
 type Admin struct {
