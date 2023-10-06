@@ -54,12 +54,12 @@ func TestGiftModel(t *testing.T) {
 	// Create Gift
 	gift := model.Gift{Name: "Super cool new toy", Price: 500000.00, Link: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", Description: "Really great content. Highly recommend", Demographic: "Unknown..."}
 
-	err = db.Create(&gift).Error
+	err = tx.Create(&gift).Error
 	assert.NoError(t, err)
 
 	// Check if Gift exists
 	var fetchedGift model.Gift
-	err = db.First(&fetchedGift, gift.ID).Error
+	err = tx.First(&fetchedGift, gift.ID).Error
 	assert.NoError(t, err)
 	assert.Equal(t, gift.ID, fetchedGift.ID)
 	assert.Equal(t, gift.Name, fetchedGift.Name)
@@ -72,22 +72,22 @@ func TestGiftModel(t *testing.T) {
 		fetchedGift.CreatedAt.In(time.UTC).Round(time.Millisecond))
 
 	// Update Gift
-	err = db.Model(&fetchedGift).Update("Name", "Slightly less cool older toy").Error
+	err = tx.Model(&fetchedGift).Update("Name", "Slightly less cool older toy").Error
 	assert.NoError(t, err)
 
 	// Check if it's updated
 	var updatedGift model.Gift
-	err = db.First(&updatedGift, fetchedGift.ID).Error
+	err = tx.First(&updatedGift, fetchedGift.ID).Error
 	assert.NoError(t, err)
 	assert.Equal(t, "Slightly less cool older toy", updatedGift.Name)
 
 	// Delete Gift
-	err = db.Delete(&updatedGift).Error
+	err = tx.Delete(&updatedGift).Error
 	assert.NoError(t, err)
 
 	//  Check if it's Gift
 	var count int64
-	db.Model(&model.Gift{}).Where("id = ?", updatedGift.ID).Count(&count)
+	tx.Model(&model.Gift{}).Where("id = ?", updatedGift.ID).Count(&count)
 	assert.Equal(t, int64(0), count)
 }
 
@@ -102,7 +102,7 @@ func TestGiftRequestModel(t *testing.T) {
 		t.Fatalf("Unable to connect to database: %v", err)
 	}
 	// Put auto migrations here
-	err = db.AutoMigrate(&model.GiftRequest{}, &model.GiftResponse{})
+	err = db.AutoMigrate(&model.GiftRequest{}, &model.GiftResponse{}, &model.GiftCollection{})
 	if err != nil {
 		panic("failed to migrate test admin database schema")
 	}
@@ -112,7 +112,7 @@ func TestGiftRequestModel(t *testing.T) {
 	defer tx.Rollback()
 
 	// Create GiftResponse
-	giftResponse := model.GiftResponse{CustomMessage: "This is a custom message"}
+	giftResponse := model.GiftResponse{CustomMessage: "This is a custom message", GiftCollection: model.GiftCollection{CollectionName: "Name"}}
 	err = tx.Create(&giftResponse).Error
 	assert.NoError(t, err)
 
@@ -311,7 +311,6 @@ func TestGiftResponseModel(t *testing.T) {
 	tx.Model(&model.GiftRequest{}).Where("id = ?", giftResponseRetrieved.ID).Count(&count)
 	assert.Equal(t, int64(0), count)
 }
-
 func TestUserModel(t *testing.T) {
 	// This code should be the same for each test
 	dsn := "user=testuser password=testpwd host=localhost port=5433 dbname=testdb sslmode=disable"
@@ -333,12 +332,12 @@ func TestUserModel(t *testing.T) {
 
 	// Create User
 	user := model.User{Email: "tsai.me@northeastern.edu", FirstName: "Joey", LastName: "Tsai", Password: "dgeeg32"}
-	err = db.Create(&user).Error
+	err = tx.Create(&user).Error
 	assert.NoError(t, err)
 
 	// Check if user exists
 	var fetchedUser model.User
-	err = db.First(&fetchedUser, user.ID).Error
+	err = tx.First(&fetchedUser, user.ID).Error
 	assert.NoError(t, err)
 	assert.Equal(t, user.ID, fetchedUser.ID)
 	assert.Equal(t, user.FirstName, fetchedUser.FirstName)
@@ -349,22 +348,22 @@ func TestUserModel(t *testing.T) {
 		fetchedUser.CreatedAt.In(time.UTC).Round(time.Millisecond))
 
 	// Update User
-	err = db.Model(&fetchedUser).Update("FirstName", "Dessy").Error
+	err = tx.Model(&fetchedUser).Update("FirstName", "Dessy").Error
 	assert.NoError(t, err)
 
 	// Check if it's updated
 	var updatedUser model.User
-	err = db.First(&updatedUser, fetchedUser.ID).Error
+	err = tx.First(&updatedUser, fetchedUser.ID).Error
 	assert.NoError(t, err)
 	assert.Equal(t, "Dessy", updatedUser.FirstName)
 
 	// Delete user
-	err = db.Delete(&updatedUser).Error
+	err = tx.Delete(&updatedUser).Error
 	assert.NoError(t, err)
 
 	//  Check if it's user
 	var count int64
-	db.Model(&model.User{}).Where("id = ?", updatedUser.ID).Count(&count)
+	tx.Model(&model.User{}).Where("id = ?", updatedUser.ID).Count(&count)
 	assert.Equal(t, int64(0), count)
 }
 
@@ -389,12 +388,12 @@ func TestAdminModel(t *testing.T) {
 
 	// Create Admin
 	admin := model.Admin{UserID: uint(1)}
-	err = db.Create(&admin).Error
+	err = tx.Create(&admin).Error
 	assert.NoError(t, err)
 
 	// Check if Admin exists
 	var fetchedAdmin model.Admin
-	err = db.First(&fetchedAdmin, admin.ID).Error
+	err = tx.First(&fetchedAdmin, admin.ID).Error
 	assert.NoError(t, err)
 	assert.Equal(t, admin.ID, fetchedAdmin.ID)
 	assert.Equal(t, admin.UserID, fetchedAdmin.UserID)
@@ -402,22 +401,22 @@ func TestAdminModel(t *testing.T) {
 		fetchedAdmin.CreatedAt.In(time.UTC).Round(time.Millisecond))
 
 	// Update Admin
-	err = db.Model(&fetchedAdmin).Update("UserID", uint(2)).Error
+	err = tx.Model(&fetchedAdmin).Update("UserID", uint(2)).Error
 	assert.NoError(t, err)
 
 	// Check if it's updated
 	var updatedAdmin model.Admin
-	err = db.First(&updatedAdmin, fetchedAdmin.ID).Error
+	err = tx.First(&updatedAdmin, fetchedAdmin.ID).Error
 	assert.NoError(t, err)
 	assert.Equal(t, uint(2), updatedAdmin.UserID)
 
 	// Delete Admin
-	err = db.Delete(&updatedAdmin).Error
+	err = tx.Delete(&updatedAdmin).Error
 	assert.NoError(t, err)
 
 	//  Check if it's user
 	var count int64
-	db.Model(&model.Admin{}).Where("id = ?", updatedAdmin.ID).Count(&count)
+	tx.Model(&model.Admin{}).Where("id = ?", updatedAdmin.ID).Count(&count)
 	assert.Equal(t, int64(0), count)
 }
 
@@ -442,12 +441,12 @@ func TestCustomerModel(t *testing.T) {
 
 	// Create customer
 	customer := model.Customer{UserID: uint(3)}
-	err = db.Create(&customer).Error
+	err = tx.Create(&customer).Error
 	assert.NoError(t, err)
 
 	// Check if customer exists
 	var fetchedCustomer model.Customer
-	err = db.First(&fetchedCustomer, customer.ID).Error
+	err = tx.First(&fetchedCustomer, customer.ID).Error
 	assert.NoError(t, err)
 	assert.Equal(t, customer.ID, fetchedCustomer.ID)
 	assert.Equal(t, customer.UserID, fetchedCustomer.UserID)
@@ -455,21 +454,21 @@ func TestCustomerModel(t *testing.T) {
 		fetchedCustomer.CreatedAt.In(time.UTC).Round(time.Millisecond))
 
 	// Update customer
-	err = db.Model(&fetchedCustomer).Update("UserID", uint(4)).Error
+	err = tx.Model(&fetchedCustomer).Update("UserID", uint(4)).Error
 	assert.NoError(t, err)
 
 	// Check if it's updated
 	var updatedCustomer model.Customer
-	err = db.First(&updatedCustomer, fetchedCustomer.ID).Error
+	err = tx.First(&updatedCustomer, fetchedCustomer.ID).Error
 	assert.NoError(t, err)
 	assert.Equal(t, uint(4), updatedCustomer.UserID)
 
 	// Delete customer
-	err = db.Delete(&updatedCustomer).Error
+	err = tx.Delete(&updatedCustomer).Error
 	assert.NoError(t, err)
 
 	//  Check if it's user
 	var count int64
-	db.Model(&model.Customer{}).Where("id = ?", updatedCustomer.ID).Count(&count)
+	tx.Model(&model.Customer{}).Where("id = ?", updatedCustomer.ID).Count(&count)
 	assert.Equal(t, int64(0), count)
 }
