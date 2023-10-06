@@ -5,7 +5,7 @@ go 1.21.1
 require (
 	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-gonic/gin v1.9.1
-	github.com/go-playground/assert/v2 v2.2.0
+	github.com/lib/pq v1.10.9
 	github.com/stretchr/testify v1.8.3
 	gorm.io/driver/postgres v1.5.2
 	gorm.io/gorm v1.25.4
