@@ -6,12 +6,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"sort"
 	"time"
-
-	"github.com/stretchr/testify/assert"
 
 	"github.com/lib/pq"
 
