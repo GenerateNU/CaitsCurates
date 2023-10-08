@@ -333,7 +333,7 @@ func TestUserModel(t *testing.T) {
 	defer tx.Rollback()
 
 	// Create User
-	user := model.User{Email: "tsai.me@northeastern.edu", FirstName: "Joey", LastName: "Tsai", Password: "dgeeg32"}
+	user := model.User{Email: "example123@northeastern.edu", FirstName: "person1", LastName: "lastname1", Password: "dgeeg32"}
 	err = tx.Create(&user).Error
 	assert.NoError(t, err)
 
@@ -350,14 +350,14 @@ func TestUserModel(t *testing.T) {
 		fetchedUser.CreatedAt.In(time.UTC).Round(time.Millisecond))
 
 	// Update User
-	err = tx.Model(&fetchedUser).Update("FirstName", "Dessy").Error
+	err = tx.Model(&fetchedUser).Update("FirstName", "person2").Error
 	assert.NoError(t, err)
 
 	// Check if it's updated
 	var updatedUser model.User
 	err = tx.First(&updatedUser, fetchedUser.ID).Error
 	assert.NoError(t, err)
-	assert.Equal(t, "Dessy", updatedUser.FirstName)
+	assert.Equal(t, "person2", updatedUser.FirstName)
 
 	// Delete user
 	err = tx.Delete(&updatedUser).Error
