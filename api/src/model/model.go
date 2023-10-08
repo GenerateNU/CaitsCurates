@@ -64,3 +64,26 @@ func (m *PgModel) CompleteRequests() ([]GiftRequest, error) {
 	}
 	return gifts, nil
 }
+
+func (m *PgModel) UpdateGift(id int64, inputGift Gift) (Gift, error) {
+
+	updatedGift, err := UpdateGiftToDb(m.Conn, id, inputGift)
+
+	if err != nil {
+		return Gift{}, err
+	}
+
+	return updatedGift, nil
+}
+
+func (m *PgModel) DeleteGift(id int64) (error) {
+
+	err := DeleteGiftFromDb(m.Conn, id)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+

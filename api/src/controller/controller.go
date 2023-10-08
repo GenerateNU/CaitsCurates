@@ -91,5 +91,56 @@ func (pg *PgController) Serve() *gin.Engine {
 		c.JSON(http.StatusOK, insertedCollection)
 	})
 
+	// Update Gift Record Given Gift ID
+	r.PUT("/gifts/:id", func(c *gin.Context) {
+
+		// Get Gift ID
+		id := c.Param("id")
+		intId, err := strconv.Atoi(id)
+		if err != nil {
+			panic(err)
+		}
+
+		// Get Body Parameters and put in JSON Object
+		var input model.Gift;
+		fmt.Print(c)
+		if err := c.BindJSON(&input); err != nil {
+			c.JSON(http.StatusBadRequest, "Failed to unmarshal gift")
+			fmt.Print(err)
+			return
+		}
+
+		// Model Call to Update Gift
+		updatedGift, err := pg.UpdateGift(int64(intId), input)
+
+		if err != nil {
+			c.JSON(http.StatusBadRequest, input)
+			panic(err)
+		}
+
+		c.JSON(http.StatusOK, updatedGift)
+	})
+
+	// Delete Gift Record based on Gift ID
+	r.DELETE("/gifts/:id", func(c *gin.Context) {
+
+		// Get Gift ID
+		id := c.Param("id")
+		intId, err := strconv.Atoi(id)
+		if err != nil {
+			panic(err)
+		}
+
+		err = pg.DeleteGift(int64(intId))
+
+		// Delete Gift
+		if err != nil {
+			c.JSON(http.StatusBadRequest, "Failed to delete gift")
+			fmt.Print(err)
+			return
+		}
+		c.JSON(http.StatusNoContent, "Deletd Gift")
+	})
+
 	return r
 }

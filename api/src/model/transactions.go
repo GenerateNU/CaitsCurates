@@ -31,6 +31,46 @@ func GetIncompleteGiftRequestsFromDB(db *gorm.DB) ([]GiftRequest, error) {
 	return requests, nil
 }
 
+// UpdateGiftToDb updates the Gift and returns it
+func UpdateGiftToDb(db *gorm.DB, id int64, inputGift Gift) (Gift, error) {
+	// Fetch Gift Record
+	var updatedGift Gift
+	if err := db.Where("id = ?", id).First(&updatedGift).Error; err != nil {
+		return Gift{}, err
+	}
+
+	// Update Gift Record
+	updates := map[string]interface{} {
+		"Name": inputGift.Name,
+		"Price": inputGift.Price,
+		"Link": inputGift.Link,
+		"Description": inputGift.Description,
+		"Demographic": inputGift.Demographic,
+		"GiftCollections": inputGift.GiftCollections,
+	}
+
+	if err := db.Model(&updatedGift).Updates(updates).Error; err != nil {
+		return Gift{}, err
+	}
+
+	// Return Updated Gift Record
+	return updatedGift, nil
+}
+
+// DeleteGiftFromDb Delete Gift
+func DeleteGiftFromDb(db *gorm.DB, id int64) (error) {
+	var deletedGift Gift
+	if err := db.Where("id = ?", id).First(&deletedGift).Error; err != nil {
+		return err
+	}
+
+	if err := db.Delete(&deletedGift).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func GetCompleteGiftRequestsFromDB(db *gorm.DB) ([]GiftRequest, error) {
 	var requests []GiftRequest
 	if err := db.Where("gift_response_id IS NOT NULL").Find(&requests).Error; err != nil {
