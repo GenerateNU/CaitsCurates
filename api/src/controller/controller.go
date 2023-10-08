@@ -103,7 +103,6 @@ func (pg *PgController) Serve() *gin.Engine {
 
 		// Get Body Parameters and put in JSON Object
 		var input model.Gift;
-		fmt.Print(c)
 		if err := c.BindJSON(&input); err != nil {
 			c.JSON(http.StatusBadRequest, "Failed to unmarshal gift")
 			fmt.Print(err)
@@ -139,7 +138,7 @@ func (pg *PgController) Serve() *gin.Engine {
 			fmt.Print(err)
 			return
 		}
-		c.JSON(http.StatusNoContent, "Deletd Gift")
+		c.JSON(http.StatusNoContent, "Deleted Gift")
 	})
 
 	return r
