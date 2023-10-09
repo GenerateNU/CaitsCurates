@@ -715,3 +715,68 @@ func TestDeleteGift(t *testing.T) {
 	tx.Model(&model.Gift{}).Where("id = ?", testGift.ID).Count(&deletedCount)
 	assert.Equal(t, int64(0), deletedCount)
 }
+
+/*
+func TestGetGiftCollection(t *testing.T) {
+	// Database setup
+	dsn := "user=testuser password=testpwd host=localhost port=5433 dbname=testdb sslmode=disable"
+	if dbURL, exists := os.LookupEnv("TEST_DATABASE_URL"); exists {
+		dsn = dbURL
+	}
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("Unable to connect to database: %v", err)
+	}
+	// Put auto migrations here
+	err = db.AutoMigrate(&model.ExampleGift{})
+	if err != nil {
+		panic("failed to migrate test database schema")
+	}
+	// Wrap the DB connection in a transaction
+	tx := db.Begin()
+	defer tx.Rollback()
+
+	// Create Model and Controller
+	m := &model.PgModel{Conn: tx}
+	c := &c.PgController{Model: m}
+	router := c.Serve()
+
+	// Test code
+	w := httptest.NewRecorder()
+
+	gift := model.Gift{
+		Name:  "gift example",
+		Price: 50,
+		Link: "link to gift",
+		Description: "gift description",
+		Demographic: "demographic"
+		Gift Collections: [],
+	}
+
+	err = db.Create(&gift).Error
+
+	collection := model.GiftCollection{
+		CollectionName:  "gift collection",
+		Gifts: [gift],
+	}
+
+	err = db.Create(&collection).Error
+	assert.NoError(t, err)
+	req1, err := http.NewRequest("GET", fmt.Sprintf("/collections/%d", gift.ID), nil)
+	router.ServeHTTP(w, req1)
+
+	assert.Equal(t, 200, w.Code)
+
+	var giftRetrieved model.ExampleGift
+	if e := json.Unmarshal(w.Body.Bytes(), &giftRetrieved); e != nil {
+		t.Fatalf("Error unmarshaling JSON: %v", e)
+	}
+
+	assert.Equal(t, gift.ID, giftRetrieved.ID)
+	assert.Equal(t, gift.Name, giftRetrieved.Name)
+	assert.Equal(t, gift.Price, giftRetrieved.Price)
+	assert.Equal(t, gift.CreatedAt.In(time.UTC).Round(time.Millisecond),
+		giftRetrieved.CreatedAt.In(time.UTC).Round(time.Millisecond))
+
+}
+*/
