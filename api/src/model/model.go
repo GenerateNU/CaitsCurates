@@ -75,6 +75,7 @@ func (m *PgModel) GetGift(id int64) (Gift, error) {
 	return createdGift, nil
 }
 
+
 func (m *PgModel) GetAllGifts() ([]Gift, error) {
 
 	createdGifts, err := GetAllGiftsFromDB(m.Conn)
@@ -85,6 +86,7 @@ func (m *PgModel) GetAllGifts() ([]Gift, error) {
 
 	return createdGifts, nil
 }
+
 func (m *PgModel) UpdateGift(id int64, inputGift Gift) (Gift, error) {
 
 	updatedGift, err := UpdateGiftToDb(m.Conn, id, inputGift)
@@ -94,6 +96,15 @@ func (m *PgModel) UpdateGift(id int64, inputGift Gift) (Gift, error) {
 	}
 
 	return updatedGift, nil
+}
+
+func (m *PgModel) AllGiftResponses() ([]GiftResponse, error) {
+	responses, err := GetAllResponsesFromDB(m.Conn)
+
+	if err != nil {
+		return []GiftResponse{}, err
+	}
+	return responses, nil
 }
 
 func (m *PgModel) DeleteGift(id int64) error {
@@ -106,14 +117,7 @@ func (m *PgModel) DeleteGift(id int64) error {
 
 	return nil
 }
-func (m *PgModel) AllGiftResponses() ([]GiftResponse, error) {
-	responses, err := GetAllGiftResponsesFromDB(m.Conn)
 
-	if err != nil {
-		return []GiftResponse{}, err
-	}
-	return responses, nil
-}
 
 func (m *PgModel) AllCollections() ([]GiftCollection, error) {
 	collections, err := GetAllCollectionsFromDB(m.Conn)
@@ -123,6 +127,7 @@ func (m *PgModel) AllCollections() ([]GiftCollection, error) {
 	}
 	return collections, nil
 }
+
 func (m *PgModel) IncompleteRequests() ([]GiftRequest, error) {
 	gifts, err := GetIncompleteGiftRequestsFromDB(m.Conn)
 
