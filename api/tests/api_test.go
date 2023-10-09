@@ -748,7 +748,7 @@ func TestGetGift(t *testing.T) {	// Database setup
 		Link: "https://something",
 		Description: "sample description",
 		Demographic: "sample demographic",
-		GiftCollections: [],
+	    GiftCollections: []*model.GiftCollection{},
 	}
 	err = db.Create(&gift).Error
 	assert.NoError(t, err)
@@ -802,10 +802,12 @@ func TestGetGiftCollection(t *testing.T) {
 	// Test code
 	w := httptest.NewRecorder()
 
+	uintValue := uint(5)
+
 	collection := model.GiftCollection{
-		CustomerID: 5,
+		CustomerID: &uintValue,
 		CollectionName: "sample name",
-		Gifts: []*Gift,
+		Gifts: []*model.Gift{},
 	}
 
 	err = db.Create(&collection).Error
@@ -857,7 +859,7 @@ func TestGetGiftResponse(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	response := model.GiftResponse{
-		GiftCollection: nil,
+		GiftCollection: model.GiftCollection{},
 		GiftCollectionID: 6,
 		CustomMessage: "sample custom message",
 	}
