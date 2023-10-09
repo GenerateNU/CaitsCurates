@@ -6,11 +6,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"sort"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/lib/pq"
 
@@ -277,6 +278,11 @@ func TestGetCompleteGiftRequests(t *testing.T) {
 	assert.Equal(t, request.BudgetMax, requestsRetrieved[0].BudgetMax)
 	assert.Equal(t, request.BudgetMin, requestsRetrieved[0].BudgetMin)
 	assert.Equal(t, request.GiftResponseID, requestsRetrieved[0].GiftResponseID)
+	assert.Equal(t, request.GiftResponse.ID, giftResponse.ID)
+	assert.NotNil(t, request.GiftResponse) // make sure preloading works
+	assert.Equal(t, request.GiftResponse.GiftCollectionID, giftResponse.GiftCollectionID)
+	assert.Equal(t, request.GiftResponse.GiftCollection, giftResponse.GiftCollection)
+	assert.Equal(t, request.GiftResponse.CustomMessage, giftResponse.CustomMessage)
 	assert.Equal(t, request.DateNeeded.In(time.UTC).Round(time.Millisecond),
 		requestsRetrieved[0].DateNeeded.In(time.UTC).Round(time.Millisecond))
 }

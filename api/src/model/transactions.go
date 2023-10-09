@@ -33,7 +33,7 @@ func GetAllExampleGiftsFromDB(db *gorm.DB) ([]ExampleGift, error) {
 
 func GetIncompleteGiftRequestsFromDB(db *gorm.DB) ([]GiftRequest, error) {
 	var requests []GiftRequest
-	if err := db.Where("gift_response_id IS NULL").Find(&requests).Error; err != nil {
+	if err := db.Where("gift_response_id IS NULL").Preload("GiftResponse").Find(&requests).Error; err != nil {
 		return nil, err
 	}
 	return requests, nil
