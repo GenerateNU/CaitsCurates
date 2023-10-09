@@ -30,3 +30,19 @@ func GetAllExampleGiftsFromDB(db *gorm.DB) ([]ExampleGift, error) {
 	}
 	return gifts, nil
 }
+
+func GetIncompleteGiftRequestsFromDB(db *gorm.DB) ([]GiftRequest, error) {
+	var requests []GiftRequest
+	if err := db.Where("gift_response_id IS NULL").Find(&requests).Error; err != nil {
+		return nil, err
+	}
+	return requests, nil
+}
+
+func GetCompleteGiftRequestsFromDB(db *gorm.DB) ([]GiftRequest, error) {
+	var requests []GiftRequest
+	if err := db.Where("gift_response_id IS NOT NULL").Find(&requests).Error; err != nil {
+		return nil, err
+	}
+	return requests, nil
+}
