@@ -44,6 +44,7 @@ type GiftRequest struct {
 type GiftCollection struct {
 	gorm.Model
 	CustomerID     *uint
+	Customer       *Customer
 	CollectionName string
 	Gifts          []*Gift `gorm:"many2many:gift_request_gifts;"`
 }
