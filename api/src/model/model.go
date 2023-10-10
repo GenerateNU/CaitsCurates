@@ -12,6 +12,8 @@ type Model interface {
 	GetExampleGift(int64) ExampleGift
 	AllExampleGifts() ([]ExampleGift, error)
 	AddExampleGift(ExampleGiftInput) (ExampleGift, error)
+	IncompleteRequests() ([]GiftRequest, error)
+	CompleteRequests() ([]GiftRequest, error)
 }
 
 func (m *PgModel) GetExampleGift(id int64) ExampleGift {
@@ -40,6 +42,24 @@ func (m *PgModel) AllExampleGifts() ([]ExampleGift, error) {
 
 	if err != nil {
 		return []ExampleGift{}, err
+	}
+	return gifts, nil
+}
+
+func (m *PgModel) IncompleteRequests() ([]GiftRequest, error) {
+	gifts, err := GetIncompleteGiftRequestsFromDB(m.Conn)
+
+	if err != nil {
+		return []GiftRequest{}, err
+	}
+	return gifts, nil
+}
+
+func (m *PgModel) CompleteRequests() ([]GiftRequest, error) {
+	gifts, err := GetCompleteGiftRequestsFromDB(m.Conn)
+
+	if err != nil {
+		return []GiftRequest{}, err
 	}
 	return gifts, nil
 }

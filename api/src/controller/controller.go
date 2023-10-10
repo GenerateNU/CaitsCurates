@@ -31,8 +31,27 @@ func (pg *PgController) Serve() *gin.Engine {
 		}
 		c.JSON(http.StatusOK, gift)
 	})
+
 	r.GET("/gifts", func(c *gin.Context) {
 		gifts, err := pg.AllExampleGifts()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, "Oops")
+		}
+		c.JSON(http.StatusOK, gifts)
+	})
+
+	// Get incomplete gift requests
+	r.GET("/requests/incomplete", func(c *gin.Context) {
+		gifts, err := pg.IncompleteRequests()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, "Oops")
+		}
+		c.JSON(http.StatusOK, gifts)
+	})
+
+	// Get complete gift requests
+	r.GET("/requests/complete", func(c *gin.Context) {
+		gifts, err := pg.CompleteRequests()
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, "Oops")
 		}
