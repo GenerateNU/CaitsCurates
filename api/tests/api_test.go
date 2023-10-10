@@ -427,11 +427,11 @@ func TestUpdateGift(t *testing.T) {
 
 	// Create Gift
 	testGift := model.Gift{
-		Name:         "gift1",
-		Price:        50,
-		Link:         "link1",
-		Description:  "description1",
-		Demographic:  "demogrpahic1",
+		Name:            "gift1",
+		Price:           50,
+		Link:            "link1",
+		Description:     "description1",
+		Demographic:     "demogrpahic1",
 		GiftCollections: nil,
 	}
 	err = db.Create(&testGift).Error
@@ -453,11 +453,11 @@ func TestUpdateGift(t *testing.T) {
 
 	// Updated Gift Fields
 	updatedTestGift := model.Gift{
-		Name:         "updatedgift1",
-		Price:        100,
-		Link:         "updatedlink1",
-		Description:  "updateddescription1",
-		Demographic:  "updateddemogrpahic1",
+		Name:            "updatedgift1",
+		Price:           100,
+		Link:            "updatedlink1",
+		Description:     "updateddescription1",
+		Demographic:     "updateddemogrpahic1",
 		GiftCollections: nil,
 	}
 
@@ -528,14 +528,14 @@ func TestDeleteGift(t *testing.T) {
 
 	// Create Gift
 	testGift := model.Gift{
-		Name:         "gift1",
-		Price:        50,
-		Link:         "link1",
-		Description:  "description1",
-		Demographic:  "demogrpahic1",
+		Name:            "gift1",
+		Price:           50,
+		Link:            "link1",
+		Description:     "description1",
+		Demographic:     "demogrpahic1",
 		GiftCollections: nil,
 	}
-	err = db.Create(&testGift).Error
+	err = tx.Create(&testGift).Error
 	assert.NoError(t, err)
 
 	// Test Inputted Gift Fields
@@ -554,7 +554,7 @@ func TestDeleteGift(t *testing.T) {
 
 	//  Check that there's only 1 Gift
 	var count int64
-	db.Model(&model.Gift{}).Where("id = ?", testGift.ID).Count(&count)
+	tx.Model(&model.Gift{}).Where("id = ?", testGift.ID).Count(&count)
 	assert.Equal(t, int64(1), count)
 
 	req1, err := http.NewRequest("DELETE", fmt.Sprintf("/gifts/%d", testGift.ID), nil)
@@ -566,6 +566,6 @@ func TestDeleteGift(t *testing.T) {
 
 	//  Check that Gift has been deleted
 	var deletedCount int64
-	db.Model(&model.Gift{}).Where("id = ?", testGift.ID).Count(&deletedCount)
+	tx.Model(&model.Gift{}).Where("id = ?", testGift.ID).Count(&deletedCount)
 	assert.Equal(t, int64(0), deletedCount)
 }
