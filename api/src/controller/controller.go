@@ -6,6 +6,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 )
 
 type Controller interface {
@@ -90,7 +91,43 @@ func (pg *PgController) Serve() *gin.Engine {
 
 		c.JSON(http.StatusOK, insertedCollection)
 	})
+	r.GET("/gifts/:id", func(c *gin.Context) {
+		id := c.Param("id")
+		intId, err := strconv.Atoi(id)
+		gift, err := pg.GetGift(int64(intId))
+		if err != nil {
+			panic(err)
+		}
+		c.JSON(http.StatusOK, gift)
+	})
 
+	r.GET("/gifts", func(c *gin.Context) {
+		gifts, err := pg.GetAllGifts()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, "Oops")
+		}
+		c.JSON(http.StatusOK, gifts)
+	})
+
+	r.POST("/addGift", func(c *gin.Context) {
+		var input model.Gift
+		fmt.Print(c)
+		if err := c.BindJSON(&input); err != nil {
+			c.JSON(http.StatusBadRequest, "Failed to unmarshal gift")
+
+			fmt.Print(err)
+
+			return
+		}
+		insertedGift, err := pg.AddGift(input)
+
+		if err != nil {
+			c.JSON(http.StatusBadRequest, input)
+			panic(err)
+		}
+
+		c.JSON(http.StatusOK, insertedGift)
+	})
 	// Update Gift Record Given Gift ID
 	r.PUT("/gifts/:id", func(c *gin.Context) {
 
@@ -100,7 +137,7 @@ func (pg *PgController) Serve() *gin.Engine {
 		if err != nil {
 			panic(err)
 		}
-
+		
 		// Get Body Parameters and put in JSON Object
 		var input model.Gift;
 		if err := c.BindJSON(&input); err != nil {
@@ -122,7 +159,7 @@ func (pg *PgController) Serve() *gin.Engine {
 
 	// Delete Gift Record based on Gift ID
 	r.DELETE("/gifts/:id", func(c *gin.Context) {
-
+		
 		// Get Gift ID
 		id := c.Param("id")
 		intId, err := strconv.Atoi(id)
