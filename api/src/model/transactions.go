@@ -4,31 +4,23 @@ import (
 	"gorm.io/gorm"
 )
 
-// WriteExampleGiftToDb saves the ExampleGift and returns it
-func WriteExampleGiftToDb(db *gorm.DB, inputGift ExampleGiftInput) (ExampleGift, error) {
-	eg := ExampleGift{Name: inputGift.Name, Price: inputGift.Price}
-	if err := db.Create(&eg).Error; err != nil {
-		return ExampleGift{}, err
+func WriteRequestToDb(db *gorm.DB, inputRequest GiftRequest) (GiftRequest, error) {
+	if err := db.Create(&inputRequest).Error; err != nil {
+		return GiftRequest{}, err
 	}
-	return eg, nil
+	return inputRequest, nil
 }
-
-// GetExampleGiftFromDB fetches an ExampleGift by ID
-func GetExampleGiftFromDB(db *gorm.DB, id int64) (ExampleGift, error) {
-	var eg ExampleGift
-	if err := db.Where("id = ?", id).First(&eg).Error; err != nil {
-		return ExampleGift{}, err
+func WriteResponseToDb(db *gorm.DB, inputResponse GiftResponse) (GiftResponse, error) {
+	if err := db.Create(&inputResponse).Error; err != nil {
+		return GiftResponse{}, err
 	}
-	return eg, nil
+	return inputResponse, nil
 }
-
-// GetAllExampleGiftsFromDB fetches all ExampleGift
-func GetAllExampleGiftsFromDB(db *gorm.DB) ([]ExampleGift, error) {
-	var gifts []ExampleGift
-	if err := db.Find(&gifts).Error; err != nil {
-		return nil, err
+func WriteCollectionToDb(db *gorm.DB, inputCollection GiftCollection) (GiftCollection, error) {
+	if err := db.Create(&inputCollection).Error; err != nil {
+		return GiftCollection{}, err
 	}
-	return gifts, nil
+	return inputCollection, nil
 }
 
 func GetIncompleteGiftRequestsFromDB(db *gorm.DB) ([]GiftRequest, error) {

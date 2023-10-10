@@ -6,17 +6,6 @@ import (
 	"time"
 )
 
-type ExampleGift struct {
-	gorm.Model
-	Name  string
-	Price int
-}
-
-type ExampleGiftInput struct {
-	Name  string
-	Price int
-}
-
 type Gift struct {
 	gorm.Model
 	Name            string
@@ -37,7 +26,7 @@ type GiftRequest struct {
 	RecipientInterests pq.StringArray `gorm:"type:text[]"`
 	BudgetMax          uint
 	BudgetMin          uint
-	GiftResponse       GiftResponse
+	GiftResponse       *GiftResponse
 	DateNeeded         time.Time
 }
 
