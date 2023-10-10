@@ -34,8 +34,15 @@ func main() {
 		os.Exit(1)
 	}
 	// Auto migrate tables
-	err = db.AutoMigrate(&model.ExampleGift{})
-
+	err = db.AutoMigrate(model.User{}, model.Customer{}, model.GiftRequest{}, model.GiftCollection{}, model.GiftResponse{}, model.Admin{})
+	user := model.User{}
+	err = db.Create(&user).Error
+	var retrievedUser model.User
+	err = db.First(&retrievedUser).Error
+	customer := model.Customer{
+		User: retrievedUser,
+	}
+	err = db.Create(&customer).Error
 	// Check for errors
 	if err != nil {
 		fmt.Println("Error auto-migrating:", err)

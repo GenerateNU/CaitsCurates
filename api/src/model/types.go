@@ -37,7 +37,7 @@ type GiftRequest struct {
 	RecipientInterests pq.StringArray `gorm:"type:text[]"`
 	BudgetMax          uint
 	BudgetMin          uint
-	GiftResponse       GiftResponse
+	GiftResponse       *GiftResponse
 	DateNeeded         time.Time
 }
 

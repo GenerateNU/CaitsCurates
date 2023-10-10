@@ -117,7 +117,7 @@ func TestGiftRequestModel(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Create GiftRequest
-	giftRequest := model.GiftRequest{GiftResponse: giftResponse}
+	giftRequest := model.GiftRequest{GiftResponse: &giftResponse}
 	user := model.User{Email: "tsai.me@northeastern.edu", FirstName: "Joey", LastName: "Tsai", Password: "dgeeg32"}
 	customer := model.Customer{GiftRequests: []*model.GiftRequest{&giftRequest}, User: user}
 	err = tx.Create(&customer).Error

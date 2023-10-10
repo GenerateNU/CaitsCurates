@@ -3,11 +3,9 @@ package controller
 import (
 	"CaitsCurates/backend/src/model"
 	"fmt"
-	"net/http"
-	"strconv"
-
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 type Controller interface {
@@ -21,24 +19,6 @@ type PgController struct {
 func (pg *PgController) Serve() *gin.Engine {
 	r := gin.Default()
 	r.Use(cors.Default())
-
-	r.GET("/gifts/:id", func(c *gin.Context) {
-		id := c.Param("id")
-		intId, err := strconv.Atoi(id)
-		gift := pg.GetExampleGift(int64(intId))
-		if err != nil {
-			panic(err)
-		}
-		c.JSON(http.StatusOK, gift)
-	})
-
-	r.GET("/gifts", func(c *gin.Context) {
-		gifts, err := pg.AllExampleGifts()
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, "Oops")
-		}
-		c.JSON(http.StatusOK, gifts)
-	})
 
 	// Get incomplete gift requests
 	r.GET("/requests/incomplete", func(c *gin.Context) {
@@ -58,24 +38,57 @@ func (pg *PgController) Serve() *gin.Engine {
 		c.JSON(http.StatusOK, gifts)
 	})
 
-	r.POST("/addGift", func(c *gin.Context) {
-		var input model.ExampleGiftInput
-		fmt.Print(c)
+	r.POST("/addGiftResponse", func(c *gin.Context) {
+		var input model.GiftResponse
 		if err := c.BindJSON(&input); err != nil {
-			c.JSON(http.StatusBadRequest, "Failed to unmarshal gift")
+			c.JSON(http.StatusBadRequest, "Failed to unmarshal respone")
 
 			fmt.Print(err)
 
 			return
 		}
-		insertedGift, err := pg.AddExampleGift(input)
+		insertedResponse, err := pg.AddResponse(input)
 
 		if err != nil {
 			c.JSON(http.StatusBadRequest, input)
 			panic(err)
 		}
 
-		c.JSON(http.StatusOK, insertedGift)
+		c.JSON(http.StatusOK, insertedResponse)
+	})
+	r.POST("/addGiftRequest", func(c *gin.Context) {
+		var input model.GiftRequest
+		if err := c.BindJSON(&input); err != nil {
+			c.JSON(http.StatusBadRequest, "Failed to unmarshal request")
+			fmt.Print(err)
+			return
+		}
+		insertedRequest, err := pg.AddRequest(input)
+
+		if err != nil {
+			c.JSON(http.StatusBadRequest, input)
+			panic(err)
+		}
+
+		c.JSON(http.StatusOK, insertedRequest)
+	})
+	r.POST("/addGiftCollection", func(c *gin.Context) {
+		var input model.GiftCollection
+		if err := c.BindJSON(&input); err != nil {
+			c.JSON(http.StatusBadRequest, "Failed to unmarshal collection")
+
+			fmt.Print(err)
+
+			return
+		}
+		insertedCollection, err := pg.AddCollection(input)
+
+		if err != nil {
+			c.JSON(http.StatusBadRequest, input)
+			panic(err)
+		}
+
+		c.JSON(http.StatusOK, insertedCollection)
 	})
 
 	return r

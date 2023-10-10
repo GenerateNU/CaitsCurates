@@ -9,41 +9,42 @@ type PgModel struct {
 }
 
 type Model interface {
-	GetExampleGift(int64) ExampleGift
-	AllExampleGifts() ([]ExampleGift, error)
-	AddExampleGift(ExampleGiftInput) (ExampleGift, error)
+	AddRequest(GiftRequest) (GiftRequest, error)
+	AddResponse(GiftResponse) (GiftResponse, error)
+	AddCollection(GiftCollection) (GiftCollection, error)
 	IncompleteRequests() ([]GiftRequest, error)
 	CompleteRequests() ([]GiftRequest, error)
 }
 
-func (m *PgModel) GetExampleGift(id int64) ExampleGift {
-	gift, err := GetExampleGiftFromDB(m.Conn, id)
+func (m *PgModel) AddRequest(inputRequest GiftRequest) (GiftRequest, error) {
+
+	createdRequest, err := WriteRequestToDb(m.Conn, inputRequest)
 
 	if err != nil {
-		panic(err)
+		return GiftRequest{}, err
 	}
 
-	return gift
+	return createdRequest, nil
 }
+func (m *PgModel) AddResponse(inputResponse GiftResponse) (GiftResponse, error) {
 
-func (m *PgModel) AddExampleGift(inputGift ExampleGiftInput) (ExampleGift, error) {
-
-	createdGift, err := WriteExampleGiftToDb(m.Conn, inputGift)
+	createdResponse, err := WriteResponseToDb(m.Conn, inputResponse)
 
 	if err != nil {
-		return ExampleGift{}, err
+		return GiftResponse{}, err
 	}
 
-	return createdGift, nil
+	return createdResponse, nil
 }
+func (m *PgModel) AddCollection(inputCollection GiftCollection) (GiftCollection, error) {
 
-func (m *PgModel) AllExampleGifts() ([]ExampleGift, error) {
-	gifts, err := GetAllExampleGiftsFromDB(m.Conn)
+	createdCollection, err := WriteCollectionToDb(m.Conn, inputCollection)
 
 	if err != nil {
-		return []ExampleGift{}, err
+		return GiftCollection{}, err
 	}
-	return gifts, nil
+
+	return createdCollection, nil
 }
 
 func (m *PgModel) IncompleteRequests() ([]GiftRequest, error) {
