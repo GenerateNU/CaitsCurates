@@ -92,7 +92,7 @@ func GetGiftFromDB(db *gorm.DB, id int64) (Gift, error) {
 // GetAllGiftsFromDB fetches all Gift
 func GetAllGiftsFromDB(db *gorm.DB) ([]Gift, error) {
 	var gifts []Gift
-	if err := db.Find(&gifts).Error; err != nil {
+	if err := db.Preload("GiftCollections").Find(&gifts).Error; err != nil {
 		return nil, err
 	}
 	return gifts, nil
@@ -108,7 +108,7 @@ func WriteGiftToDb(db *gorm.DB, inputGift Gift) (Gift, error) {
 }
 func GetAllResponsesFromDB(db *gorm.DB) ([]GiftResponse, error) {
 	var response []GiftResponse
-	if err := db.Find(&response).Error; err != nil {
+	if err := db.Preload("GiftCollection").Find(&response).Error; err != nil {
 		return nil, err
 	}
 	return response, nil
@@ -117,7 +117,7 @@ func GetAllResponsesFromDB(db *gorm.DB) ([]GiftResponse, error) {
 // GetAllCollectionsFromDB fetches all GiftCollection
 func GetAllCollectionsFromDB(db *gorm.DB) ([]GiftCollection, error) {
 	var collections []GiftCollection
-	if err := db.Find(&collections).Error; err != nil {
+	if err := db.Preload("Gifts").Find(&collections).Error; err != nil {
 		return nil, err
 	}
 	return collections, nil
