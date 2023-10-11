@@ -102,6 +102,7 @@ func TestGetIncompleteGiftRequests(t *testing.T) {
 	assert.Equal(t, request.DateNeeded.In(time.UTC).Round(time.Millisecond),
 		requestsRetrieved[0].DateNeeded.In(time.UTC).Round(time.Millisecond))
 }
+
 func TestGetCompleteGiftRequests(t *testing.T) {
 	// Database setup
 	dsn := "user=testuser password=testpwd host=localhost port=5433 dbname=testdb sslmode=disable"
@@ -396,6 +397,151 @@ func TestAddCollection(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, retrievedCollection.CollectionName, addedCollection.CollectionName)
 	assert.Equal(t, retrievedCollection.Gifts[0].Name, addedCollection.Gifts[0].Name)
+}
+
+//---------------CRUD GIFT ENDPOINT TESTS--------------------------------------
+
+func TestGetGift(t *testing.T) {
+	// Database setup
+	dsn := "user=testuser password=testpwd host=localhost port=5433 dbname=testdb sslmode=disable"
+	if dbURL, exists := os.LookupEnv("TEST_DATABASE_URL"); exists {
+		dsn = dbURL
+	}
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("Unable to connect to database: %v", err)
+	}
+	// Put auto migrations here
+	err = db.AutoMigrate(&model.Gift{})
+	if err != nil {
+		panic("failed to migrate test database schema")
+	}
+	// Wrap the DB connection in a transaction
+	tx := db.Begin()
+	defer tx.Rollback()
+
+	// Create Model and Controller
+	m := &model.PgModel{Conn: tx}
+	c := &c.PgController{Model: m}
+	router := c.Serve()
+
+	// Test code
+	w := httptest.NewRecorder()
+
+	// Create Gift
+	testGift := model.Gift{
+		Name:            "gift1",
+		Price:           50,
+		Link:            "link1",
+		Description:     "description1",
+		Demographic:     "demogrpahic1",
+		GiftCollections: nil,
+	}
+	err = tx.Create(&testGift).Error
+	assert.NoError(t, err)
+
+	// Get Gift from database
+	req1, err := http.NewRequest("GET", fmt.Sprintf("/gifts/%d", testGift.ID), nil)
+	if err != nil {
+		t.Fatalf("Error creating request: %v", err)
+	}
+	router.ServeHTTP(w, req1)
+	assert.Equal(t, 200, w.Code)
+
+	var retrievedGift model.Gift
+	if e := json.Unmarshal(w.Body.Bytes(), &retrievedGift); e != nil {
+		t.Fatalf("Error unmarshaling JSON: %v", e)
+	}
+
+	// Test Retrieved Gift Fields
+	var fetchedGift model.Gift
+	err = tx.First(&fetchedGift, retrievedGift.ID).Error
+	assert.NoError(t, err)
+	assert.Equal(t, retrievedGift.ID, fetchedGift.ID)
+	assert.Equal(t, retrievedGift.Name, fetchedGift.Name)
+	assert.Equal(t, retrievedGift.Price, fetchedGift.Price)
+	assert.Equal(t, retrievedGift.Link, fetchedGift.Link)
+	assert.Equal(t, retrievedGift.Description, fetchedGift.Description)
+	assert.Equal(t, retrievedGift.Demographic, fetchedGift.Demographic)
+	assert.Equal(t, retrievedGift.Link, fetchedGift.Link)
+	assert.Equal(t, retrievedGift.CreatedAt.In(time.UTC).Round(time.Millisecond),
+		fetchedGift.CreatedAt.In(time.UTC).Round(time.Millisecond))
+}
+
+func TestAddGift(t *testing.T) {
+	// Database setup
+	dsn := "user=testuser password=testpwd host=localhost port=5433 dbname=testdb sslmode=disable"
+	if dbURL, exists := os.LookupEnv("TEST_DATABASE_URL"); exists {
+		dsn = dbURL
+	}
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("Unable to connect to database: %v", err)
+	}
+	// Put auto migrations here
+	err = db.AutoMigrate(&model.Gift{})
+	if err != nil {
+		panic("failed to migrate test database schema")
+	}
+	// Wrap the DB connection in a transaction
+	tx := db.Begin()
+	defer tx.Rollback()
+
+	// Create Model and Controller
+	m := &model.PgModel{Conn: tx}
+	c := &c.PgController{Model: m}
+	router := c.Serve()
+
+	// Test code
+	w := httptest.NewRecorder()
+
+	// Create Gift
+	testGift := model.Gift{
+		Name:            "gift1",
+		Price:           50,
+		Link:            "link1",
+		Description:     "description1",
+		Demographic:     "demogrpahic1",
+		GiftCollections: nil,
+	}
+
+	// Test Adding Gift to Database
+	giftJson, err := json.Marshal(testGift)
+	if err != nil {
+		t.Fatalf("Error marshaling JSON: %v", err)
+	}
+	assert.NoError(t, err)
+
+	req1, err := http.NewRequest("POST", fmt.Sprintf("/addGift"), bytes.NewBuffer(giftJson))
+	if err != nil {
+		t.Fatalf("Error creating request: %v", err)
+	}
+	router.ServeHTTP(w, req1)
+	assert.Equal(t, 200, w.Code)
+
+	// Test Added Gift Fields
+	var insertedGift model.Gift
+	if e := json.Unmarshal(w.Body.Bytes(), &insertedGift); e != nil {
+		t.Fatalf("Error unmarshaling JSON: %v", e)
+	}
+
+	var fetchedGift model.Gift
+	err = tx.First(&fetchedGift, insertedGift.ID).Error
+	assert.NoError(t, err)
+	assert.Equal(t, insertedGift.ID, fetchedGift.ID)
+	assert.Equal(t, insertedGift.Name, fetchedGift.Name)
+	assert.Equal(t, insertedGift.Price, fetchedGift.Price)
+	assert.Equal(t, insertedGift.Link, fetchedGift.Link)
+	assert.Equal(t, insertedGift.Description, fetchedGift.Description)
+	assert.Equal(t, insertedGift.Demographic, fetchedGift.Demographic)
+	assert.Equal(t, insertedGift.Link, fetchedGift.Link)
+	assert.Equal(t, insertedGift.CreatedAt.In(time.UTC).Round(time.Millisecond),
+		fetchedGift.CreatedAt.In(time.UTC).Round(time.Millisecond))
+
+	//  Check that there's only 1 Gift
+	var count int64
+	tx.Model(&model.Gift{}).Where("id = ?", insertedGift.ID).Count(&count)
+	assert.Equal(t, int64(1), count)
 }
 
 func TestUpdateGift(t *testing.T) {
