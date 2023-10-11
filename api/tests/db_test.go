@@ -313,6 +313,7 @@ func TestGiftResponseModel(t *testing.T) {
 	tx.Model(&model.GiftRequest{}).Where("id = ?", giftResponseRetrieved.ID).Count(&count)
 	assert.Equal(t, int64(0), count)
 }
+
 func TestUserModel(t *testing.T) {
 	// This code should be the same for each test
 	dsn := "user=testuser password=testpwd host=localhost port=5433 dbname=testdb sslmode=disable"
