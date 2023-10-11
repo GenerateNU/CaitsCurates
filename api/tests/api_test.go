@@ -580,7 +580,7 @@ func TestUpdateGift(t *testing.T) {
 		Demographic:     "demogrpahic1",
 		GiftCollections: nil,
 	}
-	err = db.Create(&testGift).Error
+	err = tx.Create(&testGift).Error
 	assert.NoError(t, err)
 
 	// Test Inputted Gift Fields
@@ -717,7 +717,8 @@ func TestDeleteGift(t *testing.T) {
 }
 
 
-func TestGetGift(t *testing.T) {	// Database setup
+func TestGetAllGift(t *testing.T) {
+	// Database setup
 	dsn := "user=testuser password=testpwd host=localhost port=5433 dbname=testdb sslmode=disable"
 	if dbURL, exists := os.LookupEnv("TEST_DATABASE_URL"); exists {
 		dsn = dbURL
@@ -727,7 +728,7 @@ func TestGetGift(t *testing.T) {	// Database setup
 		t.Fatalf("Unable to connect to database: %v", err)
 	}
 	// Put auto migrations here
-	err = db.AutoMigrate(&model.ExampleGift{})
+	err = db.AutoMigrate(&model.Gift{}, model.GiftCollection{})
 	if err != nil {
 		panic("failed to migrate test database schema")
 	}
@@ -748,34 +749,48 @@ func TestGetGift(t *testing.T) {	// Database setup
 		Link: "https://something",
 		Description: "sample description",
 		Demographic: "sample demographic",
-	    GiftCollections: []*model.GiftCollection{},
+		GiftCollections: []*model.GiftCollection{},
 	}
-	err = db.Create(&gift).Error
+
+	gift_two := model.Gift{
+		Name:  "nice sweater 2",
+		Price: 20,
+		Link: "https://something 2",
+		Description: "sample description 2",
+		Demographic: "sample demographic 2",
+		GiftCollections: []*model.GiftCollection{},
+	}
+	err = tx.Create(&gift).Error
 	assert.NoError(t, err)
-	req1, err := http.NewRequest("GET", fmt.Sprintf("/gifts/%d", gift.ID), nil)
+
+	err = tx.Create(&gift_two).Error
+	assert.NoError(t, err)
+	req1, err := http.NewRequest("GET", fmt.Sprintf("/gifts"), nil)
 	router.ServeHTTP(w, req1)
 
 	assert.Equal(t, 200, w.Code)
 
-	var giftRetrieved model.Gift
+	var giftRetrieved []model.Gift
 	if e := json.Unmarshal(w.Body.Bytes(), &giftRetrieved); e != nil {
 		t.Fatalf("Error unmarshaling JSON: %v", e)
 	}
+	t.Log(len(giftRetrieved))
+	assert.Equal(t, gift.Name, giftRetrieved[0].Name)
+	assert.Equal(t, gift.Price, giftRetrieved[0].Price)
+	assert.Equal(t, gift.Link, giftRetrieved[0].Link)
+	assert.Equal(t, gift.Description, giftRetrieved[0].Description)
+	assert.Equal(t, gift.Demographic, giftRetrieved[0].Demographic)
+	assert.Equal(t, gift.GiftCollections, giftRetrieved[0].GiftCollections)
 
-	assert.Equal(t, gift.ID, giftRetrieved.ID)
-	assert.Equal(t, gift.Name, giftRetrieved.Name)
-	assert.Equal(t, gift.Price, giftRetrieved.Price)
-	assert.Equal(t, gift.Link, giftRetrieved.Link)
-	assert.Equal(t, gift.Description, giftRetrieved.Description)
-	assert.Equal(t, gift.Demographic, giftRetrieved.Demographic)
-	assert.Equal(t, gift.GiftCollections, giftRetrieved.GiftCollections)
-	assert.Equal(t, gift.CreatedAt.In(time.UTC).Round(time.Millisecond),
-		giftRetrieved.CreatedAt.In(time.UTC).Round(time.Millisecond))
-
+	assert.Equal(t, gift_two.Name, giftRetrieved[1].Name)
+	assert.Equal(t, gift_two.Price, giftRetrieved[1].Price)
+	assert.Equal(t, gift_two.Link, giftRetrieved[1].Link)
+	assert.Equal(t, gift_two.Description, giftRetrieved[1].Description)
+	assert.Equal(t, gift_two.Demographic, giftRetrieved[1].Demographic)
+	assert.Equal(t, gift_two.GiftCollections, giftRetrieved[1].GiftCollections)
 }
 
-
-func TestGetGiftCollection(t *testing.T) {
+func TestGetAllGiftCollection(t *testing.T) {
 	// Database setup
 	dsn := "user=testuser password=testpwd host=localhost port=5433 dbname=testdb sslmode=disable"
 	if dbURL, exists := os.LookupEnv("TEST_DATABASE_URL"); exists {
@@ -810,28 +825,38 @@ func TestGetGiftCollection(t *testing.T) {
 		Gifts: []*model.Gift{},
 	}
 
+	collection_two := model.GiftCollection{
+		CustomerID: &uintValue,
+		CollectionName: "sample name 2",
+		Gifts: []*model.Gift{},
+	}
+
 	err = db.Create(&collection).Error
 	assert.NoError(t, err)
-	req1, err := http.NewRequest("GET", fmt.Sprintf("/collections/%d", collection.ID), nil)
+
+	err = db.Create(&collection_two).Error
+	assert.NoError(t, err)
+
+	req1, err := http.NewRequest("GET", fmt.Sprintf("/collections"), nil)
 	router.ServeHTTP(w, req1)
 
 	assert.Equal(t, 200, w.Code)
 
-	var collectionRetrieved model.GiftCollection
+	var collectionRetrieved []model.GiftCollection
 	if e := json.Unmarshal(w.Body.Bytes(), &collectionRetrieved); e != nil {
 		t.Fatalf("Error unmarshaling JSON: %v", e)
 	}
 
-	assert.Equal(t, collection.ID, collectionRetrieved.ID)
-	assert.Equal(t, collection.CustomerID, collectionRetrieved.CustomerID)
-	assert.Equal(t, collection.CollectionName, collectionRetrieved.CollectionName)
-	assert.Equal(t, collection.Gifts, collectionRetrieved.Gifts)
-	assert.Equal(t, collection.CreatedAt.In(time.UTC).Round(time.Millisecond),
-		collectionRetrieved.CreatedAt.In(time.UTC).Round(time.Millisecond))
+	assert.Equal(t, collection.CustomerID, collectionRetrieved[0].CustomerID)
+	assert.Equal(t, collection.CollectionName, collectionRetrieved[0].CollectionName)
+	assert.Equal(t, collection.Gifts, collectionRetrieved[0].Gifts)
 
+	assert.Equal(t, collection_two.CustomerID, collectionRetrieved[1].CustomerID)
+	assert.Equal(t, collection_two.CollectionName, collectionRetrieved[1].CollectionName)
+	assert.Equal(t, collection_two.Gifts, collectionRetrieved[1].Gifts)
 }
 
-func TestGetGiftResponse(t *testing.T) {
+func TestGetAllGiftResponse(t *testing.T) {
 	// Database setup
 	dsn := "user=testuser password=testpwd host=localhost port=5433 dbname=testdb sslmode=disable"
 	if dbURL, exists := os.LookupEnv("TEST_DATABASE_URL"); exists {
@@ -842,7 +867,7 @@ func TestGetGiftResponse(t *testing.T) {
 		t.Fatalf("Unable to connect to database: %v", err)
 	}
 	// Put auto migrations here
-	err = db.AutoMigrate(&model.GiftResponse{})
+	err = db.AutoMigrate(&model.GiftResponse{}, model.GiftCollection{})
 	if err != nil {
 		panic("failed to migrate test database schema")
 	}
@@ -858,30 +883,42 @@ func TestGetGiftResponse(t *testing.T) {
 	// Test code
 	w := httptest.NewRecorder()
 
+	collection := model.GiftCollection{}
+	err = tx.Create(&collection).Error
+
 	response := model.GiftResponse{
-		GiftCollection: model.GiftCollection{},
-		GiftCollectionID: 6,
+		GiftCollection: collection,
 		CustomMessage: "sample custom message",
 	}
 
-	err = db.Create(&response).Error
+
+	response_two := model.GiftResponse{
+		GiftCollection: collection,
+		CustomMessage: "sample custom message 2",
+	}
+
+	err = tx.Create(&response).Error
 	assert.NoError(t, err)
-	req1, err := http.NewRequest("GET", fmt.Sprintf("/responses/%d", response.ID), nil)
+
+	err = tx.Create(&response_two).Error
+	assert.NoError(t, err)
+	req1, err := http.NewRequest("GET", fmt.Sprintf("/responses"), nil)
 	router.ServeHTTP(w, req1)
 
 	assert.Equal(t, 200, w.Code)
 
-	var responseRetrieved model.GiftResponse
+	var responseRetrieved []model.GiftResponse
 	if e := json.Unmarshal(w.Body.Bytes(), &responseRetrieved); e != nil {
 		t.Fatalf("Error unmarshaling JSON: %v", e)
 	}
 
-	assert.Equal(t, response.ID, responseRetrieved.ID)
-	assert.Equal(t, response.GiftCollection, responseRetrieved.GiftCollection)
-	assert.Equal(t, response.GiftCollectionID, responseRetrieved.GiftCollectionID)
-	assert.Equal(t, response.CustomMessage, responseRetrieved.CustomMessage)
-	assert.Equal(t, response.CreatedAt.In(time.UTC).Round(time.Millisecond),
-		responseRetrieved.CreatedAt.In(time.UTC).Round(time.Millisecond))
+	assert.Equal(t, response.GiftCollection.ID, responseRetrieved[0].GiftCollection.ID)
+	assert.Equal(t, response.GiftCollectionID, responseRetrieved[0].GiftCollectionID)
+	assert.Equal(t, response.CustomMessage, responseRetrieved[0].CustomMessage)
+
+	assert.Equal(t, response_two.GiftCollection.ID, responseRetrieved[1].GiftCollection.ID)
+	assert.Equal(t, response_two.GiftCollectionID, responseRetrieved[1].GiftCollectionID)
+	assert.Equal(t, response_two.CustomMessage, responseRetrieved[1].CustomMessage)
 
 }
 
