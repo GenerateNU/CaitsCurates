@@ -2,6 +2,12 @@ import { useState } from 'react';
 import CollectionItem from '../components/CollectionItem';
 import EditForm from '../components/CollectionForm';
 
+type Collection = {
+    id: number;
+    name: string;
+    gifts: string[];
+  };
+
 const CollectionsPage = () => {
   const [collections, setCollections] = useState([
     {
@@ -77,15 +83,28 @@ const CollectionsPage = () => {
       
   ]);
 
-  const [showEditForm, setShowEditForm] = useState(false);
-  const [editCollectionId, setEditCollectionId] = useState(null);
+  const handleCreateCollection = () => {
+    const newCollection: Collection = {
+      id: Date.now(),
+      name: 'New Collection',
+      gifts: [],
+    };
 
-  const handleEditCollection = (collectionId) => {
+    // Add the new collection to the state
+    setCollections((prevCollections) => [...prevCollections, newCollection]);
+    setEditCollectionId(newCollection.id);
+    setShowEditForm(true);
+  };
+
+  const [showEditForm, setShowEditForm] = useState<boolean>(false);
+  const [editCollectionId, setEditCollectionId] = useState<number | null>(null);
+
+  const handleEditCollection = (collectionId: number) => {
     setEditCollectionId(collectionId);
     setShowEditForm(true);
   };
 
-  const handleSaveCollection = (updatedCollection) => {
+  const handleSaveCollection = (updatedCollection: Collection) => {
     setCollections((prevCollections) =>
       prevCollections.map((collection) =>
         collection.id === updatedCollection.id ? updatedCollection : collection
@@ -99,12 +118,12 @@ const CollectionsPage = () => {
     setShowEditForm(false);
   };
 
-  const handleDeleteCollection = (collectionId) => {
+  const handleDeleteCollection = (collectionId: number) => {
     setCollections((prevCollections) => prevCollections.filter((collection) => collection.id !== collectionId));
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="min-h-screen items-center justify-center">
       <div className="app" style={{ overflowX: "auto"}}>
         <div className="flex">
           {collections.map((collection) => (
@@ -124,13 +143,20 @@ const CollectionsPage = () => {
       </div>
       {showEditForm && (
         <div className="items-center justify-center">
-          <EditForm
-            collection={collections.find((c) => c.id === editCollectionId)}
-            onSave={handleSaveCollection}
-            onClose={handleCloseEditForm}
-          />
+          <div className="m-4">
+            <EditForm
+              collection={collections.find((c) => c.id === editCollectionId)!}
+              onSave={handleSaveCollection}
+              onClose={handleCloseEditForm}
+            />
+          </div>
         </div>
       )}
+      <div className="flex items-center justify-center mt-4">
+        <button onClick={handleCreateCollection} className="bg-blue-500 text-white p-2 rounded">
+          Create New Collection
+        </button>
+      </div>
     </div>
   );
 };

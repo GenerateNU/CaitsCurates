@@ -12,16 +12,24 @@ type EditFormProps = {
   onClose: () => void;
 };
 
+const predefinedGifts = ["Gift 1", "Gift 2", "Gift 3", "Gift 4", "Gift 5"];
+
 function CollectionForm({ collection, onSave, onClose }: EditFormProps) {
   const [editedName, setEditedName] = useState(collection.name);
-  const [editedGifts, setEditedGifts] = useState(collection.gifts.join(', '));
+  const [editedGifts, setEditedGifts] = useState(collection.gifts);
 
   const handleNameChange = (e: ChangeEvent<HTMLInputElement>) => {
     setEditedName(e.target.value);
   };
 
-  const handleGiftsChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setEditedGifts(e.target.value);
+  const handleGiftsChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    const selectedOptions = Array.from(e.target.options);
+    const selectedGifts = selectedOptions
+      .filter((option) => option.selected)
+      .map((option) => option.value);
+
+    // Here, we concatenate the selected gifts with the existing gifts
+    setEditedGifts([...editedGifts, ...selectedGifts]);
   };
 
   const handleSubmit = (e: FormEvent) => {
@@ -29,17 +37,18 @@ function CollectionForm({ collection, onSave, onClose }: EditFormProps) {
     onSave({
       id: collection.id,
       name: editedName,
-      gifts: editedGifts.split(',').map((gift) => gift.trim()),
+      gifts: editedGifts,
     });
     onClose();
   };
-
 
   return (
     <div className="edit-form border border-black p-4 rounded-md text-center">
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
-          <label htmlFor="name" className="block mb-2">Name:</label>
+          <label htmlFor="name" className="block mb-2">
+            Name:
+          </label>
           <input
             type="text"
             id="name"
@@ -49,16 +58,27 @@ function CollectionForm({ collection, onSave, onClose }: EditFormProps) {
           />
         </div>
         <div className="mb-4">
-          <label htmlFor="gifts" className="block mb-2">Gifts:</label>
-          <input
-            type="text"
+          <label htmlFor="gifts" className="block mb-2">
+            Select a Gift to Add:
+          </label>
+          <select
             id="gifts"
             className="border border-blue-500 rounded-md w-64 p-2 mx-auto"
+            multiple
             value={editedGifts}
             onChange={handleGiftsChange}
-          />
+          >
+            {predefinedGifts.map((gift) => (
+              <option key={gift} value={gift}>
+                {gift}
+              </option>
+            ))}
+          </select>
         </div>
-        <button type="submit" className="bg-blue-500 text-white p-2 rounded-md border border-black-500">
+        <button
+          type="submit"
+          className="bg-blue-500 text-white p-2 rounded-md border border-black-500"
+        >
           Save
         </button>
         <button
