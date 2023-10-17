@@ -191,5 +191,61 @@ func (pg *PgController) Serve() *gin.Engine {
 		c.JSON(http.StatusNoContent, "Deleted Gift")
 	})
 
+	// Add Gift to Gift Collection
+	r.POST("/addGiftCollection/:id", func(c *gin.Context) {
+		var input model.Gift
+
+		// Get Gift Collection Id
+		id := c.Param("id")
+		intId, err := strconv.Atoi(id)
+		if err != nil {
+			panic(err)
+		}
+
+		if err := c.BindJSON(&input); err != nil {
+			c.JSON(http.StatusBadRequest, "Failed to unmarshal collection")
+			fmt.Print(err)
+			return
+		}
+
+		giftAddedCollection, err := pg.AddGiftToGiftCollection(input, int64(intId))
+
+		if err != nil {
+			c.JSON(http.StatusBadRequest, input)
+			panic(err)
+		}
+
+		c.JSON(http.StatusOK, giftAddedCollection)
+	})
+
+	// Delete Gift to Gift Collection
+	r.DELETE("/addGiftCollection/:id", func(c *gin.Context) {
+		var input model.Gift
+
+		// Get Gift Collection Id
+		id := c.Param("id")
+		intId, err := strconv.Atoi(id)
+		if err != nil {
+			panic(err)
+		}
+
+		if err := c.BindJSON(&input); err != nil {
+			c.JSON(http.StatusBadRequest, "Failed to unmarshal collection")
+			fmt.Print(err)
+			return
+		}
+
+		giftDeletedCollection, err := pg.DeleteGiftFromGiftCollection(input, int64(intId))
+
+		if err != nil {
+			c.JSON(http.StatusBadRequest, input)
+			panic(err)
+		}
+
+		c.JSON(http.StatusOK, giftDeletedCollection)
+	})
+
+	// Add Gift Collection to Gift Response
+
 	return r
 }

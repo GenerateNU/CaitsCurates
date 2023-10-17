@@ -122,3 +122,41 @@ func GetAllCollectionsFromDB(db *gorm.DB) ([]GiftCollection, error) {
 	}
 	return collections, nil
 }
+
+func AddGiftToCollectionFromDB(db *gorm.DB, inputGift Gift, id int64) (GiftCollection, error) {
+	var collection GiftCollection
+	if err := db.Where("id = ?", id).First(&collection).Error; err != nil {
+		return GiftCollection{}, err
+	}
+
+	collection.Gifts = append(collection.Gifts, &inputGift)
+
+	if err := db.Save(&collection).Error; err != nil {
+		return GiftCollection{}, err
+	}
+
+	return collection, nil
+}
+
+func DeleteGiftFromCollectionFromDB(db *gorm.DB, inputGift Gift, id int64) (GiftCollection, error) {
+	var collection GiftCollection
+	if err := db.Where("id = ?", id).First(&collection).Error; err != nil {
+		return GiftCollection{}, err
+	}
+
+	// Create a new GiftCollection array without the inputGift
+	var giftDeletedCollection []*Gift
+	for _, gift := range collection.Gifts {
+		if gift.ID != uint(id) {
+			giftDeletedCollection = append(giftDeletedCollection, gift)
+		}
+	}
+
+	collection.Gifts = giftDeletedCollection
+
+	if err := db.Save(&collection).Error; err != nil {
+		return GiftCollection{}, err
+	}
+
+	return collection, nil
+}

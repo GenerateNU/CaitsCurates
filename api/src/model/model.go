@@ -14,6 +14,7 @@ type Model interface {
 	AddCollection(GiftCollection) (GiftCollection, error)
 	IncompleteRequests() ([]GiftRequest, error)
 	CompleteRequests() ([]GiftRequest, error)
+
 	GetGift(int64) (Gift, error)
 	GetAllGifts() ([]Gift, error)
 	AddGift(Gift) (Gift, error)
@@ -21,6 +22,8 @@ type Model interface {
 	DeleteGift(int64) error
 	AllGiftResponses() ([]GiftResponse, error)
 	AllCollections() ([]GiftCollection, error)
+	AddGiftToGiftCollection(Gift, int64) (GiftCollection, error)
+	DeleteGiftFromGiftCollection(Gift, int64) (GiftCollection, error)
 }
 
 func (m *PgModel) AddRequest(inputRequest GiftRequest) (GiftRequest, error) {
@@ -75,7 +78,6 @@ func (m *PgModel) GetGift(id int64) (Gift, error) {
 	return createdGift, nil
 }
 
-
 func (m *PgModel) GetAllGifts() ([]Gift, error) {
 
 	createdGifts, err := GetAllGiftsFromDB(m.Conn)
@@ -118,7 +120,6 @@ func (m *PgModel) DeleteGift(id int64) error {
 	return nil
 }
 
-
 func (m *PgModel) AllCollections() ([]GiftCollection, error) {
 	collections, err := GetAllCollectionsFromDB(m.Conn)
 
@@ -146,4 +147,24 @@ func (m *PgModel) CompleteRequests() ([]GiftRequest, error) {
 	return gifts, nil
 }
 
+func (m *PgModel) AddGiftToGiftCollection(inputGift Gift, id int64) (GiftCollection, error) {
 
+	giftAddedCollection, err := AddGiftToCollectionFromDB(m.Conn, inputGift, id)
+
+	if err != nil {
+		return GiftCollection{}, err
+	}
+
+	return giftAddedCollection, nil
+}
+
+func (m *PgModel) DeleteGiftFromGiftCollection(inputGift Gift, id int64) (GiftCollection, error) {
+
+	giftDeletedCollection, err := DeleteGiftFromCollectionFromDB(m.Conn, inputGift, id)
+
+	if err != nil {
+		return GiftCollection{}, err
+	}
+
+	return giftDeletedCollection, nil
+}
