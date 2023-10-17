@@ -108,7 +108,20 @@ func (pg *PgController) Serve() *gin.Engine {
 		}
 		c.JSON(http.StatusOK, gifts)
 	})
-
+	r.GET("/responses", func(c *gin.Context) {
+		responses, err := pg.AllGiftResponses()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, "Oops")
+		}
+		c.JSON(http.StatusOK, responses)
+	})
+	r.GET("/collections", func(c *gin.Context) {
+		collections, err := pg.AllCollections()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, "Oops")
+		}
+		c.JSON(http.StatusOK, collections)
+	})
 	r.POST("/addGift", func(c *gin.Context) {
 		var input model.Gift
 		fmt.Print(c)
@@ -137,9 +150,9 @@ func (pg *PgController) Serve() *gin.Engine {
 		if err != nil {
 			panic(err)
 		}
-		
+
 		// Get Body Parameters and put in JSON Object
-		var input model.Gift;
+		var input model.Gift
 		if err := c.BindJSON(&input); err != nil {
 			c.JSON(http.StatusBadRequest, "Failed to unmarshal gift")
 			fmt.Print(err)
@@ -159,7 +172,7 @@ func (pg *PgController) Serve() *gin.Engine {
 
 	// Delete Gift Record based on Gift ID
 	r.DELETE("/gifts/:id", func(c *gin.Context) {
-		
+
 		// Get Gift ID
 		id := c.Param("id")
 		intId, err := strconv.Atoi(id)
