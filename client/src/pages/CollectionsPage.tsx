@@ -2,83 +2,130 @@ import { useState } from 'react';
 import CollectionItem from '../components/CollectionItem';
 import EditForm from '../components/CollectionForm';
 
+type Gift = {
+  name: string;
+  description: string;
+  price: number;
+};
+
 type Collection = {
-    id: number;
-    name: string;
-    gifts: string[];
-  };
+  id: number;
+  name: string;
+  gifts: Gift[];
+};
+
+const predefinedGifts: Gift[] = [
+  {
+    name: "Gift 1",
+    description: "Description of Gift 1",
+    price: 10,
+  },
+  {
+    name: "Gift 2",
+    description: "Description of Gift 2",
+    price: 20,
+  },
+  {
+    name: "Gift 3",
+    description: "Description of Gift 3",
+    price: 30,
+  },
+  {
+    name: "Gift 4",
+    description: "Description of Gift 4",
+    price: 40,
+  },
+  {
+    name: "Gift 5",
+    description: "Description of Gift 5",
+    price: 50,
+  },
+];
+
+const predefinedGifts2: Gift[] = [
+  {
+    name: "Gift 10",
+    description: "Description of Gift 1",
+    price: 10,
+  },
+  {
+    name: "Gift 11",
+    description: "Description of Gift 2",
+    price: 20,
+  },
+];
 
 const CollectionsPage = () => {
   const [collections, setCollections] = useState([
     {
       id: 1,
       name: 'Birthday Gifts',
-      gifts: ['Toy car', 'Art supplies', 'Book', 'Candy'],
+      gifts: [],
     },
     {
       id: 2,
       name: 'Christmas Gifts',
-      gifts: ['Sweater', 'Toys', 'Cookies'],
+      gifts: predefinedGifts,
     },
     {
         id: 3,
         name: 'Birthday Gifts',
-        gifts: ['Toy car', 'Art supplies', 'Book', 'Candy'],
+        gifts: predefinedGifts2,
       },
       {
         id: 4,
         name: 'Christmas Gifts',
-        gifts: ['Sweater', 'Toys', 'Cookies'],
+        gifts: predefinedGifts,
       },
       {
         id: 5,
         name: 'Birthday Gifts',
-        gifts: ['Toy car', 'Art supplies', 'Book', 'Candy'],
+        gifts: predefinedGifts,
       },
       {
         id: 6,
         name: 'Christmas Gifts',
-        gifts: ['Sweater', 'Toys', 'Cookies'],
+        gifts: predefinedGifts,
       },
       {
         id: 7,
         name: 'Birthday Gifts',
-        gifts: ['Toy car', 'Art supplies', 'Book', 'Candy'],
+        gifts: predefinedGifts,
       },
       {
         id: 8,
         name: 'Christmas Gifts',
-        gifts: ['Sweater', 'Toys', 'Cookies'],
+        gifts: predefinedGifts,
       },
       {
         id: 9,
         name: 'Birthday Gifts',
-        gifts: ['Toy car', 'Art supplies', 'Book', 'Candy'],
+        gifts: predefinedGifts,
       },
       {
         id: 10,
         name: 'Christmas Gifts',
-        gifts: ['Sweater', 'Toys', 'Cookies'],
+        gifts: predefinedGifts,
       },
       {
         id: 11,
         name: 'Birthday Gifts',
-        gifts: ['Toy car', 'Art supplies', 'Book', 'Candy'],
+        gifts: predefinedGifts
       },
       {
         id: 12,
         name: 'Christmas Gifts',
-        gifts: ['Sweater', 'Toys', 'Cookies'],
+        gifts: predefinedGifts
       },
       {
         id: 13,
         name: 'Birthday Gifts',
-        gifts: ['Toy car', 'Art supplies', 'Book', 'Candy'],
+        gifts: predefinedGifts,
       },
       {
         id: 14,
         name: 'Christmas Gifts',
-        gifts: ['Sweater', 'Toys', 'Cookies'],
+        gifts: predefinedGifts,
       },
       
   ]);
@@ -124,7 +171,7 @@ const CollectionsPage = () => {
 
   return (
     <div className="min-h-screen items-center justify-center">
-      <div className="app" style={{ overflowX: "auto"}}>
+      <div className="app" style={{ overflowX: "auto" }}>
         <div className="flex">
           {collections.map((collection) => (
             <div key={collection.id} className="m-4 flex-shrink-0 ">

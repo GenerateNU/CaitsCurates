@@ -1,9 +1,15 @@
 import React, { useState, ChangeEvent, FormEvent } from 'react';
 
+type Gift = {
+  name: string; 
+  description: string;
+  price: number; 
+};
+
 type Collection = {
   id: number;
   name: string;
-  gifts: string[];
+  gifts: Gift[];
 };
 
 type EditFormProps = {
@@ -12,7 +18,43 @@ type EditFormProps = {
   onClose: () => void;
 };
 
-const predefinedGifts = ["Gift 1", "Gift 2", "Gift 3", "Gift 4", "Gift 5"];
+const predefinedGifts: Gift[] = [
+  {
+    name: "Gift 1",
+    description: "Description of Gift 1",
+    price: 10,
+  },
+  {
+    name: "Gift 2",
+    description: "Description of Gift 2",
+    price: 20,
+  },
+  {
+    name: "Gift 3",
+    description: "Description of Gift 3",
+    price: 30,
+  },
+  {
+    name: "Gift 4",
+    description: "Description of Gift 4",
+    price: 40,
+  },
+  {
+    name: "Gift 5",
+    description: "Description of Gift 5",
+    price: 50,
+  },
+  {
+    name: "Gift 10",
+    description: "Description of Gift 1",
+    price: 10,
+  },
+  {
+    name: "Gift 11",
+    description: "Description of Gift 2",
+    price: 20,
+  },
+];
 
 function CollectionForm({ collection, onSave, onClose }: EditFormProps) {
   const [editedName, setEditedName] = useState(collection.name);
@@ -26,7 +68,11 @@ function CollectionForm({ collection, onSave, onClose }: EditFormProps) {
     const selectedOptions = Array.from(e.target.options);
     const selectedGifts = selectedOptions
       .filter((option) => option.selected)
-      .map((option) => option.value);
+      .map((option) => ({
+        name: option.value,
+        description: "",
+        price: 0,
+      }));
 
     // Here, we concatenate the selected gifts with the existing gifts
     setEditedGifts([...editedGifts, ...selectedGifts]);
@@ -65,12 +111,12 @@ function CollectionForm({ collection, onSave, onClose }: EditFormProps) {
             id="gifts"
             className="border border-blue-500 rounded-md w-64 p-2 mx-auto"
             multiple
-            value={editedGifts}
+            value={editedGifts.map((gift) => gift.name)}
             onChange={handleGiftsChange}
           >
-            {predefinedGifts.map((gift) => (
-              <option key={gift} value={gift}>
-                {gift}
+            {predefinedGifts.map((gift, index) => (
+              <option key={index} value={gift.name}>
+                {gift.name}
               </option>
             ))}
           </select>
