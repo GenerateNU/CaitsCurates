@@ -194,11 +194,9 @@ func main() {
 		fmt.Println("Error auto-migrating:", err)
 		return
 	}
-
 	m := &model.PgModel{
 		Conn: db,
 	}
-
 	c := &controller.PgController{
 		Model: m,
 	}

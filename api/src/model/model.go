@@ -34,6 +34,7 @@ type Model interface {
 	DeleteGiftFromGiftCollection(int64, int64) (GiftCollection, error)
 }
 
+
 func (m *PgModel) AddRequest(inputRequest GiftRequest) (GiftRequest, error) {
 
 	createdRequest, err := WriteRequestToDb(m.Conn, inputRequest)

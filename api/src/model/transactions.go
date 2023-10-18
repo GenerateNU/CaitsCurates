@@ -4,6 +4,17 @@ import (
 	"gorm.io/gorm"
 )
 
+func SearchGiftsDb(db *gorm.DB, searchTerm string, minPrice int, maxPrice int) ([]Gift, error) {
+	var gifts []Gift
+
+	if err := db.Where("to_tsvector('english', name || ' ' || description) @@ to_tsquery('english', ?)", searchTerm).
+		Where("price >= ? AND price <= ?", minPrice, maxPrice).
+		Find(&gifts).Error; err != nil {
+		return nil, err
+	}
+
+	return gifts, nil
+}
 func WriteRequestToDb(db *gorm.DB, inputRequest GiftRequest) (GiftRequest, error) {
 	if err := db.Create(&inputRequest).Error; err != nil {
 		return GiftRequest{}, err
