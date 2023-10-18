@@ -1062,13 +1062,11 @@ func TestGiftDeleteFromCollection(t *testing.T) {
 	assert.Equal(t, int64(1), count1)
 
 	// Delete Gift from Gift Collection
-	giftJSON, err := json.Marshal(gift)
-	if err != nil {
-		t.Fatalf("Error marshaling JSON: %v", err)
-	}
-
 	assert.NoError(t, err)
-	req2, err := http.NewRequest("DELETE", fmt.Sprintf("/addGiftCollection/%d", addedCollection.ID), bytes.NewBuffer(giftJSON))
+	fmt.Print(retrievedCollection.Gifts[0].ID)
+	fmt.Print(retrievedCollection.ID)
+	fmt.Print(addedCollection.ID)
+	req2, err := http.NewRequest("DELETE", fmt.Sprintf("/removeGiftFromGiftCollection/%d/%d", retrievedCollection.Gifts[0].ID, addedCollection.ID), nil)
 	router.ServeHTTP(w2, req2)
 	assert.Equal(t, 200, w2.Code)
 

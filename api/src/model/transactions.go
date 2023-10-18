@@ -138,26 +138,22 @@ func AddGiftToCollectionFromDB(db *gorm.DB, inputGift Gift, id int64) (GiftColle
 	return collection, nil
 }
 
-func DeleteGiftFromCollectionFromDB(db *gorm.DB, inputGift Gift, id int64) (GiftCollection, error) {
+func DeleteGiftFromCollectionFromDB(db *gorm.DB, giftID int64, giftCollectionID int64) (GiftCollection, error) {
 	var collection GiftCollection
-	if err := db.Where("id = ?", id).First(&collection).Error; err != nil {
+	if err := db.Preload("Gifts").First(&collection, giftCollectionID).Error; err != nil {
 		return GiftCollection{}, err
 	}
 
 	// Create a new GiftCollection array without the inputGift
-	var giftDeletedCollection []*Gift
+	var giftRemovedCollection []*Gift
 	for _, gift := range collection.Gifts {
-		if gift.ID != uint(id) {
-			giftDeletedCollection = append(giftDeletedCollection, gift)
+		if gift.ID != uint(giftID) {
+			giftRemovedCollection = append(giftRemovedCollection, gift)
 		}
 	}
-
-	collection.Gifts = giftDeletedCollection
-
-	if err := db.Save(&collection).Error; err != nil {
+	if err := db.Model(&collection).Association("Gifts").Replace(giftRemovedCollection); err != nil {
 		return GiftCollection{}, err
 	}
 
 	return collection, nil
-
 }

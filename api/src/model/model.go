@@ -23,7 +23,7 @@ type Model interface {
 	AllGiftResponses() ([]GiftResponse, error)
 	AllCollections() ([]GiftCollection, error)
 	AddGiftToGiftCollection(Gift, int64) (GiftCollection, error)
-	DeleteGiftFromGiftCollection(Gift, int64) (GiftCollection, error)
+	DeleteGiftFromGiftCollection(int64, int64) (GiftCollection, error)
 }
 
 func (m *PgModel) AddRequest(inputRequest GiftRequest) (GiftRequest, error) {
@@ -158,9 +158,9 @@ func (m *PgModel) AddGiftToGiftCollection(inputGift Gift, id int64) (GiftCollect
 	return giftAddedCollection, nil
 }
 
-func (m *PgModel) DeleteGiftFromGiftCollection(inputGift Gift, id int64) (GiftCollection, error) {
+func (m *PgModel) DeleteGiftFromGiftCollection(giftID int64, giftCollectionID int64) (GiftCollection, error) {
 
-	giftDeletedCollection, err := DeleteGiftFromCollectionFromDB(m.Conn, inputGift, id)
+	giftDeletedCollection, err := DeleteGiftFromCollectionFromDB(m.Conn, giftID, giftCollectionID)
 
 	if err != nil {
 		return GiftCollection{}, err
