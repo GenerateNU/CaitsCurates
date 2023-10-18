@@ -1,6 +1,7 @@
-import { useState } from 'react';
-import CollectionItem from '../components/CollectionItem';
-import EditForm from '../components/CollectionForm';
+import { useState } from "react";
+import CollectionItem from "../components/CollectionItem";
+import EditForm from "../components/CollectionForm";
+import Navbar from "../components/Navbar";
 
 type Gift = {
   name: string;
@@ -59,81 +60,80 @@ const CollectionsPage = () => {
   const [collections, setCollections] = useState([
     {
       id: 1,
-      name: 'Birthday Gifts',
+      name: "Birthday Gifts",
       gifts: [],
     },
     {
       id: 2,
-      name: 'Christmas Gifts',
+      name: "Christmas Gifts",
       gifts: predefinedGifts,
     },
     {
-        id: 3,
-        name: 'Birthday Gifts',
-        gifts: predefinedGifts2,
-      },
-      {
-        id: 4,
-        name: 'Christmas Gifts',
-        gifts: predefinedGifts,
-      },
-      {
-        id: 5,
-        name: 'Birthday Gifts',
-        gifts: predefinedGifts,
-      },
-      {
-        id: 6,
-        name: 'Christmas Gifts',
-        gifts: predefinedGifts,
-      },
-      {
-        id: 7,
-        name: 'Birthday Gifts',
-        gifts: predefinedGifts,
-      },
-      {
-        id: 8,
-        name: 'Christmas Gifts',
-        gifts: predefinedGifts,
-      },
-      {
-        id: 9,
-        name: 'Birthday Gifts',
-        gifts: predefinedGifts,
-      },
-      {
-        id: 10,
-        name: 'Christmas Gifts',
-        gifts: predefinedGifts,
-      },
-      {
-        id: 11,
-        name: 'Birthday Gifts',
-        gifts: predefinedGifts
-      },
-      {
-        id: 12,
-        name: 'Christmas Gifts',
-        gifts: predefinedGifts
-      },
-      {
-        id: 13,
-        name: 'Birthday Gifts',
-        gifts: predefinedGifts,
-      },
-      {
-        id: 14,
-        name: 'Christmas Gifts',
-        gifts: predefinedGifts,
-      },
-      
+      id: 3,
+      name: "Birthday Gifts",
+      gifts: predefinedGifts2,
+    },
+    {
+      id: 4,
+      name: "Christmas Gifts",
+      gifts: predefinedGifts,
+    },
+    {
+      id: 5,
+      name: "Birthday Gifts",
+      gifts: predefinedGifts,
+    },
+    {
+      id: 6,
+      name: "Christmas Gifts",
+      gifts: predefinedGifts,
+    },
+    {
+      id: 7,
+      name: "Birthday Gifts",
+      gifts: predefinedGifts,
+    },
+    {
+      id: 8,
+      name: "Christmas Gifts",
+      gifts: predefinedGifts,
+    },
+    {
+      id: 9,
+      name: "Birthday Gifts",
+      gifts: predefinedGifts,
+    },
+    {
+      id: 10,
+      name: "Christmas Gifts",
+      gifts: predefinedGifts,
+    },
+    {
+      id: 11,
+      name: "Birthday Gifts",
+      gifts: predefinedGifts,
+    },
+    {
+      id: 12,
+      name: "Christmas Gifts",
+      gifts: predefinedGifts,
+    },
+    {
+      id: 13,
+      name: "Birthday Gifts",
+      gifts: predefinedGifts,
+    },
+    {
+      id: 14,
+      name: "Christmas Gifts",
+      gifts: predefinedGifts,
+    },
   ]);
 
   const handleCreateCollection = () => {
     const newCollection: Collection = {
       id: Date.now(),
-      name: 'New Collection',
+      name: "New Collection",
       gifts: [],
     };
 
@@ -166,43 +166,60 @@ const CollectionsPage = () => {
   };
 
   const handleDeleteCollection = (collectionId: number) => {
-    setCollections((prevCollections) => prevCollections.filter((collection) => collection.id !== collectionId));
+    setCollections((prevCollections) =>
+      prevCollections.filter((collection) => collection.id !== collectionId)
+    );
   };
 
   return (
-    <div className="min-h-screen items-center justify-center">
-      <div className="app" style={{ overflowX: "auto" }}>
-        <div className="flex">
-          {collections.map((collection) => (
-            <div key={collection.id} className="m-4 flex-shrink-0 ">
-              <CollectionItem name={collection.name} gifts={collection.gifts} />
-              <div className="mt-2">
-                <button onClick={() => handleEditCollection(collection.id)} className="m-2">
-                  Edit
-                </button>
-                <button onClick={() => handleDeleteCollection(collection.id)} className="m-2 text-red-500">
-                  Delete
-                </button>
+    <div>
+      <Navbar />
+      <div className="min-h-screen items-center justify-center">
+        <div className="app" style={{ overflowX: "auto" }}>
+          <div className="flex">
+            {collections.map((collection) => (
+              <div key={collection.id} className="m-4 flex-shrink-0 ">
+                <CollectionItem
+                  name={collection.name}
+                  gifts={collection.gifts}
+                />
+                <div className="mt-2">
+                  <button
+                    onClick={() => handleEditCollection(collection.id)}
+                    className="m-2"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDeleteCollection(collection.id)}
+                    className="m-2 text-red-500"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      </div>
-      {showEditForm && (
-        <div className="items-center justify-center">
-          <div className="m-4">
-            <EditForm
-              collection={collections.find((c) => c.id === editCollectionId)!}
-              onSave={handleSaveCollection}
-              onClose={handleCloseEditForm}
-            />
+            ))}
           </div>
         </div>
-      )}
-      <div className="flex items-center justify-center mt-4">
-        <button onClick={handleCreateCollection} className="bg-blue-500 text-white p-2 rounded">
-          Create New Collection
-        </button>
+        {showEditForm && (
+          <div className="items-center justify-center">
+            <div className="m-4">
+              <EditForm
+                collection={collections.find((c) => c.id === editCollectionId)!}
+                onSave={handleSaveCollection}
+                onClose={handleCloseEditForm}
+              />
+            </div>
+          </div>
+        )}
+        <div className="flex items-center justify-center mt-4">
+          <button
+            onClick={handleCreateCollection}
+            className="bg-blue-500 text-white p-2 rounded"
+          >
+            Create New Collection
+          </button>
+        </div>
       </div>
     </div>
   );
