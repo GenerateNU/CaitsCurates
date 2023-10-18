@@ -245,7 +245,5 @@ func (pg *PgController) Serve() *gin.Engine {
 		c.JSON(http.StatusOK, giftDeletedCollection)
 	})
 
-	// Add Gift Collection to Gift Response
-
 	return r
 }

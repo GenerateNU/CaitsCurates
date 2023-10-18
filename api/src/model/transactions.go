@@ -144,19 +144,22 @@ func DeleteGiftFromCollectionFromDB(db *gorm.DB, inputGift Gift, id int64) (Gift
 		return GiftCollection{}, err
 	}
 
-	// Create a new GiftCollection array without the inputGift
-	var giftDeletedCollection []*Gift
-	for _, gift := range collection.Gifts {
-		if gift.ID != uint(id) {
-			giftDeletedCollection = append(giftDeletedCollection, gift)
+	var giftIndex = -1
+	for i, gift := range collection.Gifts {
+		if gift.ID == inputGift.ID {
+			giftIndex = i
+			break
 		}
 	}
 
-	collection.Gifts = giftDeletedCollection
+	if giftIndex != -1 {
+		collection.Gifts = append(collection.Gifts[:giftIndex], collection.Gifts[giftIndex+1:]...)
+	}
 
 	if err := db.Save(&collection).Error; err != nil {
 		return GiftCollection{}, err
 	}
 
 	return collection, nil
+
 }

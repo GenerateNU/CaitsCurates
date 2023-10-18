@@ -716,7 +716,6 @@ func TestDeleteGift(t *testing.T) {
 	assert.Equal(t, int64(0), deletedCount)
 }
 
-
 func TestGetAllGift(t *testing.T) {
 	// Database setup
 	dsn := "user=testuser password=testpwd host=localhost port=5433 dbname=testdb sslmode=disable"
@@ -744,20 +743,20 @@ func TestGetAllGift(t *testing.T) {
 	// Test code
 	w := httptest.NewRecorder()
 	gift := model.Gift{
-		Name:  "nice sweater",
-		Price: 50,
-		Link: "https://something",
-		Description: "sample description",
-		Demographic: "sample demographic",
+		Name:            "nice sweater",
+		Price:           50,
+		Link:            "https://something",
+		Description:     "sample description",
+		Demographic:     "sample demographic",
 		GiftCollections: []*model.GiftCollection{},
 	}
 
 	gift_two := model.Gift{
-		Name:  "nice sweater 2",
-		Price: 20,
-		Link: "https://something 2",
-		Description: "sample description 2",
-		Demographic: "sample demographic 2",
+		Name:            "nice sweater 2",
+		Price:           20,
+		Link:            "https://something 2",
+		Description:     "sample description 2",
+		Demographic:     "sample demographic 2",
 		GiftCollections: []*model.GiftCollection{},
 	}
 	err = tx.Create(&gift).Error
@@ -820,15 +819,15 @@ func TestGetAllGiftCollection(t *testing.T) {
 	uintValue := uint(5)
 
 	collection := model.GiftCollection{
-		CustomerID: &uintValue,
+		CustomerID:     &uintValue,
 		CollectionName: "sample name",
-		Gifts: []*model.Gift{},
+		Gifts:          []*model.Gift{},
 	}
 
 	collection_two := model.GiftCollection{
-		CustomerID: &uintValue,
+		CustomerID:     &uintValue,
 		CollectionName: "sample name 2",
-		Gifts: []*model.Gift{},
+		Gifts:          []*model.Gift{},
 	}
 
 	err = db.Create(&collection).Error
@@ -888,13 +887,12 @@ func TestGetAllGiftResponse(t *testing.T) {
 
 	response := model.GiftResponse{
 		GiftCollection: collection,
-		CustomMessage: "sample custom message",
+		CustomMessage:  "sample custom message",
 	}
-
 
 	response_two := model.GiftResponse{
 		GiftCollection: collection,
-		CustomMessage: "sample custom message 2",
+		CustomMessage:  "sample custom message 2",
 	}
 
 	err = tx.Create(&response).Error
@@ -921,7 +919,6 @@ func TestGetAllGiftResponse(t *testing.T) {
 	assert.Equal(t, response_two.CustomMessage, responseRetrieved[1].CustomMessage)
 
 }
-
 
 func TestAddGiftToCollection(t *testing.T) {
 	// Database setup
@@ -1054,6 +1051,7 @@ func TestGiftDeleteFromCollection(t *testing.T) {
 	var retrievedCollection model.GiftCollection
 	err = tx.Preload("Gifts").First(&retrievedCollection, "id = ?", addedCollection.ID).Error
 	assert.NoError(t, err)
+	assert.Equal(t, retrievedCollection.Gifts[0].ID, addedCollection.Gifts[0].ID)
 	assert.Equal(t, retrievedCollection.CollectionName, addedCollection.CollectionName)
 	assert.Equal(t, retrievedCollection.Gifts[0].Name, addedCollection.Gifts[0].Name)
 
@@ -1066,6 +1064,7 @@ func TestGiftDeleteFromCollection(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Error marshaling JSON: %v", err)
 	}
+
 	assert.NoError(t, err)
 	req2, err := http.NewRequest("DELETE", fmt.Sprintf("/addGiftCollection/%d", addedCollection.ID), bytes.NewBuffer(giftJSON))
 	router.ServeHTTP(w2, req2)
@@ -1079,6 +1078,8 @@ func TestGiftDeleteFromCollection(t *testing.T) {
 	err = tx.Preload("Gifts").First(&giftDeletedRetrievedCollection, "id = ?", giftDeletedCollection.ID).Error
 	assert.NoError(t, err)
 	assert.Equal(t, giftDeletedRetrievedCollection.CollectionName, giftDeletedCollection.CollectionName)
+	assert.Equal(t, giftDeletedRetrievedCollection.Gifts[0], giftDeletedCollection.CollectionName)
+
 	var count2 int64
 	count2 = int64(len(giftDeletedRetrievedCollection.Gifts))
 	assert.Equal(t, int64(0), count2)
