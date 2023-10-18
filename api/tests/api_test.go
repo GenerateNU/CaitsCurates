@@ -1039,6 +1039,7 @@ func TestGiftDeleteFromCollection(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Error marshaling JSON: %v", err)
 	}
+
 	assert.NoError(t, err)
 	req1, err := http.NewRequest("POST", fmt.Sprintf("/addGiftCollection"), bytes.NewBuffer(collectionJSON))
 	router.ServeHTTP(w1, req1)
@@ -1048,6 +1049,7 @@ func TestGiftDeleteFromCollection(t *testing.T) {
 	if e := json.Unmarshal(w1.Body.Bytes(), &addedCollection); e != nil {
 		t.Fatalf("Error unmarshaling JSON: %v", e)
 	}
+
 	var retrievedCollection model.GiftCollection
 	err = tx.Preload("Gifts").First(&retrievedCollection, "id = ?", addedCollection.ID).Error
 	assert.NoError(t, err)
@@ -1078,7 +1080,6 @@ func TestGiftDeleteFromCollection(t *testing.T) {
 	err = tx.Preload("Gifts").First(&giftDeletedRetrievedCollection, "id = ?", giftDeletedCollection.ID).Error
 	assert.NoError(t, err)
 	assert.Equal(t, giftDeletedRetrievedCollection.CollectionName, giftDeletedCollection.CollectionName)
-	assert.Equal(t, giftDeletedRetrievedCollection.Gifts[0], giftDeletedCollection.CollectionName)
 
 	var count2 int64
 	count2 = int64(len(giftDeletedRetrievedCollection.Gifts))
