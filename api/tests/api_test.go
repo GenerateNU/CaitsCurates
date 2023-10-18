@@ -601,7 +601,6 @@ func TestUpdateGift(t *testing.T) {
 	updatedTestGift := model.Gift{
 		Name:            "updatedgift1",
 		Price:           100,
-		Link:            "updatedlink1",
 		Description:     "updateddescription1",
 		Demographic:     "updateddemogrpahic1",
 		GiftCollections: nil,
@@ -624,15 +623,17 @@ func TestUpdateGift(t *testing.T) {
 	if e := json.Unmarshal(w.Body.Bytes(), &updatedGiftRetrieved); e != nil {
 		t.Fatalf("Error unmarshaling JSON: %v", e)
 	}
+	fmt.Print(updatedGiftRetrieved.ID)
 
 	var fetchedUpdatedGift model.Gift
 	err = tx.First(&fetchedUpdatedGift, updatedGiftRetrieved.ID).Error
+	assert.NoError(t, err)
 	err = tx.First(&updatedGiftRetrieved, fetchedUpdatedGift.ID).Error
 	assert.NoError(t, err)
 	assert.Equal(t, fetchedUpdatedGift.ID, updatedGiftRetrieved.ID)
 	assert.Equal(t, fetchedUpdatedGift.Name, updatedGiftRetrieved.Name)
 	assert.Equal(t, fetchedUpdatedGift.Price, updatedGiftRetrieved.Price)
-	assert.Equal(t, fetchedUpdatedGift.Link, updatedGiftRetrieved.Link)
+	assert.Equal(t, "link1", updatedGiftRetrieved.Link)
 	assert.Equal(t, fetchedUpdatedGift.Description, updatedGiftRetrieved.Description)
 	assert.Equal(t, fetchedUpdatedGift.Demographic, updatedGiftRetrieved.Demographic)
 	assert.Equal(t, fetchedUpdatedGift.Link, updatedGiftRetrieved.Link)
@@ -641,7 +642,7 @@ func TestUpdateGift(t *testing.T) {
 
 	//  Check that there's only 1 Gift
 	var count int64
-	db.Model(&model.Gift{}).Where("id = ?", updatedGiftRetrieved.ID).Count(&count)
+	tx.Model(&model.Gift{}).Where("id = ?", fetchedUpdatedGift.ID).Count(&count)
 	assert.Equal(t, int64(1), count)
 }
 
@@ -716,7 +717,6 @@ func TestDeleteGift(t *testing.T) {
 	assert.Equal(t, int64(0), deletedCount)
 }
 
-
 func TestGetAllGift(t *testing.T) {
 	// Database setup
 	dsn := "user=testuser password=testpwd host=localhost port=5433 dbname=testdb sslmode=disable"
@@ -744,20 +744,20 @@ func TestGetAllGift(t *testing.T) {
 	// Test code
 	w := httptest.NewRecorder()
 	gift := model.Gift{
-		Name:  "nice sweater",
-		Price: 50,
-		Link: "https://something",
-		Description: "sample description",
-		Demographic: "sample demographic",
+		Name:            "nice sweater",
+		Price:           50,
+		Link:            "https://something",
+		Description:     "sample description",
+		Demographic:     "sample demographic",
 		GiftCollections: []*model.GiftCollection{},
 	}
 
 	gift_two := model.Gift{
-		Name:  "nice sweater 2",
-		Price: 20,
-		Link: "https://something 2",
-		Description: "sample description 2",
-		Demographic: "sample demographic 2",
+		Name:            "nice sweater 2",
+		Price:           20,
+		Link:            "https://something 2",
+		Description:     "sample description 2",
+		Demographic:     "sample demographic 2",
 		GiftCollections: []*model.GiftCollection{},
 	}
 	err = tx.Create(&gift).Error
@@ -820,15 +820,15 @@ func TestGetAllGiftCollection(t *testing.T) {
 	uintValue := uint(5)
 
 	collection := model.GiftCollection{
-		CustomerID: &uintValue,
+		CustomerID:     &uintValue,
 		CollectionName: "sample name",
-		Gifts: []*model.Gift{},
+		Gifts:          []*model.Gift{},
 	}
-
+	uintValue = uint(6)
 	collection_two := model.GiftCollection{
-		CustomerID: &uintValue,
+		CustomerID:     &uintValue,
 		CollectionName: "sample name 2",
-		Gifts: []*model.Gift{},
+		Gifts:          []*model.Gift{},
 	}
 
 	err = db.Create(&collection).Error
@@ -888,13 +888,12 @@ func TestGetAllGiftResponse(t *testing.T) {
 
 	response := model.GiftResponse{
 		GiftCollection: collection,
-		CustomMessage: "sample custom message",
+		CustomMessage:  "sample custom message",
 	}
-
 
 	response_two := model.GiftResponse{
 		GiftCollection: collection,
-		CustomMessage: "sample custom message 2",
+		CustomMessage:  "sample custom message 2",
 	}
 
 	err = tx.Create(&response).Error
@@ -922,3 +921,166 @@ func TestGetAllGiftResponse(t *testing.T) {
 
 }
 
+func TestAddGiftToCollection(t *testing.T) {
+	// Database setup
+	dsn := "user=testuser password=testpwd host=localhost port=5433 dbname=testdb sslmode=disable"
+	if dbURL, exists := os.LookupEnv("TEST_DATABASE_URL"); exists {
+		dsn = dbURL
+	}
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("Unable to connect to database: %v", err)
+	}
+	// Put auto migrations here
+	err = db.AutoMigrate(&model.GiftCollection{}, &model.Gift{})
+	if err != nil {
+		panic("failed to migrate test database schema")
+	}
+	// Wrap the DB connection in a transaction
+	tx := db.Begin()
+	defer tx.Rollback()
+
+	// Create Model and Controller
+	m := &model.PgModel{Conn: tx}
+	c := &c.PgController{Model: m}
+	router := c.Serve()
+
+	// Test code
+	w1 := httptest.NewRecorder()
+	w2 := httptest.NewRecorder()
+
+	// Create a new Gift Collection
+	collection := model.GiftCollection{
+		Gifts:          []*model.Gift{},
+		CollectionName: "collection",
+	}
+
+	collectionJSON, err := json.Marshal(collection)
+	if err != nil {
+		t.Fatalf("Error marshaling JSON: %v", err)
+	}
+	assert.NoError(t, err)
+	req1, err := http.NewRequest("POST", fmt.Sprintf("/addGiftCollection"), bytes.NewBuffer(collectionJSON))
+	router.ServeHTTP(w1, req1)
+	assert.Equal(t, 200, w1.Code)
+
+	var addedCollection model.GiftCollection
+	if e := json.Unmarshal(w1.Body.Bytes(), &addedCollection); e != nil {
+		t.Fatalf("Error unmarshaling JSON: %v", e)
+	}
+	var retrievedCollection model.GiftCollection
+	err = tx.Preload("Gifts").First(&retrievedCollection, "id = ?", addedCollection.ID).Error
+	assert.NoError(t, err)
+	assert.Equal(t, retrievedCollection.CollectionName, addedCollection.CollectionName)
+
+	// Add Gift to Gift Collection
+	gift := model.Gift{
+		Name: "Gift1",
+	}
+	giftJSON, err := json.Marshal(gift)
+	if err != nil {
+		t.Fatalf("Error marshaling JSON: %v", err)
+	}
+	assert.NoError(t, err)
+	req2, err := http.NewRequest("POST", fmt.Sprintf("/addGiftCollection/%d", addedCollection.ID), bytes.NewBuffer(giftJSON))
+	router.ServeHTTP(w2, req2)
+	assert.Equal(t, 200, w2.Code)
+
+	var giftAddedCollection model.GiftCollection
+	if e := json.Unmarshal(w2.Body.Bytes(), &giftAddedCollection); e != nil {
+		t.Fatalf("Error unmarshaling JSON: %v", e)
+	}
+	var giftAddedRetrievedCollection model.GiftCollection
+	err = tx.Preload("Gifts").First(&giftAddedRetrievedCollection, "id = ?", giftAddedCollection.ID).Error
+	assert.NoError(t, err)
+	assert.Equal(t, giftAddedRetrievedCollection.CollectionName, giftAddedCollection.CollectionName)
+	assert.Equal(t, giftAddedRetrievedCollection.Gifts[0].Name, giftAddedCollection.Gifts[0].Name)
+}
+
+func TestGiftDeleteFromCollection(t *testing.T) {
+	// Database setup
+	dsn := "user=testuser password=testpwd host=localhost port=5433 dbname=testdb sslmode=disable"
+	if dbURL, exists := os.LookupEnv("TEST_DATABASE_URL"); exists {
+		dsn = dbURL
+	}
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("Unable to connect to database: %v", err)
+	}
+	// Put auto migrations here
+	err = db.AutoMigrate(&model.GiftCollection{}, &model.Gift{})
+	if err != nil {
+		panic("failed to migrate test database schema")
+	}
+	// Wrap the DB connection in a transaction
+	tx := db.Begin()
+	defer tx.Rollback()
+
+	// Create Model and Controller
+	m := &model.PgModel{Conn: tx}
+	c := &c.PgController{Model: m}
+	router := c.Serve()
+
+	// Test code
+	w1 := httptest.NewRecorder()
+	w2 := httptest.NewRecorder()
+
+	gift := model.Gift{
+		Name: "Gift1",
+	}
+	err = tx.Create(&gift).Error
+	assert.NoError(t, err)
+
+	collection := model.GiftCollection{
+		Gifts:          []*model.Gift{&gift},
+		CollectionName: "collection",
+	}
+
+	collectionJSON, err := json.Marshal(collection)
+	if err != nil {
+		t.Fatalf("Error marshaling JSON: %v", err)
+	}
+
+	assert.NoError(t, err)
+	req1, err := http.NewRequest("POST", fmt.Sprintf("/addGiftCollection"), bytes.NewBuffer(collectionJSON))
+	router.ServeHTTP(w1, req1)
+	assert.Equal(t, 200, w1.Code)
+
+	var addedCollection model.GiftCollection
+	if e := json.Unmarshal(w1.Body.Bytes(), &addedCollection); e != nil {
+		t.Fatalf("Error unmarshaling JSON: %v", e)
+	}
+
+	var retrievedCollection model.GiftCollection
+	err = tx.Preload("Gifts").First(&retrievedCollection, "id = ?", addedCollection.ID).Error
+	assert.NoError(t, err)
+	assert.Equal(t, retrievedCollection.Gifts[0].ID, addedCollection.Gifts[0].ID)
+	assert.Equal(t, retrievedCollection.CollectionName, addedCollection.CollectionName)
+	assert.Equal(t, retrievedCollection.Gifts[0].Name, addedCollection.Gifts[0].Name)
+
+	var count1 int64
+	count1 = int64(len(retrievedCollection.Gifts))
+	assert.Equal(t, int64(1), count1)
+
+	// Delete Gift from Gift Collection
+	assert.NoError(t, err)
+	fmt.Print(retrievedCollection.Gifts[0].ID)
+	fmt.Print(retrievedCollection.ID)
+	fmt.Print(addedCollection.ID)
+	req2, err := http.NewRequest("DELETE", fmt.Sprintf("/removeGiftFromGiftCollection/%d/%d", retrievedCollection.Gifts[0].ID, addedCollection.ID), nil)
+	router.ServeHTTP(w2, req2)
+	assert.Equal(t, 200, w2.Code)
+
+	var giftDeletedCollection model.GiftCollection
+	if e := json.Unmarshal(w2.Body.Bytes(), &giftDeletedCollection); e != nil {
+		t.Fatalf("Error unmarshaling JSON: %v", e)
+	}
+	var giftDeletedRetrievedCollection model.GiftCollection
+	err = tx.Preload("Gifts").First(&giftDeletedRetrievedCollection, "id = ?", giftDeletedCollection.ID).Error
+	assert.NoError(t, err)
+	assert.Equal(t, giftDeletedRetrievedCollection.CollectionName, giftDeletedCollection.CollectionName)
+
+	var count2 int64
+	count2 = int64(len(giftDeletedRetrievedCollection.Gifts))
+	assert.Equal(t, int64(0), count2)
+}

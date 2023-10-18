@@ -40,13 +40,26 @@ func UpdateGiftToDb(db *gorm.DB, id int64, inputGift Gift) (Gift, error) {
 	}
 
 	// Update Gift Record
-	updates := map[string]interface{}{
-		"Name":            inputGift.Name,
-		"Price":           inputGift.Price,
-		"Link":            inputGift.Link,
-		"Description":     inputGift.Description,
-		"Demographic":     inputGift.Demographic,
-		"GiftCollections": inputGift.GiftCollections,
+	updates := make(map[string]interface{})
+
+	// Check each field in inputGift and add it to the updates map if it is non-zero
+	if inputGift.Name != "" {
+		updates["Name"] = inputGift.Name
+	}
+	if inputGift.Price != 0 {
+		updates["Price"] = inputGift.Price
+	}
+	if inputGift.Link != "" {
+		updates["Link"] = inputGift.Link
+	}
+	if inputGift.Description != "" {
+		updates["Description"] = inputGift.Description
+	}
+	if inputGift.Demographic != "" {
+		updates["Demographic"] = inputGift.Demographic
+	}
+	if inputGift.GiftCollections != nil && len(inputGift.GiftCollections) > 0 {
+		updates["GiftCollections"] = inputGift.GiftCollections
 	}
 
 	if err := db.Model(&updatedGift).Updates(updates).Error; err != nil {
@@ -121,4 +134,39 @@ func GetAllCollectionsFromDB(db *gorm.DB) ([]GiftCollection, error) {
 		return nil, err
 	}
 	return collections, nil
+}
+
+func AddGiftToCollectionFromDB(db *gorm.DB, inputGift Gift, id int64) (GiftCollection, error) {
+	var collection GiftCollection
+	if err := db.Where("id = ?", id).First(&collection).Error; err != nil {
+		return GiftCollection{}, err
+	}
+
+	collection.Gifts = append(collection.Gifts, &inputGift)
+
+	if err := db.Save(&collection).Error; err != nil {
+		return GiftCollection{}, err
+	}
+
+	return collection, nil
+}
+
+func DeleteGiftFromCollectionFromDB(db *gorm.DB, giftID int64, giftCollectionID int64) (GiftCollection, error) {
+	var collection GiftCollection
+	if err := db.Preload("Gifts").First(&collection, giftCollectionID).Error; err != nil {
+		return GiftCollection{}, err
+	}
+
+	// Create a new GiftCollection array without the inputGift
+	var giftRemovedCollection []*Gift
+	for _, gift := range collection.Gifts {
+		if gift.ID != uint(giftID) {
+			giftRemovedCollection = append(giftRemovedCollection, gift)
+		}
+	}
+	if err := db.Model(&collection).Association("Gifts").Replace(giftRemovedCollection); err != nil {
+		return GiftCollection{}, err
+	}
+
+	return collection, nil
 }
