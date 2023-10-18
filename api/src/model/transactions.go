@@ -40,13 +40,26 @@ func UpdateGiftToDb(db *gorm.DB, id int64, inputGift Gift) (Gift, error) {
 	}
 
 	// Update Gift Record
-	updates := map[string]interface{}{
-		"Name":            inputGift.Name,
-		"Price":           inputGift.Price,
-		"Link":            inputGift.Link,
-		"Description":     inputGift.Description,
-		"Demographic":     inputGift.Demographic,
-		"GiftCollections": inputGift.GiftCollections,
+	updates := make(map[string]interface{})
+
+	// Check each field in inputGift and add it to the updates map if it is non-zero
+	if inputGift.Name != "" {
+		updates["Name"] = inputGift.Name
+	}
+	if inputGift.Price != 0 {
+		updates["Price"] = inputGift.Price
+	}
+	if inputGift.Link != "" {
+		updates["Link"] = inputGift.Link
+	}
+	if inputGift.Description != "" {
+		updates["Description"] = inputGift.Description
+	}
+	if inputGift.Demographic != "" {
+		updates["Demographic"] = inputGift.Demographic
+	}
+	if inputGift.GiftCollections != nil && len(inputGift.GiftCollections) > 0 {
+		updates["GiftCollections"] = inputGift.GiftCollections
 	}
 
 	if err := db.Model(&updatedGift).Updates(updates).Error; err != nil {

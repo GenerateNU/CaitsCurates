@@ -601,7 +601,6 @@ func TestUpdateGift(t *testing.T) {
 	updatedTestGift := model.Gift{
 		Name:            "updatedgift1",
 		Price:           100,
-		Link:            "updatedlink1",
 		Description:     "updateddescription1",
 		Demographic:     "updateddemogrpahic1",
 		GiftCollections: nil,
@@ -624,15 +623,17 @@ func TestUpdateGift(t *testing.T) {
 	if e := json.Unmarshal(w.Body.Bytes(), &updatedGiftRetrieved); e != nil {
 		t.Fatalf("Error unmarshaling JSON: %v", e)
 	}
+	fmt.Print(updatedGiftRetrieved.ID)
 
 	var fetchedUpdatedGift model.Gift
 	err = tx.First(&fetchedUpdatedGift, updatedGiftRetrieved.ID).Error
+	assert.NoError(t, err)
 	err = tx.First(&updatedGiftRetrieved, fetchedUpdatedGift.ID).Error
 	assert.NoError(t, err)
 	assert.Equal(t, fetchedUpdatedGift.ID, updatedGiftRetrieved.ID)
 	assert.Equal(t, fetchedUpdatedGift.Name, updatedGiftRetrieved.Name)
 	assert.Equal(t, fetchedUpdatedGift.Price, updatedGiftRetrieved.Price)
-	assert.Equal(t, fetchedUpdatedGift.Link, updatedGiftRetrieved.Link)
+	assert.Equal(t, "link1", updatedGiftRetrieved.Link)
 	assert.Equal(t, fetchedUpdatedGift.Description, updatedGiftRetrieved.Description)
 	assert.Equal(t, fetchedUpdatedGift.Demographic, updatedGiftRetrieved.Demographic)
 	assert.Equal(t, fetchedUpdatedGift.Link, updatedGiftRetrieved.Link)
@@ -641,7 +642,7 @@ func TestUpdateGift(t *testing.T) {
 
 	//  Check that there's only 1 Gift
 	var count int64
-	db.Model(&model.Gift{}).Where("id = ?", updatedGiftRetrieved.ID).Count(&count)
+	tx.Model(&model.Gift{}).Where("id = ?", fetchedUpdatedGift.ID).Count(&count)
 	assert.Equal(t, int64(1), count)
 }
 
@@ -823,7 +824,7 @@ func TestGetAllGiftCollection(t *testing.T) {
 		CollectionName: "sample name",
 		Gifts:          []*model.Gift{},
 	}
-
+	uintValue = uint(6)
 	collection_two := model.GiftCollection{
 		CustomerID:     &uintValue,
 		CollectionName: "sample name 2",
