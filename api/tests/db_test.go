@@ -2,10 +2,11 @@ package tests
 
 import (
 	"CaitsCurates/backend/src/model"
-	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -274,6 +275,7 @@ func TestGiftResponseModel(t *testing.T) {
 		CollectionName: "Cool Toys",
 		Gifts:          []*model.Gift{&gift1, &gift2},
 	}
+
 	// Save the gifts
 	tx.Save(&gift1)
 	tx.Save(&gift2)
