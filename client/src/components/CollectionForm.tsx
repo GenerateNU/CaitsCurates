@@ -1,6 +1,5 @@
 import  { useState, ChangeEvent, FormEvent } from 'react';
-import {GiftCollection} from "../types.tsx";
-import Gift from "./Gift.tsx";
+import {Gift, GiftCollection} from "../types.tsx";
 
 
 
@@ -17,7 +16,6 @@ type EditFormProps = {
 function CollectionForm({ collection, allGifts, onSave, onClose }: EditFormProps) {
   const [editedName, setEditedName] = useState(collection?.CollectionName || "");
   const [editedGifts, setEditedGifts] = useState(collection?.Gifts || []);
-  //const [selectedGiftIds, setSelectedGiftIds] = useState(editedGifts.map(gift => gift.ID));
 
   const handleNameChange = (e: ChangeEvent<HTMLInputElement>) => {
     setEditedName(e.target.value);

@@ -168,7 +168,7 @@ func DeleteGiftCollectionFromDb(db *gorm.DB, id int64) error {
 
 func GetCompleteGiftRequestsFromDB(db *gorm.DB) ([]GiftRequest, error) {
 	var requests []GiftRequest
-	if err := db.Where("gift_response_id IS NOT NULL").Find(&requests).Error; err != nil {
+	if err := db.Where("gift_response_id IS NOT NULL").Preload("GiftResponse").Preload("GiftResponse.GiftCollection").Find(&requests).Error; err != nil {
 		return nil, err
 	}
 	return requests, nil

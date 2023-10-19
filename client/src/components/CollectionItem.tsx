@@ -1,5 +1,5 @@
-import Gift from "./Gift.tsx";
-
+//import Gift from "./Gift.tsx";
+import {Gift} from "../types.tsx";
 
 type CollectionItemProps = {
   name: string;

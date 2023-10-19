@@ -3,8 +3,8 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import RequestsPage from "./pages/RequestsPage";
 import CollectionPage from './pages/CollectionsPage';
-import TestPage from "./pages/TestPage.tsx";
 import {AdminProvider} from "./Context/AdminContext.tsx";
+import GiftManagementPage from "./pages/GiftManagementPage.tsx";
 
 function App() {
     return (
@@ -26,10 +26,10 @@ function App() {
                         </AdminProvider>}
                 />
                 <Route
-                    path="/test/"
+                    path="/gifts/"
                     element={
                         <AdminProvider>
-                            <TestPage/>
+                            <GiftManagementPage/>
                         </AdminProvider>}
                 />
             </Routes>
