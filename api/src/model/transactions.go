@@ -165,7 +165,17 @@ func DeleteGiftCollectionFromDb(db *gorm.DB, id int64) error {
 
 	return nil
 }
+func SearchGiftsDb(db *gorm.DB, searchTerm string, minPrice int, maxPrice int) ([]Gift, error) {
+	var gifts []Gift
 
+	if err := db.Where("to_tsvector('english', name || ' ' || description) @@ to_tsquery('english', ?)", searchTerm).
+		Where("price >= ? AND price <= ?", minPrice, maxPrice).
+		Find(&gifts).Error; err != nil {
+		return nil, err
+	}
+
+	return gifts, nil
+}
 func GetCompleteGiftRequestsFromDB(db *gorm.DB) ([]GiftRequest, error) {
 	var requests []GiftRequest
 	if err := db.Where("gift_response_id IS NOT NULL").Preload("GiftResponse").Preload("GiftResponse.GiftCollection").Find(&requests).Error; err != nil {

@@ -2,6 +2,8 @@ package model
 
 import (
 	"gorm.io/gorm"
+	"regexp"
+	"strings"
 )
 
 type PgModel struct {
@@ -21,6 +23,7 @@ type Model interface {
 	UpdateGift(int64, Gift) (Gift, error)
 	DeleteGift(int64) error
 	DeleteGiftCollection(int64) error
+	SearchGifts(string, int, int) ([]Gift, error)
 	AllGiftResponses() ([]GiftResponse, error)
 	AllCollections() ([]GiftCollection, error)
 	UpdateCollection(GiftCollection) (GiftCollection, error)
@@ -142,7 +145,30 @@ func (m *PgModel) DeleteGift(id int64) error {
 
 	return nil
 }
+func (m *PgModel) SearchGifts(searchTerm string, minPrice int, maxPrice int) ([]Gift, error) {
+	var gifts []Gift
+	searchTerm = strings.TrimSpace(searchTerm)
 
+	// Convert to lowercase
+	searchTerm = strings.ToLower(searchTerm)
+
+	// Remove special characters or punctuations
+	reg, _ := regexp.Compile("[^a-zA-Z0-9]+")
+	searchTerm = reg.ReplaceAllString(searchTerm, " ")
+	//
+	searchTerms := strings.Fields(searchTerm)
+	for i, term := range searchTerms {
+		searchTerms[i] = term + ":*"
+	}
+	formattedSearchTerm := strings.Join(searchTerms, " | ")
+	gifts, err := SearchGiftsDb(m.Conn, formattedSearchTerm, minPrice, maxPrice)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return gifts, nil
+}
 func (m *PgModel) DeleteGiftCollection(id int64) error {
 
 	err := DeleteGiftCollectionFromDb(m.Conn, id)

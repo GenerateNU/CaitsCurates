@@ -178,6 +178,19 @@ func (pg *PgController) Serve() *gin.Engine {
 
 		c.JSON(http.StatusOK, insertedGift)
 	})
+	r.GET("/search", func(c *gin.Context) {
+		searchTerm := c.Query("q")
+		minPriceStr := c.Query("minPrice")
+		maxPriceStr := c.Query("maxPrice")
+
+		minPrice, _ := strconv.Atoi(minPriceStr)
+		maxPrice, _ := strconv.Atoi(maxPriceStr)
+		gifts, err := pg.SearchGifts(searchTerm, minPrice, maxPrice)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, "Oops")
+		}
+		c.JSON(http.StatusOK, gifts)
+	})
 	// Update Gift Record Given Gift ID
 	r.PUT("/gifts/:id", func(c *gin.Context) {
 
