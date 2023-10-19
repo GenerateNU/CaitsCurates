@@ -59,28 +59,59 @@ func main() {
 	customer := model.Customer{GiftRequests: []*model.GiftRequest{&giftRequest}, User: user}
 	err = db.Create(&customer).Error
 	gift1 := model.Gift{
-		Name:            "Super cool new toy",
-		Price:           500.00,
-		Link:            "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-		Description:     "Really great content. Highly recommend",
-		Demographic:     "Unknown...",
+		Name:            "Robot Extreme",
+		Price:           50.00,
+		Link:            "link.robot.com",
+		Description:     "Robot Toy With Laser Eyes",
+		Demographic:     "For Kids",
 		GiftCollections: nil,
 	}
 
 	gift2 := model.Gift{
-		Name:            "Super cool new toy 2",
-		Price:           2.00,
-		Link:            "https://www.youtube.com/Penguinz0",
-		Description:     "Really great content. Highly recommend",
-		Demographic:     "Unknown...",
+		Name:            "Angry Teddy Bear",
+		Price:           20.00,
+		Link:            "link.evilTeddy.com",
+		Description:     "A Teddy Bear Toy but Evil!",
+		Demographic:     "For Kids",
+		GiftCollections: nil,
+	}
+	gift3 := model.Gift{
+		Name:            "Pumpkin Sweater",
+		Price:           40.00,
+		Link:            "link.Sweater.com",
+		Description:     "Perfect festive sweater for fall weather",
+		Demographic:     "All",
 		GiftCollections: nil,
 	}
 
+	gift4 := model.Gift{
+		Name:            "Cozy Fall Mug",
+		Price:           10.00,
+		Link:            "link.Mug.com",
+		Description:     "Insulated festive mug perfect for warm drinks",
+		Demographic:     "All",
+		GiftCollections: nil,
+	}
+	gift5 := model.Gift{
+		Name:            "Burger Seasoning",
+		Price:           5.00,
+		Link:            "link.Burger.com",
+		Description:     "Great for grill masters looking to up their game",
+		Demographic:     "All",
+		GiftCollections: nil,
+	}
 	giftCollection := model.GiftCollection{
 		CollectionName: "Cool Toys",
 		Gifts:          []*model.Gift{&gift1, &gift2},
 	}
 	err = db.Create(&giftCollection).Error
+	giftCollection2 := model.GiftCollection{
+		CollectionName: "Fall Favorites",
+		Gifts:          []*model.Gift{&gift3, &gift4},
+	}
+	err = db.Create(&giftCollection2).Error
+	err = db.Create(&gift5).Error
+
 	// Check for errors
 	if err != nil {
 		fmt.Println("Error auto-migrating:", err)

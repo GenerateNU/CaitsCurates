@@ -62,7 +62,36 @@ func WriteCollectionToDb(db *gorm.DB, inputCollection GiftCollection) (GiftColle
 	}
 	return inputCollection, nil
 }
+func UpdateCollectionToDb(db *gorm.DB, inputCollection GiftCollection) (GiftCollection, error) {
+	var updatedCollection GiftCollection
+	if err := db.Where("id = ?", inputCollection.ID).First(&updatedCollection).Error; err != nil {
+		return GiftCollection{}, err
+	}
 
+	updates := make(map[string]interface{})
+
+	if inputCollection.CollectionName != "" {
+		updates["CollectionName"] = inputCollection.CollectionName
+	}
+	if inputCollection.Customer != nil {
+		updates["Customer"] = inputCollection.Customer
+	}
+	if inputCollection.CustomerID != nil {
+		updates["CustomerID"] = inputCollection.CustomerID
+	}
+	if inputCollection.Gifts != nil {
+		updates["Gifts"] = inputCollection.Gifts
+	}
+	if err := db.Model(&updatedCollection).Association("Gifts").Clear(); err != nil {
+		return GiftCollection{}, err
+	}
+	if err := db.Model(&updatedCollection).Updates(updates).Error; err != nil {
+		return GiftCollection{}, err
+	}
+
+	// Return Updated Gift Record
+	return updatedCollection, nil
+}
 func GetIncompleteGiftRequestsFromDB(db *gorm.DB) ([]GiftRequest, error) {
 	var requests []GiftRequest
 	if err := db.Where("gift_response_id IS NULL").Preload("GiftResponse").Find(&requests).Error; err != nil {
@@ -118,6 +147,19 @@ func DeleteGiftFromDb(db *gorm.DB, id int64) error {
 	}
 
 	if err := db.Delete(&deletedGift).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func DeleteGiftCollectionFromDb(db *gorm.DB, id int64) error {
+	var deletedGiftCollection GiftCollection
+	if err := db.Where("id = ?", id).First(&deletedGiftCollection).Error; err != nil {
+		return err
+	}
+
+	if err := db.Delete(&deletedGiftCollection).Error; err != nil {
 		return err
 	}
 

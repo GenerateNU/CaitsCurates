@@ -1,8 +1,5 @@
-type Gift = {
-  name: string;
-  description: string;
-  price: number;
-};
+import Gift from "./Gift.tsx";
+
 
 type CollectionItemProps = {
   name: string;
@@ -15,7 +12,7 @@ function CollectionItem({ name, gifts }: CollectionItemProps) {
       <h2 className="text-2xl font-bold">{name}</h2>
       <ul className="max-h-40 overflow-y-auto">
         {gifts.map((gift, index) => (
-          <li key={index}>{gift.name}</li>
+          <li key={index}>{gift.Name}</li>
         ))}
       </ul>
     </div>

@@ -2,84 +2,32 @@ import {useEffect, useState} from "react";
 import CollectionItem from "../components/CollectionItem";
 import EditForm from "../components/CollectionForm";
 import Navbar from "../components/Navbar";
-import {GiftCollection, GiftRequest} from "../types.tsx";
+import {GiftCollection} from "../types.tsx";
 import {useAdmin} from "../Context/AdminContext.tsx";
+import axios from "axios";
 
-type Gift = {
-  name: string;
-  description: string;
-  price: number;
-};
 
-type Collection = {
-  id: number;
-  name: string;
-  gifts: Gift[];
-};
 
-const predefinedGifts: Gift[] = [
-  {
-    name: "Gift 1",
-    description: "Description of Gift 1",
-    price: 10,
-  },
-  {
-    name: "Gift 2",
-    description: "Description of Gift 2",
-    price: 20,
-  },
-  {
-    name: "Gift 3",
-    description: "Description of Gift 3",
-    price: 30,
-  },
-  {
-    name: "Gift 4",
-    description: "Description of Gift 4",
-    price: 40,
-  },
-  {
-    name: "Gift 5",
-    description: "Description of Gift 5",
-    price: 50,
-  },
-];
 
-const predefinedGifts2: Gift[] = [
-  {
-    name: "Gift 10",
-    description: "Description of Gift 1",
-    price: 10,
-  },
-  {
-    name: "Gift 11",
-    description: "Description of Gift 2",
-    price: 20,
-  },
-];
 
 const CollectionsPage = () => {
   const { collections, fetchGiftCollections } = useAdmin();
+  const { gifts, fetchGifts } = useAdmin();
+  const [showEditForm, setShowEditForm] = useState<boolean>(false);
+  const [editCollectionId, setEditCollectionId] = useState<number | null>(null);
 
   useEffect(() => {
     fetchGiftCollections();
+    fetchGifts();
   }, []);
-  const handleCreateCollection = () => {
-    const newCollection: Collection = {
-      id: Date.now(),
-      name: "New Collection",
-      gifts: [],
-    };
+  const handleCreateCollection =  () => {
 
     // Add the new collection to the state
-    setCollections((prevCollections) => [...prevCollections, newCollection]);
-    setEditCollectionId(newCollection.id);
+    setEditCollectionId(0);
     setShowEditForm(true);
-    fetchGiftCollections();
   };
 
-  const [showEditForm, setShowEditForm] = useState<boolean>(false);
-  const [editCollectionId, setEditCollectionId] = useState<number | null>(null);
+
 
   const handleEditCollection = (collectionId: number) => {
     setEditCollectionId(collectionId);
@@ -87,7 +35,13 @@ const CollectionsPage = () => {
     fetchGiftCollections();
   };
 
-  const handleSaveCollection = (updatedCollection: Collection) => {
+  const handleSaveCollection = async (updatedCollection: GiftCollection) => {
+    if (updatedCollection.ID != undefined) {
+      await axios.put("/api/updateGiftCollection", updatedCollection);
+    } else {
+      await axios.post("/api/addGiftCollection", updatedCollection);
+    }
+    console.log(updatedCollection)
     setShowEditForm(false);
     fetchGiftCollections();
   };
@@ -95,12 +49,12 @@ const CollectionsPage = () => {
   const handleCloseEditForm = () => {
     setEditCollectionId(null);
     setShowEditForm(false);
+    fetchGiftCollections();
   };
 
-  const handleDeleteCollection = (collectionId: number) => {
-    setCollections((prevCollections) =>
-      prevCollections.filter((collection) => collection.id !== collectionId)
-    );
+  const handleDeleteCollection = async (collectionId: number) => {
+    await axios.delete(`/api/deleteGiftCollection/${collectionId}`);
+    fetchGiftCollections();
   };
 
   return (
@@ -121,17 +75,17 @@ const CollectionsPage = () => {
         {/* Collection grid */}
         <div className="grid grid-cols-3 gap-x-24">
           {collections.map((collection) => (
-            <div key={collection.id} className="m-2">
-              <CollectionItem name={collection.name} gifts={collection.gifts} />
+            <div key={collection.ID} className="m-2">
+              <CollectionItem name={collection.CollectionName} gifts={collection.Gifts} />
               <div className="mt-0">
                 <button
-                  onClick={() => handleEditCollection(collection.id)}
+                  onClick={() => handleEditCollection(collection.ID)}
                   className="m-2"
                 >
                   Edit
                 </button>
                 <button
-                  onClick={() => handleDeleteCollection(collection.id)}
+                  onClick={() => handleDeleteCollection(collection.ID)}
                   className="m-2 text-red-500"
                 >
                   Delete
@@ -146,7 +100,8 @@ const CollectionsPage = () => {
           <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center">
             <div className="bg-white p-4">
               <EditForm
-                collection={collections.find((c) => c.id === editCollectionId)!}
+                collection={collections.find((c) => c.ID === editCollectionId)!}
+                allGifts={gifts}
                 onSave={handleSaveCollection}
                 onClose={handleCloseEditForm}
               />
