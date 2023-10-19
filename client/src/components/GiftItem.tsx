@@ -17,7 +17,9 @@ const GiftItem = (props: GiftProps) => {
             <div className='flex flex-col mb-3'>
                 <div className='flex flex-row space-x-3'>
                     <p>Price: ${props.gift.Price}</p>
-                    <a href={props.gift.Link}>Buy Now</a>
+                    <a href={props.gift.Link}
+                       className="text-blue-500 hover:underline hover:text-blue-700"
+                    >Link</a>
                 </div>
                 <p>Demographic: {props.gift.Demographic}</p>
                 <p>Description: {props.gift.Description}</p>

@@ -24,10 +24,8 @@ const ResponseForm: React.FC<ResponseFormProps> = ({ RequestID }) => {
 
         try {
             const response = await axios.post("/api/addGiftResponse", payload);
-            console.log(response.data)
             await axios.put("/api/requests", {ID: RequestID, giftResponseID : response.data.ID});
         } catch (error) {
-            console.error("An error occurred while submitting the form", error);
             alert("An error occurred while saving the gift response.");
         }
     };
