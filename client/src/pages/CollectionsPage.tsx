@@ -174,36 +174,45 @@ const CollectionsPage = () => {
   return (
     <div>
       <Navbar />
-      <div className="min-h-screen items-center justify-center">
-        <div className="app" style={{ overflowX: "auto" }}>
-          <div className="flex">
-            {collections.map((collection) => (
-              <div key={collection.id} className="m-4 flex-shrink-0 ">
-                <CollectionItem
-                  name={collection.name}
-                  gifts={collection.gifts}
-                />
-                <div className="mt-2">
-                  <button
-                    onClick={() => handleEditCollection(collection.id)}
-                    className="m-2"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDeleteCollection(collection.id)}
-                    className="m-2 text-red-500"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+      <div className="min-h-screen px-48 py-8">
+        <h2 className="font-bold text-2xl mb-2">Manage Collections</h2>
+        <p>View, create, and update collections here. </p>
+        <div className="my-4">
+          <button
+            onClick={handleCreateCollection}
+            className="bg-blue-500 text-white p-2 rounded"
+          >
+            Create new collection
+          </button>
         </div>
+
+        {/* Collection grid */}
+        <div className="grid grid-cols-3 gap-x-24">
+          {collections.map((collection) => (
+            <div key={collection.id} className="m-2">
+              <CollectionItem name={collection.name} gifts={collection.gifts} />
+              <div className="mt-0">
+                <button
+                  onClick={() => handleEditCollection(collection.id)}
+                  className="m-2"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDeleteCollection(collection.id)}
+                  className="m-2 text-red-500"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Modal for editing/adding collection */}
         {showEditForm && (
-          <div className="items-center justify-center">
-            <div className="m-4">
+          <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center">
+            <div className="bg-white p-4">
               <EditForm
                 collection={collections.find((c) => c.id === editCollectionId)!}
                 onSave={handleSaveCollection}
@@ -212,14 +221,6 @@ const CollectionsPage = () => {
             </div>
           </div>
         )}
-        <div className="flex items-center justify-center mt-4">
-          <button
-            onClick={handleCreateCollection}
-            className="bg-blue-500 text-white p-2 rounded"
-          >
-            Create New Collection
-          </button>
-        </div>
       </div>
     </div>
   );

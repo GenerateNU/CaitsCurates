@@ -11,13 +11,11 @@ type CollectionItemProps = {
 
 function CollectionItem({ name, gifts }: CollectionItemProps) {
   return (
-    <div className="collection-item p-4 border border-black text-center w-40" style={{ height: "245px" }}>
+    <div className="collection-item p-4 border border-black text-center w-auto h-48">
       <h2 className="text-2xl font-bold">{name}</h2>
       <ul className="max-h-40 overflow-y-auto">
         {gifts.map((gift, index) => (
-          <li key={index}>
-            {gift.name}
-          </li>
+          <li key={index}>{gift.name}</li>
         ))}
       </ul>
     </div>
@@ -25,8 +23,3 @@ function CollectionItem({ name, gifts }: CollectionItemProps) {
 }
 
 export default CollectionItem;
-
-  
-
-
-

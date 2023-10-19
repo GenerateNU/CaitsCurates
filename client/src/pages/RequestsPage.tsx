@@ -26,13 +26,14 @@ export default function RequestsPage() {
   return (
     <div>
       <Navbar />
-      <div className="flex flex-col px-96 py-8">
-        <h2 className="font-bold text-xl">View gift requests</h2>
+      <div className="flex flex-col px-48 py-8">
+        <h2 className="font-bold text-2xl mb-2">Manage Requests</h2>
         <p>Filter gift requests using the dropdown below. </p>
         <Select
           defaultValue={selectedOption}
           onChange={handleOption}
           options={options}
+          className="mt-2"
         />
         {(selectedOption?.value == "0" || selectedOption?.value == "2") && (
           <div className="mt-6">
