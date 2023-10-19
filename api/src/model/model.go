@@ -14,7 +14,7 @@ type Model interface {
 	AddCollection(GiftCollection) (GiftCollection, error)
 	IncompleteRequests() ([]GiftRequest, error)
 	CompleteRequests() ([]GiftRequest, error)
-
+	UpdateGiftRequest(GiftRequest) (GiftRequest, error)
 	GetGift(int64) (Gift, error)
 	GetAllGifts() ([]Gift, error)
 	AddGift(Gift) (Gift, error)
@@ -98,6 +98,17 @@ func (m *PgModel) UpdateGift(id int64, inputGift Gift) (Gift, error) {
 	}
 
 	return updatedGift, nil
+}
+
+func (m *PgModel) UpdateGiftRequest(inputGiftRequest GiftRequest) (GiftRequest, error) {
+
+	updatedGiftRequest, err := UpdateGiftRequestToDb(m.Conn, inputGiftRequest)
+
+	if err != nil {
+		return GiftRequest{}, err
+	}
+
+	return updatedGiftRequest, nil
 }
 
 func (m *PgModel) AllGiftResponses() ([]GiftResponse, error) {

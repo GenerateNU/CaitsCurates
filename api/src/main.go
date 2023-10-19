@@ -4,6 +4,7 @@ import (
 	"CaitsCurates/backend/src/controller"
 	"CaitsCurates/backend/src/model"
 	"fmt"
+	"github.com/lib/pq"
 	"gorm.io/gorm/logger"
 	"log"
 	"os"
@@ -44,7 +45,42 @@ func main() {
 		GiftCollections: nil,
 	}
 	err = db.Create(&testGift).Error
+	// Create GiftRequest
+	giftRequest := model.GiftRequest{
+		RecipientName:      "Timmy White",
+		RecipientAge:       15,
+		Occasion:           pq.StringArray{"Brithday"},
+		RecipientInterests: pq.StringArray{"Swimming", "Hiking"},
+		BudgetMax:          50,
+		BudgetMin:          20,
+		DateNeeded:         time.Date(2023, time.November, 10, 0, 0, 0, 0, time.UTC),
+	}
+	user := model.User{Email: "example1@northeastern.edu", FirstName: "Lauren", LastName: "White", Password: "xxxxx"}
+	customer := model.Customer{GiftRequests: []*model.GiftRequest{&giftRequest}, User: user}
+	err = db.Create(&customer).Error
+	gift1 := model.Gift{
+		Name:            "Super cool new toy",
+		Price:           500.00,
+		Link:            "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+		Description:     "Really great content. Highly recommend",
+		Demographic:     "Unknown...",
+		GiftCollections: nil,
+	}
 
+	gift2 := model.Gift{
+		Name:            "Super cool new toy 2",
+		Price:           2.00,
+		Link:            "https://www.youtube.com/Penguinz0",
+		Description:     "Really great content. Highly recommend",
+		Demographic:     "Unknown...",
+		GiftCollections: nil,
+	}
+
+	giftCollection := model.GiftCollection{
+		CollectionName: "Cool Toys",
+		Gifts:          []*model.Gift{&gift1, &gift2},
+	}
+	err = db.Create(&giftCollection).Error
 	// Check for errors
 	if err != nil {
 		fmt.Println("Error auto-migrating:", err)

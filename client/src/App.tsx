@@ -10,12 +10,28 @@ function App() {
     return (
         <Router>
             <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/requests/" element={<RequestsPage />} />
-                <Route path="/collections/" element={<CollectionPage />} />
-                <Route path="/test/" element={ <AdminProvider>
-                    <TestPage />
-                </AdminProvider>}/>
+                <Route path="/" element={<HomePage/>}/>
+                <Route
+                    path="/requests/"
+                    element={
+                        <AdminProvider>
+                            <RequestsPage/>
+                        </AdminProvider>}
+                />
+                <Route
+                    path="/collections/"
+                    element={
+                        <AdminProvider>
+                            <CollectionPage/>
+                        </AdminProvider>}
+                />
+                <Route
+                    path="/test/"
+                    element={
+                        <AdminProvider>
+                            <TestPage/>
+                        </AdminProvider>}
+                />
             </Routes>
         </Router>
     );

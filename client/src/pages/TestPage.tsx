@@ -1,19 +1,17 @@
 import  { useEffect } from 'react';
 import { useAdmin } from '../Context/AdminContext'; // adjust the import based on your file structure
 
-export default function TestPage() {  const { gifts, fetchGifts } = useAdmin();
+export default function TestPage() {  const { collections, fetchGiftCollections } = useAdmin();
 
     useEffect(() => {
-        fetchGifts();
+        fetchGiftCollections();
     }, []);
-
+    console.log(collections)
     return (
         <div>
-            {gifts.map((gift, index) => (
+            {collections.map((collection, index) => (
                 <div key={index}>
-                    <h3>{gift.Name}</h3>
-                    <p>Price: ${gift.Price}</p>
-                    {/* Render other gift properties as needed */}
+                    <h3>{collection.CollectionName}</h3>
                 </div>
             ))}
         </div>

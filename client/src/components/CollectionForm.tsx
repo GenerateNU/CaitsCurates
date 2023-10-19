@@ -1,64 +1,21 @@
 import React, { useState, ChangeEvent, FormEvent } from 'react';
+import {GiftCollection} from "../types.tsx";
+import Gift from "./Gift.tsx";
 
-type Gift = {
-  name: string; 
-  description: string;
-  price: number; 
-};
 
-type Collection = {
-  id: number;
-  name: string;
-  gifts: Gift[];
-};
+
+
 
 type EditFormProps = {
-  collection: Collection;
-  onSave: (collection: Collection) => void;
+  collection: GiftCollection;
+  onSave: (collection: { CollectionName: string; Gifts: Gift[]; ID: number }) => void;
   onClose: () => void;
 };
 
-const predefinedGifts: Gift[] = [
-  {
-    name: "Gift 1",
-    description: "Description of Gift 1",
-    price: 10,
-  },
-  {
-    name: "Gift 2",
-    description: "Description of Gift 2",
-    price: 20,
-  },
-  {
-    name: "Gift 3",
-    description: "Description of Gift 3",
-    price: 30,
-  },
-  {
-    name: "Gift 4",
-    description: "Description of Gift 4",
-    price: 40,
-  },
-  {
-    name: "Gift 5",
-    description: "Description of Gift 5",
-    price: 50,
-  },
-  {
-    name: "Gift 10",
-    description: "Description of Gift 1",
-    price: 10,
-  },
-  {
-    name: "Gift 11",
-    description: "Description of Gift 2",
-    price: 20,
-  },
-];
 
 function CollectionForm({ collection, onSave, onClose }: EditFormProps) {
-  const [editedName, setEditedName] = useState(collection.name);
-  const [editedGifts, setEditedGifts] = useState(collection.gifts);
+  const [editedName, setEditedName] = useState(collection.CollectionName);
+  const [editedGifts, setEditedGifts] = useState(collection.Gifts);
 
   const handleNameChange = (e: ChangeEvent<HTMLInputElement>) => {
     setEditedName(e.target.value);
@@ -81,9 +38,9 @@ function CollectionForm({ collection, onSave, onClose }: EditFormProps) {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     onSave({
-      id: collection.id,
-      name: editedName,
-      gifts: editedGifts,
+      ID: collection.ID,
+      CollectionName: editedName,
+      Gifts: editedGifts,
     });
     onClose();
   };

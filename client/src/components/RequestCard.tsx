@@ -4,6 +4,7 @@ import ResponseForm from "./ResponseForm";
 import { GiftRequest } from "../types";
 
 const RequestCard: React.FC<GiftRequest> = ({
+                                                ID,
                                                 RecipientName,
                                                 RecipientAge,
                                                 RecipientInterests,
@@ -13,11 +14,10 @@ const RequestCard: React.FC<GiftRequest> = ({
                                                 DateNeeded,
                                             }: GiftRequest) => {
     const [showForm, setShowForm] = useState(false);
-
     return (
         <div className="flex flex-col w-full">
             <h2 className="font-bold text-lg">
-                {RecipientName} ({DateNeeded.toDateString()})
+                {RecipientName} ({new Date(DateNeeded).toLocaleDateString()})
             </h2>
             <div key={RecipientName} className="px-4 py-2 bg-slate-100">
                 <p>Recipient: {RecipientName}</p>
@@ -28,7 +28,7 @@ const RequestCard: React.FC<GiftRequest> = ({
                         <p>
                             Budget: ${BudgetMin} - ${BudgetMax}
                         </p>
-                        <p>Needed by: {DateNeeded.toDateString()}</p>
+                        <p>Needed by: ({new Date(DateNeeded).toLocaleDateString()})</p>
                     </div>
                 )}
             </div>
@@ -42,7 +42,7 @@ const RequestCard: React.FC<GiftRequest> = ({
                         Add response
                     </button>
                 )}
-                {showForm && <ResponseForm />}
+                {showForm && <ResponseForm RequestID={ID} />}
             </div>
         </div>
     );

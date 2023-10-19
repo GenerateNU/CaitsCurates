@@ -1,4 +1,4 @@
-import React, {createContext, useState, useContext, ReactNode, useEffect} from 'react';
+import React, {createContext, useState, useContext, ReactNode} from 'react';
 import {Gift, GiftCollection} from "../types.tsx";
 import axios from "axios";
 
@@ -44,15 +44,13 @@ export function AdminProvider({ children }: AdminProviderProps) {
     const fetchGiftCollections = async () => {
         try {
             const response = await axios.get('/api/collections');
-            setGifts(response.data);
+            setCollections(response.data);
         } catch (error) {
             console.error('An error occurred while fetching the gifts:', error);
         }
     };
 
-    useEffect(() => {
-        fetchGifts();
-    }, []); // The function fetchGifts will run when the component mounts
+   // The function fetchGifts will run when the component mounts
     // Fetch data and other admin-specific logic
 
     return (

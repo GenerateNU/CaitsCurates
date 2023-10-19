@@ -57,6 +57,25 @@ func (pg *PgController) Serve() *gin.Engine {
 
 		c.JSON(http.StatusOK, insertedResponse)
 	})
+	r.PUT("/requests", func(c *gin.Context) {
+		// Get Body Parameters and put in JSON Object
+		var input model.GiftRequest
+		if err := c.BindJSON(&input); err != nil {
+			c.JSON(http.StatusBadRequest, "Failed to unmarshal gift")
+			fmt.Print(err)
+			return
+		}
+
+		// Model Call to Update GiftRequest
+		updatedGiftRequest, err := pg.UpdateGiftRequest(input)
+
+		if err != nil {
+			c.JSON(http.StatusBadRequest, input)
+			panic(err)
+		}
+
+		c.JSON(http.StatusOK, updatedGiftRequest)
+	})
 	r.POST("/addGiftRequest", func(c *gin.Context) {
 		var input model.GiftRequest
 		if err := c.BindJSON(&input); err != nil {

@@ -1,7 +1,9 @@
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import CollectionItem from "../components/CollectionItem";
 import EditForm from "../components/CollectionForm";
 import Navbar from "../components/Navbar";
+import {GiftCollection, GiftRequest} from "../types.tsx";
+import {useAdmin} from "../Context/AdminContext.tsx";
 
 type Gift = {
   name: string;
@@ -57,79 +59,11 @@ const predefinedGifts2: Gift[] = [
 ];
 
 const CollectionsPage = () => {
-  const [collections, setCollections] = useState([
-    {
-      id: 1,
-      name: "Birthday Gifts",
-      gifts: [],
-    },
-    {
-      id: 2,
-      name: "Christmas Gifts",
-      gifts: predefinedGifts,
-    },
-    {
-      id: 3,
-      name: "Birthday Gifts",
-      gifts: predefinedGifts2,
-    },
-    {
-      id: 4,
-      name: "Christmas Gifts",
-      gifts: predefinedGifts,
-    },
-    {
-      id: 5,
-      name: "Birthday Gifts",
-      gifts: predefinedGifts,
-    },
-    {
-      id: 6,
-      name: "Christmas Gifts",
-      gifts: predefinedGifts,
-    },
-    {
-      id: 7,
-      name: "Birthday Gifts",
-      gifts: predefinedGifts,
-    },
-    {
-      id: 8,
-      name: "Christmas Gifts",
-      gifts: predefinedGifts,
-    },
-    {
-      id: 9,
-      name: "Birthday Gifts",
-      gifts: predefinedGifts,
-    },
-    {
-      id: 10,
-      name: "Christmas Gifts",
-      gifts: predefinedGifts,
-    },
-    {
-      id: 11,
-      name: "Birthday Gifts",
-      gifts: predefinedGifts,
-    },
-    {
-      id: 12,
-      name: "Christmas Gifts",
-      gifts: predefinedGifts,
-    },
-    {
-      id: 13,
-      name: "Birthday Gifts",
-      gifts: predefinedGifts,
-    },
-    {
-      id: 14,
-      name: "Christmas Gifts",
-      gifts: predefinedGifts,
-    },
-  ]);
+  const { collections, fetchGiftCollections } = useAdmin();
 
+  useEffect(() => {
+    fetchGiftCollections();
+  }, []);
   const handleCreateCollection = () => {
     const newCollection: Collection = {
       id: Date.now(),
@@ -141,6 +75,7 @@ const CollectionsPage = () => {
     setCollections((prevCollections) => [...prevCollections, newCollection]);
     setEditCollectionId(newCollection.id);
     setShowEditForm(true);
+    fetchGiftCollections();
   };
 
   const [showEditForm, setShowEditForm] = useState<boolean>(false);
@@ -149,15 +84,12 @@ const CollectionsPage = () => {
   const handleEditCollection = (collectionId: number) => {
     setEditCollectionId(collectionId);
     setShowEditForm(true);
+    fetchGiftCollections();
   };
 
   const handleSaveCollection = (updatedCollection: Collection) => {
-    setCollections((prevCollections) =>
-      prevCollections.map((collection) =>
-        collection.id === updatedCollection.id ? updatedCollection : collection
-      )
-    );
     setShowEditForm(false);
+    fetchGiftCollections();
   };
 
   const handleCloseEditForm = () => {

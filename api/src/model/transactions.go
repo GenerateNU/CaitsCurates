@@ -10,6 +10,46 @@ func WriteRequestToDb(db *gorm.DB, inputRequest GiftRequest) (GiftRequest, error
 	}
 	return inputRequest, nil
 }
+func UpdateGiftRequestToDb(db *gorm.DB, inputRequest GiftRequest) (GiftRequest, error) {
+	var updatedGiftRequest GiftRequest
+	if err := db.Where("id = ?", inputRequest.ID).First(&updatedGiftRequest).Error; err != nil {
+		return GiftRequest{}, err
+	}
+
+	updates := make(map[string]interface{})
+
+	if inputRequest.RecipientName != "" {
+		updates["RecipientName"] = inputRequest.RecipientName
+	}
+	if inputRequest.RecipientAge != 0 {
+		updates["RecipientAge"] = inputRequest.RecipientAge
+	}
+	if len(inputRequest.Occasion) > 0 {
+		updates["Occasion"] = inputRequest.Occasion
+	}
+	if len(inputRequest.RecipientInterests) > 0 {
+		updates["RecipientInterests"] = inputRequest.RecipientInterests
+	}
+	if inputRequest.BudgetMax != 0 {
+		updates["BudgetMax"] = inputRequest.BudgetMax
+	}
+	if inputRequest.BudgetMin != 0 {
+		updates["BudgetMin"] = inputRequest.BudgetMin
+	}
+	if !inputRequest.DateNeeded.IsZero() {
+		updates["DateNeeded"] = inputRequest.DateNeeded
+	}
+	if inputRequest.GiftResponseID != nil {
+		updates["GiftResponseID"] = inputRequest.GiftResponseID
+	}
+
+	if err := db.Model(&updatedGiftRequest).Updates(updates).Error; err != nil {
+		return GiftRequest{}, err
+	}
+
+	// Return Updated Gift Record
+	return updatedGiftRequest, nil
+}
 func WriteResponseToDb(db *gorm.DB, inputResponse GiftResponse) (GiftResponse, error) {
 	if err := db.Create(&inputResponse).Error; err != nil {
 		return GiftResponse{}, err
