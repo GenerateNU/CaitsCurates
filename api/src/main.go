@@ -11,6 +11,7 @@ import (
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"github.com/lib/pq"
 )
 
 func main() {
@@ -145,7 +146,7 @@ func main() {
 	if err != nil {
 		fmt.Println("Error creating Admin:", err)
 	} 
-	
+
 	mockCustomer2 := model.Customer {
 		User: mockUserCustomer2,
 	}
@@ -153,6 +154,45 @@ func main() {
 	if err != nil {
 		fmt.Println("Error creating Admin:", err)
 	} 
+
+	// GiftRequest Data
+	mockGiftRequest := model.GiftRequest{
+		CustomerID: mockCustomer1.ID,         
+		RecipientName: "John Doe",
+		RecipientAge: 24,
+		Occasion: pq.StringArray{"Birthday"},
+		RecipientInterests: pq.StringArray{"Books", "Music", "Sports"},
+		BudgetMax: 50,
+		BudgetMin: 30,
+		DateNeeded: time.Date(time.Now().Year(), time.October, 19, 12, 0, 0, 0, time.UTC),
+	}
+	err = db.Create(&mockGiftRequest).Error
+	if err != nil {
+		fmt.Println("Error creating GiftRequest:", err)
+	}
+
+	// GiftCollection Data
+	mockGiftCollection := model.GiftCollection{
+		CustomerID: &mockCustomer1.ID,
+		CollectionName: "Birthday Gifts",
+		Gifts: []*model.Gift{
+			&mockGift2, &mockGift3,
+		},
+	}
+	err = db.Create(&mockGiftCollection).Error
+	if err != nil {
+		fmt.Println("Error creating GiftCollection:", err)
+	}
+
+	// GiftResponse
+	mockGiftResponse := model.GiftResponse{
+		GiftCollection: mockGiftCollection,
+		CustomMessage: "Here are some great gift ideas for the Birthday!",
+	}
+	err = db.Create(&mockGiftResponse).Error
+	if err != nil {
+		fmt.Println("Error creating GiftCollection:", err)
+	}
 
 
 	m := &model.PgModel{
