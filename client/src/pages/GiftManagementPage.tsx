@@ -49,13 +49,7 @@ const GiftManagementPage = () => {
 
           {gifts.map((gift) => (
             <GiftItem
-              key={gift.name}
-              name={gift.name}
-              description={gift.description}
-              price={gift.price}
-              link={gift.link}
-              demographic={gift.demographic}
-              giftCollections={gift.giftCollections}
+              key={gift.name} {...gift}
             />
           ))}
         </section>
