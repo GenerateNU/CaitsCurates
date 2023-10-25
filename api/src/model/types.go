@@ -2,6 +2,7 @@ package model
 
 import (
 	"errors"
+	"regexp"
 	"time"
 
 	"github.com/lib/pq"
@@ -92,6 +93,41 @@ func (gc *GiftCollection) BeforeSave(tx *gorm.DB) (err error) {
 
 	if gc.CustomerID == nil {
 		err = errors.New("giftCollection must have a customerID")
+		return err
+	}
+
+	// ask about other validations
+	return
+}
+
+func (user *User) BeforeSave(tx *gorm.DB) (err error) {
+	if len(user.FirstName) >= 10 || len(user.FirstName) == 0 {
+		err = errors.New("user first name must be between 1 and 9 characters")
+		return err
+	}
+
+	if len(user.LastName) >= 10 || len(user.LastName) == 0 {
+		err = errors.New("user last name must be between 1 and 9 characters")
+		return err
+	}
+
+	if len(user.Password) >= 10 || len(user.Password) == 0 {
+		err = errors.New("user password must be between 1 and 9 characters")
+		return err
+	}
+
+	if len(user.Email) >= 10 || len(user.Email) == 0 {
+		err = errors.New("user email must be between 1 and 9 characters")
+		return err
+	}
+
+	// use regex to validate email
+	pattern := `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
+	regex := regexp.MustCompile(pattern)
+
+	// Use the MatchString function to check if the text matches the pattern
+	if regex.MatchString(user.Email) == false {
+		err = errors.New("user email must be a valid email")
 		return err
 	}
 
