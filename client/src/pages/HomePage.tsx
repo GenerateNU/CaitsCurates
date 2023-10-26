@@ -1,14 +1,16 @@
+import Navbar from "../components/Navbar";
+import logo from "../logo.png";
+
 const HomePage = () => {
-
-
-    return (
-        <div className="min-h-screen flex items-center justify-center">
-            <p className="text-4xl text-black hover:text-pink-600">
-                Caits Curates
-            </p>
-            <div className="app">
-    </div>
+  return (
+    <div>
+      <Navbar />
+      <div className="flex flex-col items-center justify-center my-8">
+        <div className="flex">
+          <img src={logo} alt="Logo" width={500} />
         </div>
-    );
-}
-export default HomePage
+      </div>
+    </div>
+  );
+};
+export default HomePage;

@@ -1,54 +1,81 @@
+import Navbar from "../components/Navbar";
 import RequestCard from "../components/RequestCard";
-import { completeRequests, incompleteRequests } from "./mockData";
-import { useState } from "react";
-import Select from "react-select";
+import {useEffect, useState} from "react";
+import Select, {ActionMeta} from "react-select";
+import {GiftRequest} from "../types.tsx";
+import axios from "axios";
 
 export type SelectValueType = {
-    [key: string]: string;
-} | null;
+  [key: string]: string
+  | null
+};
 
 const options = [
-    { value: "0", label: "Incomplete requests" },
-    { value: "1", label: "Complete requests" },
-    { value: "2", label: "All requests" },
+  { value: "0", label: "Incomplete requests" },
+  { value: "1", label: "Complete requests" },
 ];
 
 export default function RequestsPage() {
-    const [selectedOption, setSelectedOption] = useState<SelectValueType>({
-        value: "2",
-        label: "All requests",
-    });
+  const [selectedOption, setSelectedOption] = useState<SelectValueType>({
+    value: "0",
+    label: "Incomplete requests",
+  });
+  const [requests, setRequests] = useState<GiftRequest[]>([]);
 
-    const handleOption = (selection: SelectValueType) => {
-        setSelectedOption(selection);
+  useEffect(() => {
+    let url = '/api/requests'; // Base URL to fetch all requests
+
+    if (selectedOption.value === '0') {
+      url += '/incomplete';
+    } else if (selectedOption.value === '1') {
+      url += '/complete';
+    }
+    const fetchRequests = async () => {
+      try {
+        const response = await axios.get(url);
+        setRequests(response.data);
+      } catch (error) {
+        console.error('An error occurred while fetching the requests:', error);
+      }
     };
-    return (
-        <div className="flex flex-col px-96 py-8">
-            <h2 className="font-bold text-xl">View gift requests</h2>
-            <p>Filter gift requests using the dropdown below. </p>
-            <Select
-                defaultValue={selectedOption}
-                onChange={handleOption}
-                options={options}
-            />
-            {(selectedOption?.value == "0" || selectedOption?.value == "2") && (
-                <div className="mt-6">
-                    <h2 className="font-bold text-xl text-blue-800">
-                        Incomplete requests
-                    </h2>
-                    {incompleteRequests.map((req) => {
-                        return <RequestCard  {...req} />;
-                    })}
-                </div>
-            )}
-            {(selectedOption?.value == "1" || selectedOption?.value == "2") && (
-                <div className="mt-6">
-                    <h2 className="font-bold text-xl text-blue-800">Complete requests</h2>
-                    {completeRequests.map((req) => {
-                        return <RequestCard {...req} />;
-                    })}
-                </div>
-            )}
-        </div>
-    );
+    fetchRequests();
+  }, [selectedOption]);
+  const handleOption = (selection: SelectValueType) => {
+    setSelectedOption(selection);
+  };
+
+  return (
+    <div>
+      <Navbar />
+      <div className="flex flex-col px-48 py-8">
+        <h2 className="font-bold text-2xl mb-2">Manage Requests</h2>
+        <p>Filter gift requests using the dropdown below. </p>
+        <Select
+          defaultValue={selectedOption}
+          onChange={handleOption}
+          options={options}
+          className="mt-2"
+        />
+        {(selectedOption?.value == "0") && (
+          <div className="mt-6">
+            <h2 className="font-bold text-xl text-blue-800">
+              Incomplete requests
+            </h2>
+            {requests.map((req) => {
+              return <RequestCard key={req.ID} {...req} />;
+            })}
+          </div>
+        )}
+        {(selectedOption?.value == "1") && (
+          <div className="mt-6">
+            <h2 className="font-bold text-xl text-blue-800">
+              Complete requests
+            </h2>
+            {requests.map((req) => {
+              return <RequestCard key={req.ID} {...req} />;            })}
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }

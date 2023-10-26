@@ -1,29 +1,40 @@
-import { useState } from "react";
+import {useEffect} from "react";
 import Select from "react-select";
+import { useAdmin } from '../Context/AdminContext';
 
-const options = [
-    { value: "Taylor's gifts", label: "Taylor's gifts" },
-    { value: "Harry's gifts", label: "Harry's gifts" },
-];
+interface CollectionSelectorProps {
+    selectedOption: Number | null;
+    handleOptionChange: (newValue: Number | null) => void;
+}
 
-export type SelectValueType = {
-    [key: string]: string;
-} | null;
+const CollectionSelector: React.FC<CollectionSelectorProps> = ({
+                                                                   selectedOption,
+                                                                   handleOptionChange
+                                                               }) => {
+    const { collections, fetchGiftCollections } = useAdmin();
 
-export default function CollectionSelector() {
-    const [selectedOption, setSelectedOption] = useState<SelectValueType>(null);
+    useEffect(() => {
+        fetchGiftCollections();
+    }, []);
 
-    const handleOption = (selection: SelectValueType) => {
-        setSelectedOption(selection);
-    };
+
+    console.log("Collections:", collections); // Log to see the fetched collections
+
+
+    // Mapping collections to options
+    const options = collections.map((collection) => ({
+        value: collection.ID,
+        label: collection.CollectionName,
+    }));
 
     return (
-        <div className="App">
-            <Select
-                defaultValue={selectedOption}
-                onChange={handleOption}
-                options={options}
-            />
-        </div>
+        <Select
+        value={options.find(option => option.value === selectedOption)}
+        onChange={(option) => handleOptionChange(option ? option.value : null)}
+        options={options}
+       />
     );
 }
+export default CollectionSelector;
+
+

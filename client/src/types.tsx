@@ -1,4 +1,5 @@
 export interface Gift {
+    ID : number
     Name: string;
     Price: number;
     Link: string;
@@ -8,6 +9,7 @@ export interface Gift {
 }
 
 export interface GiftRequest {
+    ID : number
     CustomerId: number;
     GiftResponseId: number | null;
     RecipientName: string;
@@ -17,10 +19,11 @@ export interface GiftRequest {
     BudgetMax: number;
     BudgetMin: number;
     GiftResponse: GiftResponse | null;
-    DateNeeded: Date;
+    DateNeeded: string;
 }
 
 export interface GiftCollection {
+    ID : number
     CustomerId: number | null;
     Customer: Customer;
     CollectionName: string;
@@ -28,12 +31,14 @@ export interface GiftCollection {
 }
 
 export interface GiftResponse {
+    ID : number
     GiftCollection: GiftCollection;
     GiftCollectionId: number;
     CustomMessage: string;
 }
 
 export interface User {
+    ID : number
     Email: string;
     FirstName: string;
     LastName: string;
@@ -41,9 +46,11 @@ export interface User {
 }
 
 export interface Customer {
+    ID : number
     UserId: number;
 }
 
 export interface Admin {
+    ID : number
     UserId: number;
 }

@@ -57,6 +57,25 @@ func (pg *PgController) Serve() *gin.Engine {
 
 		c.JSON(http.StatusOK, insertedResponse)
 	})
+	r.PUT("/requests", func(c *gin.Context) {
+		// Get Body Parameters and put in JSON Object
+		var input model.GiftRequest
+		if err := c.BindJSON(&input); err != nil {
+			c.JSON(http.StatusBadRequest, "Failed to unmarshal gift")
+			fmt.Print(err)
+			return
+		}
+
+		// Model Call to Update GiftRequest
+		updatedGiftRequest, err := pg.UpdateGiftRequest(input)
+
+		if err != nil {
+			c.JSON(http.StatusBadRequest, input)
+			panic(err)
+		}
+
+		c.JSON(http.StatusOK, updatedGiftRequest)
+	})
 	r.POST("/addGiftRequest", func(c *gin.Context) {
 		var input model.GiftRequest
 		if err := c.BindJSON(&input); err != nil {
@@ -90,6 +109,24 @@ func (pg *PgController) Serve() *gin.Engine {
 		}
 
 		c.JSON(http.StatusOK, insertedCollection)
+	})
+	r.PUT("/updateGiftCollection", func(c *gin.Context) {
+		var input model.GiftCollection
+		if err := c.BindJSON(&input); err != nil {
+			c.JSON(http.StatusBadRequest, "Failed to unmarshal collection")
+
+			fmt.Print(err)
+
+			return
+		}
+		updatedCollection, err := pg.UpdateCollection(input)
+
+		if err != nil {
+			c.JSON(http.StatusBadRequest, input)
+			panic(err)
+		}
+
+		c.JSON(http.StatusOK, updatedCollection)
 	})
 	r.GET("/gifts/:id", func(c *gin.Context) {
 		id := c.Param("id")
@@ -141,6 +178,19 @@ func (pg *PgController) Serve() *gin.Engine {
 
 		c.JSON(http.StatusOK, insertedGift)
 	})
+	r.GET("/search", func(c *gin.Context) {
+		searchTerm := c.Query("q")
+		minPriceStr := c.Query("minPrice")
+		maxPriceStr := c.Query("maxPrice")
+
+		minPrice, _ := strconv.Atoi(minPriceStr)
+		maxPrice, _ := strconv.Atoi(maxPriceStr)
+		gifts, err := pg.SearchGifts(searchTerm, minPrice, maxPrice)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, "Oops")
+		}
+		c.JSON(http.StatusOK, gifts)
+	})
 	// Update Gift Record Given Gift ID
 	r.PUT("/gifts/:id", func(c *gin.Context) {
 
@@ -189,6 +239,25 @@ func (pg *PgController) Serve() *gin.Engine {
 			return
 		}
 		c.JSON(http.StatusNoContent, "Deleted Gift")
+	})
+	r.DELETE("/deleteGiftCollection/:id", func(c *gin.Context) {
+
+		// Get GiftCollection ID
+		id := c.Param("id")
+		intId, err := strconv.Atoi(id)
+		if err != nil {
+			panic(err)
+		}
+
+		err = pg.DeleteGiftCollection(int64(intId))
+
+		// Delete GiftCollection
+		if err != nil {
+			c.JSON(http.StatusBadRequest, "Failed to delete GiftCollection")
+			fmt.Print(err)
+			return
+		}
+		c.JSON(http.StatusNoContent, "Deleted GiftCollection")
 	})
 
 	// Add Gift to Gift Collection

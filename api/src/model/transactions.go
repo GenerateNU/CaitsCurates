@@ -10,6 +10,46 @@ func WriteRequestToDb(db *gorm.DB, inputRequest GiftRequest) (GiftRequest, error
 	}
 	return inputRequest, nil
 }
+func UpdateGiftRequestToDb(db *gorm.DB, inputRequest GiftRequest) (GiftRequest, error) {
+	var updatedGiftRequest GiftRequest
+	if err := db.Where("id = ?", inputRequest.ID).First(&updatedGiftRequest).Error; err != nil {
+		return GiftRequest{}, err
+	}
+
+	updates := make(map[string]interface{})
+
+	if inputRequest.RecipientName != "" {
+		updates["RecipientName"] = inputRequest.RecipientName
+	}
+	if inputRequest.RecipientAge != 0 {
+		updates["RecipientAge"] = inputRequest.RecipientAge
+	}
+	if len(inputRequest.Occasion) > 0 {
+		updates["Occasion"] = inputRequest.Occasion
+	}
+	if len(inputRequest.RecipientInterests) > 0 {
+		updates["RecipientInterests"] = inputRequest.RecipientInterests
+	}
+	if inputRequest.BudgetMax != 0 {
+		updates["BudgetMax"] = inputRequest.BudgetMax
+	}
+	if inputRequest.BudgetMin != 0 {
+		updates["BudgetMin"] = inputRequest.BudgetMin
+	}
+	if !inputRequest.DateNeeded.IsZero() {
+		updates["DateNeeded"] = inputRequest.DateNeeded
+	}
+	if inputRequest.GiftResponseID != nil {
+		updates["GiftResponseID"] = inputRequest.GiftResponseID
+	}
+
+	if err := db.Model(&updatedGiftRequest).Updates(updates).Error; err != nil {
+		return GiftRequest{}, err
+	}
+
+	// Return Updated Gift Record
+	return updatedGiftRequest, nil
+}
 func WriteResponseToDb(db *gorm.DB, inputResponse GiftResponse) (GiftResponse, error) {
 	if err := db.Create(&inputResponse).Error; err != nil {
 		return GiftResponse{}, err
@@ -22,7 +62,36 @@ func WriteCollectionToDb(db *gorm.DB, inputCollection GiftCollection) (GiftColle
 	}
 	return inputCollection, nil
 }
+func UpdateCollectionToDb(db *gorm.DB, inputCollection GiftCollection) (GiftCollection, error) {
+	var updatedCollection GiftCollection
+	if err := db.Where("id = ?", inputCollection.ID).First(&updatedCollection).Error; err != nil {
+		return GiftCollection{}, err
+	}
 
+	updates := make(map[string]interface{})
+
+	if inputCollection.CollectionName != "" {
+		updates["CollectionName"] = inputCollection.CollectionName
+	}
+	if inputCollection.Customer != nil {
+		updates["Customer"] = inputCollection.Customer
+	}
+	if inputCollection.CustomerID != nil {
+		updates["CustomerID"] = inputCollection.CustomerID
+	}
+	if inputCollection.Gifts != nil {
+		updates["Gifts"] = inputCollection.Gifts
+	}
+	if err := db.Model(&updatedCollection).Association("Gifts").Clear(); err != nil {
+		return GiftCollection{}, err
+	}
+	if err := db.Model(&updatedCollection).Updates(updates).Error; err != nil {
+		return GiftCollection{}, err
+	}
+
+	// Return Updated Gift Record
+	return updatedCollection, nil
+}
 func GetIncompleteGiftRequestsFromDB(db *gorm.DB) ([]GiftRequest, error) {
 	var requests []GiftRequest
 	if err := db.Where("gift_response_id IS NULL").Preload("GiftResponse").Find(&requests).Error; err != nil {
@@ -84,9 +153,32 @@ func DeleteGiftFromDb(db *gorm.DB, id int64) error {
 	return nil
 }
 
+func DeleteGiftCollectionFromDb(db *gorm.DB, id int64) error {
+	var deletedGiftCollection GiftCollection
+	if err := db.Where("id = ?", id).First(&deletedGiftCollection).Error; err != nil {
+		return err
+	}
+
+	if err := db.Delete(&deletedGiftCollection).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+func SearchGiftsDb(db *gorm.DB, searchTerm string, minPrice int, maxPrice int) ([]Gift, error) {
+	var gifts []Gift
+
+	if err := db.Where("to_tsvector('english', name || ' ' || description) @@ to_tsquery('english', ?)", searchTerm).
+		Where("price >= ? AND price <= ?", minPrice, maxPrice).
+		Find(&gifts).Error; err != nil {
+		return nil, err
+	}
+
+	return gifts, nil
+}
 func GetCompleteGiftRequestsFromDB(db *gorm.DB) ([]GiftRequest, error) {
 	var requests []GiftRequest
-	if err := db.Where("gift_response_id IS NOT NULL").Find(&requests).Error; err != nil {
+	if err := db.Where("gift_response_id IS NOT NULL").Preload("GiftResponse").Preload("GiftResponse.GiftCollection").Find(&requests).Error; err != nil {
 		return nil, err
 	}
 	return requests, nil
