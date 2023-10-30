@@ -1,9 +1,10 @@
 package model
 
 import (
+	"time"
+
 	"github.com/lib/pq"
 	"gorm.io/gorm"
-	"time"
 )
 
 type Gift struct {
@@ -14,6 +15,7 @@ type Gift struct {
 	Description     string
 	Demographic     string
 	GiftCollections []*GiftCollection `gorm:"many2many:gift_request_gifts;"`
+	Category 		pq.StringArray `gorm:"type:text[]"`
 }
 
 type GiftRequest struct {
