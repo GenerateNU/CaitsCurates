@@ -190,13 +190,16 @@ func main() {
 	err = db.Create(&randomGift2).Error
 
 	// Check for errors
+
 	if err != nil {
 		fmt.Println("Error auto-migrating:", err)
 		return
 	}
+
 	m := &model.PgModel{
 		Conn: db,
 	}
+
 	c := &controller.PgController{
 		Model: m,
 	}

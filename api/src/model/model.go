@@ -153,6 +153,7 @@ func (m *PgModel) SearchGifts(searchTerm string, minPrice int, maxPrice int) ([]
 	var gifts []Gift
 	searchTerm = strings.TrimSpace(searchTerm)
 
+
 	// Convert to lowercase
 	searchTerm = strings.ToLower(searchTerm)
 
