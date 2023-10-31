@@ -1,5 +1,6 @@
 import NavBar from "../components/NavBarUpdated";
-import CollectionItem from "../components/CollectionItemUpdated"; // Import your CollectionItem component
+import CollectionItem from "../components/CollectionItemUpdated"; 
+import SearchBar from "../components/SearchBar";
 
 const HomePage = () => {
   const collections = [
@@ -24,6 +25,7 @@ const HomePage = () => {
     <div className="bg-gray-100 h-screen text-white flex flex-col">
       <div className="ml-0">
         <NavBar />
+        <SearchBar /> 
       </div>
       <div className="w-full bg-gray-300 text-center py-9">
         <h1 className="text-2xl text-black">Essential Gifts</h1>
