@@ -52,15 +52,15 @@ const HomePage = () => {
             ))}
           </div>
         </div>
-        <div className="flex w-full">
+        <div className="flex " style={{maxWidth: '1000px' }}>
           <GiftSortNavBar />
         </div>
        
     
-<div className="overflow-y-auto" style={{ maxHeight: '305px' }}>
+<div className="overflow-y-auto" style={{ maxHeight: '305px', maxWidth: '1000px' }}>
   <div className="flex flex-wrap -mx-2">
     {gifts.map((gift, index) => (
-      <div key={index} className="w-1/3 px-2">
+      <div key={index} className="w-1/4 px-2">
         <UpdatedGiftItem name={gift.name} price={gift.price} />
       </div>
     ))}
