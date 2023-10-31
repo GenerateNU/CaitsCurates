@@ -4,17 +4,6 @@ import (
 	"gorm.io/gorm"
 )
 
-func SearchGiftsDb(db *gorm.DB, searchTerm string, minPrice int, maxPrice int) ([]Gift, error) {
-	var gifts []Gift
-
-	if err := db.Where("to_tsvector('english', name || ' ' || description) @@ to_tsquery('english', ?)", searchTerm).
-		Where("price >= ? AND price <= ?", minPrice, maxPrice).
-		Find(&gifts).Error; err != nil {
-		return nil, err
-	}
-
-	return gifts, nil
-}
 func WriteRequestToDb(db *gorm.DB, inputRequest GiftRequest) (GiftRequest, error) {
 	if err := db.Create(&inputRequest).Error; err != nil {
 		return GiftRequest{}, err
@@ -182,12 +171,32 @@ func DeleteGiftCollectionFromDb(db *gorm.DB, id int64) error {
 
 	return nil
 }
-func SearchGiftsDb(db *gorm.DB, searchTerm string, minPrice int, maxPrice int) ([]Gift, error) {
+func SearchGiftsDb(db *gorm.DB, searchTerm string, minPrice int, maxPrice int, occasion string, demographic string, category string) ([]Gift, error) {
 	var gifts []Gift
 
-	if err := db.Where("to_tsvector('english', name || ' ' || description) @@ to_tsquery('english', ?)", searchTerm).
-		Where("price >= ? AND price <= ?", minPrice, maxPrice).
-		Find(&gifts).Error; err != nil {
+	query := db.Where("price >= ?", minPrice)
+
+	if searchTerm != "" {
+		query = query.Where("to_tsvector('english', name || ' ' || description) @@ to_tsquery('english', ?)", searchTerm)
+	}
+	
+	if maxPrice > 0 {
+		query = query.Where("price <= ?", maxPrice)
+	}
+		
+	if occasion != "" {
+		query = query.Where("occasion = ?", occasion)
+	}
+
+	if demographic != "" {
+		query = query.Where("demographic = ?", demographic)
+	}
+
+	if category != "" {
+		query = query.Where("category = ?", category)
+	}
+
+	if err := query.Find(&gifts).Error; err != nil {
 		return nil, err
 	}
 
