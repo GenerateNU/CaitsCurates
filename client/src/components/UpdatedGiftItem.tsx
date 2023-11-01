@@ -1,5 +1,3 @@
-import { Gift } from "../types.tsx";
-
 type GiftItemProps = {
   name: string;
   price: number;
@@ -7,7 +5,7 @@ type GiftItemProps = {
 
 function UpdatedGiftItem({ name, price }: GiftItemProps) {
   return (
-    <div className="relative flex flex-col items-center">
+    <div className="relative flex flex-col flex-start">
       <div className="bg-gray-200 w-40 h-40 mx-auto mb-2 relative">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -24,7 +22,7 @@ function UpdatedGiftItem({ name, price }: GiftItemProps) {
           />
         </svg>
       </div>
-      <div className="text-left">
+      <div className="text-left" style={{marginLeft: "40px", marginBottom: "5px"}}>
         <h2 className="text-sm text-black font-bold">{name}</h2>
         <h2 className="text-xs text-black">${price}</h2>
       </div>

@@ -52,12 +52,10 @@ const HomePage = () => {
             ))}
           </div>
         </div>
-        <div className="flex " style={{maxWidth: '1000px' }}>
+        <div className=" w-1000">
           <GiftSortNavBar />
         </div>
-       
-    
-<div className="overflow-y-auto" style={{ maxHeight: '305px', maxWidth: '1000px' }}>
+  <div className="overflow-y-auto" style={{ maxHeight: '290px', maxWidth: '1000px' }}>
   <div className="flex flex-wrap -mx-2">
     {gifts.map((gift, index) => (
       <div key={index} className="w-1/4 px-2">
@@ -66,8 +64,6 @@ const HomePage = () => {
     ))}
   </div>
 </div>
-
-
       </div>
     </div>
   );

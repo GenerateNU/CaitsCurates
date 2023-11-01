@@ -24,7 +24,7 @@ function CollectionItem({ name }: CollectionItemProps) {
     <div>
       <div style={circleStyle}>
       </div>
-      <h2 className="text-sm text-black text-center">{name}</h2>
+      <h2 className="text-sm text-black text-center" style={{marginBottom: "15px"}}>{name}</h2>
     </div>
   );
 }

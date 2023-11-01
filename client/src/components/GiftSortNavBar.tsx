@@ -25,7 +25,7 @@ const GiftSortNavbar = () => {
   return (
     <div className="bg-gray-100 p-2">
     <div className="flex" style={{ maxWidth: "1440px" }}>
-      <div className="flex space-x-2">
+      <div className="flex space-x-2 "  style={{ marginRight: "680px" }}>
           <button
             className={`${buttonStyle} ${
               activeButton === "Shop" ? activeButtonStyle : ""
