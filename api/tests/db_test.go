@@ -2,11 +2,13 @@ package tests
 
 import (
 	"CaitsCurates/backend/src/model"
-	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
+	"github.com/lib/pq"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -52,7 +54,7 @@ func TestGiftModel(t *testing.T) {
 	defer tx.Rollback()
 
 	// Create Gift
-	gift := model.Gift{Name: "Super cool new toy", Price: 500000.00, Link: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", Description: "Really great content. Highly recommend", Demographic: "Unknown..."}
+	gift := model.Gift{Name: "Super cool new toy", Price: 500000.00, Link: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", Description: "Really great content. Highly recommend", Demographic: "Unknown...", Category: pq.StringArray{"Best selling"}}
 
 	err = tx.Create(&gift).Error
 	assert.NoError(t, err)
@@ -68,6 +70,7 @@ func TestGiftModel(t *testing.T) {
 	assert.Equal(t, gift.Description, fetchedGift.Description)
 	assert.Equal(t, gift.Demographic, fetchedGift.Demographic)
 	assert.Equal(t, gift.Link, fetchedGift.Link)
+	assert.Equal(t, gift.Category, fetchedGift.Category)
 	assert.Equal(t, gift.CreatedAt.In(time.UTC).Round(time.Millisecond),
 		fetchedGift.CreatedAt.In(time.UTC).Round(time.Millisecond))
 
@@ -117,7 +120,7 @@ func TestGiftRequestModel(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Create GiftRequest
-	giftRequest := model.GiftRequest{GiftResponse: &giftResponse}
+	giftRequest := model.GiftRequest{GiftResponse: &giftResponse, Occasion: pq.StringArray{"Birthday"}, RecipientInterests: pq.StringArray{"Soccer"}}
 	user := model.User{Email: "example1@northeastern.edu", FirstName: "person1", LastName: "lastname1", Password: "dgeeg32"}
 	customer := model.Customer{GiftRequests: []*model.GiftRequest{&giftRequest}, User: user}
 	err = tx.Create(&customer).Error
@@ -146,6 +149,8 @@ func TestGiftRequestModel(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, giftRequest.ID, fetchedGiftRequest.ID)
 	assert.Equal(t, giftRequest.GiftResponseID, fetchedGiftRequest.GiftResponseID)
+	assert.Equal(t, giftRequest.Occasion, fetchedGiftRequest.Occasion)
+	assert.Equal(t, giftRequest.RecipientInterests, fetchedGiftRequest.RecipientInterests)
 	assert.Equal(t, giftRequest.CreatedAt.In(time.UTC).Round(time.Millisecond),
 		fetchedGiftRequest.CreatedAt.In(time.UTC).Round(time.Millisecond))
 
@@ -257,6 +262,7 @@ func TestGiftResponseModel(t *testing.T) {
 		Link:            "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
 		Description:     "Really great content. Highly recommend",
 		Demographic:     "Unknown...",
+		Category: 		 pq.StringArray{"Best selling"},
 		GiftCollections: nil,
 	}
 
@@ -266,6 +272,7 @@ func TestGiftResponseModel(t *testing.T) {
 		Link:            "https://www.youtube.com/Penguinz0",
 		Description:     "Really great content. Highly recommend",
 		Demographic:     "Unknown...",
+		Category: 		 pq.StringArray{"Best selling"},
 		GiftCollections: nil,
 	}
 

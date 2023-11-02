@@ -6,11 +6,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"sort"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/lib/pq"
 
@@ -242,6 +243,8 @@ func TestAddRequest(t *testing.T) {
 	request := model.GiftRequest{
 		CustomerID:    retrievedCustomer.ID,
 		RecipientName: "Friend",
+		Occasion:           pq.StringArray{"Birthday", "Anniversary"},
+		RecipientInterests: pq.StringArray{"Reading", "Gaming"},
 	}
 
 	// Create the GiftRequest and call the endpoint
@@ -261,6 +264,8 @@ func TestAddRequest(t *testing.T) {
 	var retrievedRequest model.GiftRequest
 	err = tx.First(&retrievedRequest).Error
 	assert.Equal(t, addedRequest.RecipientName, retrievedRequest.RecipientName)
+	assert.Equal(t, addedRequest.Occasion, retrievedRequest.Occasion)
+	assert.Equal(t, addedRequest.RecipientInterests, retrievedRequest.RecipientInterests)
 
 }
 
@@ -976,6 +981,7 @@ func TestAddGiftToCollection(t *testing.T) {
 	// Add Gift to Gift Collection
 	gift := model.Gift{
 		Name: "Gift1",
+		Category: pq.StringArray{"Best selling", "Gadgets"},
 	}
 	giftJSON, err := json.Marshal(gift)
 	if err != nil {
@@ -995,6 +1001,7 @@ func TestAddGiftToCollection(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, giftAddedRetrievedCollection.CollectionName, giftAddedCollection.CollectionName)
 	assert.Equal(t, giftAddedRetrievedCollection.Gifts[0].Name, giftAddedCollection.Gifts[0].Name)
+	assert.Equal(t, giftAddedRetrievedCollection.Gifts[0].Category, giftAddedCollection.Gifts[0].Category)
 }
 
 func TestGiftDeleteFromCollection(t *testing.T) {
