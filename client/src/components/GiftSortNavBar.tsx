@@ -19,7 +19,7 @@ const GiftSortNavbar = () => {
   };
 
   const buttonStyle =
-    "px-4 py-2 text-black text-xs rounded-md border-gray-400";
+    "px-4 py-2 text-black text-xs rounded-md bg-gray-100 border-gray-400";
   const activeButtonStyle = "bg-gray-400";
 
   return (
@@ -61,19 +61,25 @@ const GiftSortNavbar = () => {
                 Sort By: {selectedFeature}
               </button>
               {dropdownOpen && (
-                <div className="absolute mt-2 right-0 border border-gray-300 rounded-md text-black text-sm shadow-lg"> 
+                <div className="absolute mt-2 right-0 border border-gray-300 rounded-md text-black text-sm shadow-lg z-10"> 
                   <ul>
                     <li
                       onClick={() => handleFeatureSelect("Featured")}
-                      className="cursor-pointer px-4 py-2 hover:bg-gray-200"
+                      className="cursor-pointer px-4 py-2 hover:bg-gray-300"
                     >
                       Featured
                     </li>
                     <li
-                      onClick={() => handleFeatureSelect("Price")}
-                      className="cursor-pointer px-4 py-2 hover-bg-gray-200"
+                      onClick={() => handleFeatureSelect("Featured")}
+                      className="cursor-pointer px-4 py-2 hover:bg-gray-300"
                     >
                       Price
+                    </li>
+                    <li
+                      onClick={() => handleFeatureSelect("Featured")}
+                      className="cursor-pointer px-4 py-2 hover:bg-gray-300"
+                    >
+                      Occassion
                     </li>
                     {/* Add more options here */}
                   </ul>
