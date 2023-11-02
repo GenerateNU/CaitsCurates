@@ -61,7 +61,7 @@ const GiftSortNavbar = () => {
                 Sort By: {selectedFeature}
               </button>
               {dropdownOpen && (
-                <div className="absolute mt-2 right-0 border border-gray-300 rounded-md text-black text-sm shadow-lg z-10"> 
+                <div className="absolute mt-2 right-0 border border-gray-300 rounded-md bg-gray-100 text-black text-sm shadow-lg z-10"> 
                   <ul>
                     <li
                       onClick={() => handleFeatureSelect("Featured")}
