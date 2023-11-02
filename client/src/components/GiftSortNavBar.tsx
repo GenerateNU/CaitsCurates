@@ -70,13 +70,13 @@ const GiftSortNavbar = () => {
                       Featured
                     </li>
                     <li
-                      onClick={() => handleFeatureSelect("Featured")}
+                      onClick={() => handleFeatureSelect("Price")}
                       className="cursor-pointer px-4 py-2 hover:bg-gray-300"
                     >
                       Price
                     </li>
                     <li
-                      onClick={() => handleFeatureSelect("Featured")}
+                      onClick={() => handleFeatureSelect("Occasion")}
                       className="cursor-pointer px-4 py-2 hover:bg-gray-300"
                     >
                       Occassion
