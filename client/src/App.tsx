@@ -5,6 +5,8 @@ import RequestsPage from "./pages/RequestsPage";
 import CollectionPage from './pages/CollectionsPage';
 import {AdminProvider} from "./Context/AdminContext.tsx";
 import GiftManagementPage from "./pages/GiftManagementPage.tsx";
+import LoginPage  from "./pages/LoginPage.tsx";
+import SignUpPage from "./pages/SignUpPage.tsx";
 
 function App() {
     return (
@@ -31,6 +33,14 @@ function App() {
                         <AdminProvider>
                             <GiftManagementPage/>
                         </AdminProvider>}
+                />
+                <Route
+                    path="/signup/"
+                    element={<SignUpPage/>}
+                />
+                <Route
+                    path="/login/"
+                    element={<LoginPage/>}
                 />
             </Routes>
         </Router>
