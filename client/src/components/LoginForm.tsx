@@ -36,7 +36,7 @@ const LoginForm = <T extends LoginInputs>({formData, initialState, onSubmit}: Pr
         onSubmit(formState);
     }
 
-    const lineStyle = "inline-block border-solid border-b-2 border-black w-1/2";
+    const lineStyle = "border-solid border-b-2 border-black w-1/2";
 
     return (
         <form
@@ -75,15 +75,15 @@ const LoginForm = <T extends LoginInputs>({formData, initialState, onSubmit}: Pr
             {formData.buttonText}
         </button>
         <div className="flex items-center mt-8">
-            <span className={`${lineStyle}`} />
-            <span className="inline-block px-3 text-center text-sm"> {"or"} </span>
+            <span className={`${lineStyle}`}/>
+            <span className="px-3 text-center text-sm"> {"or"} </span>
             <span className={`${lineStyle}`} />
         </div>
         <div className="flex justify-center space-x-6 mt-4">
             {/* replace with icons */}
-            <span className="inline-block w-14 h-14 rounded-full bg-orange-900"/>
-            <span className="inline-block w-14 h-14 rounded-full bg-orange-900"/>
-            <span className="inline-block w-14 h-14 rounded-full bg-orange-900"/>
+            <span className="w-14 h-14 rounded-full bg-orange-900"/>
+            <span className="w-14 h-14 rounded-full bg-orange-900"/>
+            <span className="w-14 h-14 rounded-full bg-orange-900"/>
         </div>
     </form>
     )
