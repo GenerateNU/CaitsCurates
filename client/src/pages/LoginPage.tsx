@@ -26,6 +26,7 @@ const LoginPage = () => {
                     initialState={initialState}
                     onSubmit={handleOnSubmit}
                 />
+                {/* replace with image */}
                 <div className="w-[512px] bg-slate-700 lg:w-1/2" />
             </div>
         </div>
