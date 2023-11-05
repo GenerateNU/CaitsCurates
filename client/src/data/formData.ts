@@ -23,7 +23,7 @@ export const loginFormData: FormData = {
 
 export const signUpFormData: FormData = {
     title: "Sign Up",
-    subText: "Create an account to begin youre gift-giving journey!",
+    subText: "Create an account to begin your gift-giving journey!",
     inputs: [
         {
             className: "mt-10",
