@@ -124,6 +124,9 @@ func UpdateGiftToDb(db *gorm.DB, id int64, inputGift Gift) (Gift, error) {
 	if inputGift.Description != "" {
 		updates["Description"] = inputGift.Description
 	}
+	if len(inputGift.Category) != 0 {
+		updates["Category"] = inputGift.Category
+	}
 	if inputGift.Demographic != "" {
 		updates["Demographic"] = inputGift.Demographic
 	}
@@ -193,7 +196,6 @@ func GetGiftFromDB(db *gorm.DB, id int64) (Gift, error) {
 	return gift, nil
 }
 
-// GetAllGiftsFromDB fetches all ExampleGift
 // GetAllGiftsFromDB fetches all Gift
 func GetAllGiftsFromDB(db *gorm.DB) ([]Gift, error) {
 	var gifts []Gift
@@ -203,7 +205,6 @@ func GetAllGiftsFromDB(db *gorm.DB) ([]Gift, error) {
 	return gifts, nil
 }
 
-// GetAllResponsesFromDB fetches all GiftResponse
 // WriteGiftToDb saves the Gift and returns it
 func WriteGiftToDb(db *gorm.DB, inputGift Gift) (Gift, error) {
 	if err := db.Create(&inputGift).Error; err != nil {
