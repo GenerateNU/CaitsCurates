@@ -3,6 +3,7 @@ export interface Gift {
   Name: string;
   Price: number;
   Link: string;
+  Occasion: string;
   Description: string;
   Demographic: string;
   GiftCollections: GiftCollection[];

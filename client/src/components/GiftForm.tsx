@@ -4,7 +4,7 @@ import {Gift} from "../types.tsx";
 
 
 const defaultGift: Gift = {
-    Demographic: "", Description: "", Category: [], GiftCollections: [], ID: 0, Link: "", Name: "", Price: 0
+    Demographic: "", Description: "", Occasion: "", Category: [], GiftCollections: [], ID: 0, Link: "", Name: "", Price: 0
 }
 type Props = {
     initialGift?: Gift;
@@ -80,7 +80,19 @@ const GiftForm: React.FC<Props> = ({ initialGift = defaultGift, mode, onGiftChan
                     className="mt-1 p-2 w-full border-2 border-gray-300 rounded-md"
                 />
             </div>
-
+            <div className="mb-4">
+                <label htmlFor="occasion" className="block text-sm font-medium text-gray-700">
+                    Description:
+                </label>
+                <input
+                    type="text"
+                    id="occasion"
+                    name="Occasion"
+                    value={gift.Occasion}
+                    onChange={handleInputChange}
+                    className="mt-1 p-2 w-full border-2 border-gray-300 rounded-md"
+                />
+            </div>
             <div className="mb-4">
                 <label htmlFor="price" className="block text-sm font-medium text-gray-700">
                     Price:

@@ -14,8 +14,9 @@ type Gift struct {
 	Link            string
 	Description     string
 	Demographic     string
+	Category        pq.StringArray `gorm:"type:text[]"`
+	Occasion        string
 	GiftCollections []*GiftCollection `gorm:"many2many:gift_request_gifts;"`
-	Category 		pq.StringArray `gorm:"type:text[]"`
 }
 
 type GiftRequest struct {

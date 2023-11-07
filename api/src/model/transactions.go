@@ -124,6 +124,9 @@ func UpdateGiftToDb(db *gorm.DB, id int64, inputGift Gift) (Gift, error) {
 	if inputGift.Description != "" {
 		updates["Description"] = inputGift.Description
 	}
+	if inputGift.Occasion != "" {
+		updates["Occasion"] = inputGift.Occasion
+	}
 	if len(inputGift.Category) != 0 {
 		updates["Category"] = inputGift.Category
 	}
