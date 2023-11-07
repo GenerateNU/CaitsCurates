@@ -160,10 +160,10 @@ func (pg *PgController) Serve() *gin.Engine {
 		c.JSON(http.StatusOK, collections)
 	})
 	// Create an endpoint that takes in a customerID and returns all collections with no customerID or a matching customerID.
-	r.GET("/collections/:id", func(c * gin.Context) {
+	r.GET("/collections/:customerId", func(c * gin.Context) {
 
 		// Get Customer ID 
-		id := c.Param("id")
+		id := c.Param("customerId")
 		intId, err := strconv.Atoi(id)
 		if err != nil {
 			panic(err)
