@@ -26,7 +26,7 @@ type Model interface {
 	SearchGifts(string, int, int) ([]Gift, error)
 	AllGiftResponses() ([]GiftResponse, error)
 	AllCollections() ([]GiftCollection, error)
-	AllCustomerCollectionsid(id int64) ([]GiftCollection, error)
+	AllCustomerCollections(id int64) ([]GiftCollection, error)
 	UpdateCollection(GiftCollection) (GiftCollection, error)
 	AddGiftToGiftCollection(Gift, int64) (GiftCollection, error)
 	DeleteGiftFromGiftCollection(int64, int64) (GiftCollection, error)
@@ -189,7 +189,7 @@ func (m *PgModel) AllCollections() ([]GiftCollection, error) {
 	return collections, nil
 }
 
-func (m *PgModel) AllCustomerCollectionsid(id int64) ([]GiftCollection, error) {
+func (m *PgModel) AllCustomerCollections(id int64) ([]GiftCollection, error) {
 	collections, err := GetAllCustomerCollectionsFromDB(m.Conn, id)
 
 	if err != nil {
