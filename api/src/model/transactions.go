@@ -232,6 +232,15 @@ func GetAllCollectionsFromDB(db *gorm.DB) ([]GiftCollection, error) {
 	return collections, nil
 }
 
+// GetAllCustomerCollectionsFromDB fetches all GiftCollections that associated with the customer ID or none
+func GetAllCustomerCollectionsFromDB(db *gorm.DB, id int64) ([]GiftCollection, error) {
+	var collections []GiftCollection
+	if err := db.Where("customer_id = ? OR customer_id IS NULL", id).Preload("Gifts").Find(&collections).Error; err != nil {
+		return nil, err
+	}
+	return collections, nil
+}
+
 func AddGiftToCollectionFromDB(db *gorm.DB, inputGift Gift, id int64) (GiftCollection, error) {
 	var collection GiftCollection
 	if err := db.Where("id = ?", id).First(&collection).Error; err != nil {

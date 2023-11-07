@@ -159,6 +159,22 @@ func (pg *PgController) Serve() *gin.Engine {
 		}
 		c.JSON(http.StatusOK, collections)
 	})
+	// Create an endpoint that takes in a customerID and returns all collections with no customerID or a matching customerID.
+	r.GET("/collections/:customerId", func(c * gin.Context) {
+
+		// Get Customer ID 
+		id := c.Param("customerId")
+		intId, err := strconv.Atoi(id)
+		if err != nil {
+			panic(err)
+		}
+
+		collections, err := pg.AllCustomerCollections(int64(intId))
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, "Oops")
+		}
+		c.JSON(http.StatusOK, collections)
+	})
 	r.POST("/addGift", func(c *gin.Context) {
 		var input model.Gift
 		fmt.Print(c)
