@@ -22,7 +22,9 @@ const GiftItem = (props: GiftProps) => {
                     >Link</a>
                 </div>
                 <p>Demographic: {props.gift.Demographic}</p>
+                <p>Categories: {props.gift.Category}</p>
                 <p>Description: {props.gift.Description}</p>
+                <p>Description: {props.gift.Occasion}</p>
             </div>
 
                 <div className='w-1/12 flex flex-row space-x-2'>
