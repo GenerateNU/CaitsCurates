@@ -22,6 +22,7 @@ const GiftItem = (props: GiftProps) => {
                     >Link</a>
                 </div>
                 <p>Demographic: {props.gift.Demographic}</p>
+                <p>Categories: {props.gift.Category}</p>
                 <p>Description: {props.gift.Description}</p>
             </div>
 

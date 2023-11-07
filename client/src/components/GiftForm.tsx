@@ -4,7 +4,7 @@ import {Gift} from "../types.tsx";
 
 
 const defaultGift: Gift = {
-    Demographic: "", Description: "", GiftCollections: [], ID: 0, Link: "", Name: "", Price: 0
+    Demographic: "", Description: "", Category: [], GiftCollections: [], ID: 0, Link: "", Name: "", Price: 0
 }
 type Props = {
     initialGift?: Gift;
