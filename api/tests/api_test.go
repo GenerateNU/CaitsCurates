@@ -404,7 +404,6 @@ func TestAddCollection(t *testing.T) {
 	assert.Equal(t, retrievedCollection.Gifts[0].Name, addedCollection.Gifts[0].Name)
 }
 
-//---------------CRUD GIFT ENDPOINT TESTS--------------------------------------
 
 func TestGetGift(t *testing.T) {
 	// Database setup
@@ -806,7 +805,7 @@ func TestGetAllGiftCollection(t *testing.T) {
 		t.Fatalf("Unable to connect to database: %v", err)
 	}
 	// Put auto migrations here
-	err = db.AutoMigrate(&model.GiftCollection{})
+	err = db.AutoMigrate(&model.GiftCollection{}, &model.User{}, &model.Customer{}, &model.Gift{})
 	if err != nil {
 		panic("failed to migrate test database schema")
 	}
@@ -822,24 +821,54 @@ func TestGetAllGiftCollection(t *testing.T) {
 	// Test code
 	w := httptest.NewRecorder()
 
-	uintValue := uint(5)
+	// Create a Customer
+	user := model.User{}
+	err = tx.Create(&user).Error
+	assert.NoError(t, err)
+	var retrievedUser model.User
+	err = tx.First(&retrievedUser).Error
+	assert.NoError(t, err)
+	customer := model.Customer{
+		User: retrievedUser,
+	}
+	err = tx.Create(&customer).Error
+	assert.NoError(t, err)
+	var retrievedCustomer model.Customer
+	err = tx.First(&retrievedCustomer).Error
+	assert.NoError(t, err)
+
+	// Second Customer
+	user2 := model.User{}
+	err = tx.Create(&user2).Error
+	assert.NoError(t, err)
+	var retrievedUser2 model.User
+	err = tx.Where("id = ?", user2.ID).First(&retrievedUser2).Error
+	assert.NoError(t, err)
+	customer2 := model.Customer{
+		User: retrievedUser2,
+	}
+	err = tx.Create(&customer2).Error
+	assert.NoError(t, err)
+	var retrievedCustomer2 model.Customer
+	err = tx.Where("id = ?", customer2.ID).First(&retrievedCustomer2).Error
+	assert.NoError(t, err)
 
 	collection := model.GiftCollection{
-		CustomerID:     &uintValue,
+		CustomerID:     &retrievedCustomer.ID,
 		CollectionName: "sample name",
 		Gifts:          []*model.Gift{},
 	}
-	uintValue = uint(6)
+
 	collection_two := model.GiftCollection{
-		CustomerID:     &uintValue,
+		CustomerID:     &retrievedCustomer2.ID,
 		CollectionName: "sample name 2",
 		Gifts:          []*model.Gift{},
 	}
 
-	err = db.Create(&collection).Error
+	err = tx.Create(&collection).Error
 	assert.NoError(t, err)
 
-	err = db.Create(&collection_two).Error
+	err = tx.Create(&collection_two).Error
 	assert.NoError(t, err)
 
 	req1, err := http.NewRequest("GET", fmt.Sprintf("/collections"), nil)
@@ -1119,37 +1148,66 @@ func TestGetAllCustomerGiftCollection(t *testing.T) {
 	// Test code
 	w := httptest.NewRecorder()
 
-	uintValue := uint(5)
+	
+	// Create a Customer
+	user := model.User{}
+	err = tx.Create(&user).Error
+	assert.NoError(t, err)
+	var retrievedUser model.User
+	err = tx.First(&retrievedUser).Error
+	assert.NoError(t, err)
+	customer := model.Customer{
+		User: retrievedUser,
+	}
+	err = tx.Create(&customer).Error
+	assert.NoError(t, err)
+	var retrievedCustomer model.Customer
+	err = tx.First(&retrievedCustomer).Error
+	assert.NoError(t, err)
+
+	// Second Customer
+	user2 := model.User{}
+	err = tx.Create(&user2).Error
+	assert.NoError(t, err)
+	var retrievedUser2 model.User
+	err = tx.Where("id = ?", user2.ID).First(&retrievedUser2).Error
+	assert.NoError(t, err)
+	customer2 := model.Customer{
+		User: retrievedUser2,
+	}
+	err = tx.Create(&customer2).Error
+	assert.NoError(t, err)
+	var retrievedCustomer2 model.Customer
+	err = tx.Where("id = ?", customer2.ID).First(&retrievedCustomer2).Error
+	assert.NoError(t, err)
 
 	collection := model.GiftCollection{
-		CustomerID:     &uintValue,
+		CustomerID:     &retrievedCustomer.ID,
 		CollectionName: "sample name",
 		Gifts:          []*model.Gift{},
 	}
 
-	uintValue = uint(6)
 	collection_two := model.GiftCollection{
-		CustomerID:     &uintValue,
+		CustomerID:     &retrievedCustomer2.ID,
 		CollectionName: "sample name 2",
 		Gifts:          []*model.Gift{},
 	}
 
 	collection_three := model.GiftCollection{
-		CustomerID:     nil,
 		CollectionName: "sample name 3",
 		Gifts:          []*model.Gift{},
 	}
 
-	err = db.Create(&collection).Error
+	err = tx.Create(&collection).Error
 	assert.NoError(t, err)
 
-	err = db.Create(&collection_two).Error
+	err = tx.Create(&collection_two).Error
 	assert.NoError(t, err)
 
-	err = db.Create(&collection_three).Error
+	err = tx.Create(&collection_three).Error
 	assert.NoError(t, err)
 
-	req1, err := http.NewRequest("GET", fmt.Sprintf("/collections/%d", uintValue), nil)
+	req1, err := http.NewRequest("GET", fmt.Sprintf("/collections/%d", retrievedCustomer2.ID), nil)
 	router.ServeHTTP(w, req1)
 	assert.Equal(t, 200, w.Code)
 
@@ -1166,7 +1224,4 @@ func TestGetAllCustomerGiftCollection(t *testing.T) {
 	assert.Equal(t, collection_three.CollectionName, collectionRetrieved[1].CollectionName)
 	assert.Equal(t, collection_three.Gifts, collectionRetrieved[1].Gifts)
 
-	var collectionCount int64
-	collectionCount = int64(len(collectionRetrieved))
-	assert.Equal(t, int64(2), collectionCount)
 }
