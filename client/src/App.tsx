@@ -7,12 +7,13 @@ import {AdminProvider} from "./Context/AdminContext.tsx";
 import GiftManagementPage from "./pages/GiftManagementPage.tsx";
 import LoginPage  from "./pages/LoginPage.tsx";
 import SignUpPage from "./pages/SignUpPage.tsx";
+import RequestStripeTest from "./pages/RequestsStripeTest";
 
 function App() {
     return (
         <Router>
             <Routes>
-                <Route path="/" element={<HomePage/>}/>
+                <Route path="/" element={<RequestStripeTest/>}/> 
                 <Route
                     path="/requests/"
                     element={
