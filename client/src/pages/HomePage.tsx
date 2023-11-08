@@ -3,9 +3,12 @@ import CollectionItem from "../components/CollectionItemUpdated";
 import SearchBar from "../components/SearchBar";
 import GiftSortNavBar from "../components/GiftSortNavBar";
 import UpdatedGiftItem from "../components/UpdatedGiftItem";
+import axios from "axios";
+import {useEffect, useState} from "react";
+import {GiftCollection} from "../types.tsx";
 
 const HomePage = () => {
-  const collections = [
+  const sampleCollections = [
     { name: "Collection 1", gifts: [] },
     { name: "Collection 2", gifts: [] },
     { name: "Collection 3", gifts: [] },
@@ -32,7 +35,25 @@ const HomePage = () => {
     { name: "Gift 6", price: 30 },
     { name: "Gift 7", price: 55 },
     { name: "Gift 8", price: 80 },
-  ];
+  ]
+
+  const customerID = 1;
+  const [collections, setCollections] = useState<GiftCollection[]>([]);
+  const [displayCollection, setDisplayCollection] = useState(sampleCollections[0]);
+
+  useEffect(() => {
+    getCollection();
+  }, []);
+
+  const getCollection = async ()=> {
+    try {
+      const response = await axios.get(`/api/collections/${customerID}`);
+      setCollections(response.data);
+    } catch (error) {
+      console.error('An error occurred while fetching the collection:', error);
+    }
+  };
+
 
   return (
     <div className="bg-gray-100 h-full text-white flex flex-col">
@@ -57,7 +78,7 @@ const HomePage = () => {
         </div>
   <div className="overflow-y-auto" style={{ maxHeight: '290px', maxWidth: '1000px' }}>
   <div className="flex flex-wrap -mx-2">
-    {gifts.map((gift, index) => (
+    {displayCollection.gifts.map((gift, index) => (
       <div key={index} className="w-1/4 px-2">
         <UpdatedGiftItem name={gift.name} price={gift.price} />
       </div>
