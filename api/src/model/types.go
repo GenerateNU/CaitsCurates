@@ -17,6 +17,8 @@ type Gift struct {
 	Link            string
 	Description     string
 	Demographic     string
+	Category        pq.StringArray `gorm:"type:text[]"`
+	Occasion        string
 	GiftCollections []*GiftCollection `gorm:"many2many:gift_request_gifts;"`
 }
 
@@ -72,8 +74,8 @@ type Admin struct {
 }
 
 func (gift *Gift) BeforeSave(tx *gorm.DB) (err error) {
-	if len(gift.Name) >= 10 || len(gift.Name) == 0 {
-		err = errors.New("gift name must be between 1 and 9 characters")
+	if len(gift.Name) == 0 {
+		err = errors.New("gift name cannot be empty")
 		return err
 	}
 
@@ -88,10 +90,54 @@ func (gift *Gift) BeforeSave(tx *gorm.DB) (err error) {
 		return err
 	}
 
-	// if a gift has no demographic
-	if len(gift.Demographic) == 0 {
-		err = errors.New("gift must have a demographic")
-		return err
+	Demographics := []string{
+		"For her",
+		"For him",
+		"For kids",
+		"For mom",
+		"For dad",
+		"For women",
+		"For men",
+	}
+
+	for _, demographic := range Demographics {
+		if !slices.Contains(Demographics, demographic) {
+			err = errors.New("gift must have a valid demographic")
+			return err
+		}
+	}
+
+	Occasions := []string{
+		"Birthday",
+		"Bridal",
+		"Get well soon",
+		"New baby",
+		"Thinking of you",
+		"Thank you",
+	}
+
+	for _, occasion := range Occasions {
+		if !slices.Contains(Occasions, occasion) {
+			err = errors.New("gift must have a valid occasion")
+			return err
+		}
+	}
+
+	Categories := []string{
+		"Best selling",
+		"Fun",
+		"Gadgets",
+		"Home",
+		"Jewelry",
+		"Kitchen & bar",
+		"Warm and cozy",
+	}
+
+	for _, category := range Categories {
+		if !slices.Contains(Categories, category) {
+			err = errors.New("gift must have a valid category")
+			return err
+		}
 	}
 
 	// if a gift has no description
@@ -104,14 +150,9 @@ func (gift *Gift) BeforeSave(tx *gorm.DB) (err error) {
 }
 
 func (gc *GiftCollection) BeforeSave(tx *gorm.DB) (err error) {
-	if len(gc.CollectionName) >= 10 || len(gc.CollectionName) == 0 {
-		err = errors.New("giftCollection name must be between 1 and 9 characters")
-		return err
-	}
-
-	// if customerID is not found
-	if gc.CustomerID == nil {
-		err = errors.New("giftCollection must have a customerID")
+	// if collection name is not set
+	if len(gc.CollectionName) == 0 {
+		err = errors.New("giftCollection must have a name")
 		return err
 	}
 
@@ -121,37 +162,22 @@ func (gc *GiftCollection) BeforeSave(tx *gorm.DB) (err error) {
 		return err
 	}
 
-	// if gifts is not emoty then check if each gift is in this giftCollection
-	if gc.Gifts != nil {
-		for _, gift := range gc.Gifts {
-			if !slices.Contains(gc.Gifts, gift) {
-				err = errors.New("giftCollection must have a valid gift")
-				return err
-			}
-		}
-	}
-
 	return
 }
 
 func (user *User) BeforeSave(tx *gorm.DB) (err error) {
-	if len(user.FirstName) >= 10 || len(user.FirstName) == 0 {
-		err = errors.New("user first name must be between 1 and 9 characters")
+	if len(user.FirstName) == 0 {
+		err = errors.New("user must have a first name")
 		return err
 	}
 
-	if len(user.LastName) >= 10 || len(user.LastName) == 0 {
-		err = errors.New("user last name must be between 1 and 9 characters")
+	if len(user.LastName) == 0 {
+		err = errors.New("user must have a last name")
 		return err
 	}
 
 	if len(user.Password) == 0 {
 		err = errors.New("Please enter a password")
-		return err
-	}
-
-	if len(user.Email) >= 10 || len(user.Email) == 0 {
-		err = errors.New("user email must be between 1 and 9 characters")
 		return err
 	}
 
@@ -169,23 +195,7 @@ func (user *User) BeforeSave(tx *gorm.DB) (err error) {
 }
 
 func (customer *Customer) BeforeSave(tx *gorm.DB) (err error) {
-	if customer.UserID == 0 {
-		err = errors.New("customer must have a userID")
-		return err
-	}
-
-	if customer.User.ID != customer.UserID {
-		err = errors.New("Customer UserID mismatch")
-		return err
-	}
-
-	// if giftCollections is not emoty or not populated
-	if customer.GiftCollections == nil {
-		err = errors.New("customer must have a giftCollections")
-		return err
-	}
-
-	// if giftRequests is not emoty or not populated
+	// if giftRequests is not empty or not populated
 	if customer.GiftRequests == nil {
 		err = errors.New("customer must have a giftRequests")
 		return err
@@ -195,22 +205,18 @@ func (customer *Customer) BeforeSave(tx *gorm.DB) (err error) {
 }
 
 func (giftRequest *GiftRequest) BeforeSave(tx *gorm.DB) (err error) {
-	if giftRequest.CustomerID == 0 {
-		err = errors.New("giftRequest must have a customerID")
-		return err
-	}
-
-	if giftRequest.RecipientName == "" {
+	// if recipient name is not set
+	if len(giftRequest.RecipientName) == 0 {
 		err = errors.New("giftRequest must have a recipient name")
 		return err
 	}
 
+	// if recipient age is not set
 	if giftRequest.RecipientAge < 1 || giftRequest.RecipientAge > 150 {
 		err = errors.New("giftRequest must have a valid recipient age")
 		return err
 	}
 
-	// GiftOccasions[] Occasion, Birthday, Bridal, Get well soon, New baby, Thinking of you, Thank you
 	GiftOccasions := []string{
 		"Birthday",
 		"Bridal",
@@ -256,9 +262,9 @@ func (giftRequest *GiftRequest) BeforeSave(tx *gorm.DB) (err error) {
 		return err
 	}
 
-	// if either budget is below negative or zero
-	if giftRequest.BudgetMin < 1 || giftRequest.BudgetMin < 1 {
-		err = errors.New("giftRequest must have a valid budget")
+	// if either budget is below negative
+	if giftRequest.BudgetMax < 0 || giftRequest.BudgetMin < 0 {
+		err = errors.New("giftRequest budget cannot be negative")
 		return err
 	}
 
@@ -282,11 +288,6 @@ func (giftRequest *GiftRequest) BeforeSave(tx *gorm.DB) (err error) {
 }
 
 func (giftResponse *GiftResponse) BeforeSave(tx *gorm.DB) (err error) {
-	if giftResponse.GiftCollectionID == 0 {
-		err = errors.New("giftResponse must have a giftCollectionID")
-		return err
-	}
-
 	if giftResponse.CustomMessage == "" {
 		err = errors.New("giftResponse must have a custom message")
 		return err
