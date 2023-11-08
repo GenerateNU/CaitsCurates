@@ -153,18 +153,24 @@ func (pg *PgController) Serve() *gin.Engine {
 		}
 		c.JSON(http.StatusOK, responses)
 	})
-	r.GET("/search", func(c *gin.Context) {
+	r.GET("/search/:giftCollectionId", func(c *gin.Context) {
 		searchTerm := c.Query("q")
 		minPriceStr := c.Query("minPrice")
 		maxPriceStr := c.Query("maxPrice")
 		occasion := c.Query("occasion")
 		demographic := c.Query("demographic")
-		category := c.Query("category")
-		
+		category := c.QueryArray("category")
+
+		id := c.Param("giftCollectionId")
+		intId, err := strconv.Atoi(id)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, "Invalid giftCollectionId")
+			return
+		}
 
 		minPrice, _ := strconv.Atoi(minPriceStr)
 		maxPrice, _ := strconv.Atoi(maxPriceStr)
-		gifts, err := pg.SearchGifts(searchTerm, minPrice, maxPrice, occasion, demographic, category)
+		gifts, err := pg.SearchGifts(int64(intId), searchTerm, minPrice, maxPrice, occasion, demographic, category)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, "Oops")
 		}

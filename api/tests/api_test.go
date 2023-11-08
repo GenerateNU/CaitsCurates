@@ -1148,7 +1148,7 @@ func TestGetAllCustomerGiftCollection(t *testing.T) {
 	// Test code
 	w := httptest.NewRecorder()
 
-	
+
 	// Create a Customer
 	user := model.User{}
 	err = tx.Create(&user).Error
@@ -1294,7 +1294,7 @@ func TestAddGiftToCustomerGiftCollection(t *testing.T) {
 
 	req, err := http.NewRequest(
 		"POST",
-		fmt.Sprintf("/addCustomerGiftCollection/%s/%d", retrievedCollection.CollectionName, retrievedCustomer.ID), 
+		fmt.Sprintf("/addCustomerGiftCollection/%s/%d", retrievedCollection.CollectionName, retrievedCustomer.ID),
 		bytes.NewBuffer(giftJSON),
 	)
 	router.ServeHTTP(w, req)
@@ -1321,7 +1321,7 @@ func TestSearchGift(t *testing.T) {
 		t.Fatalf("Unable to connect to database: %v", err)
 	}
 	// Put auto migrations here
-	err = db.AutoMigrate(&model.Gift{})
+	err = db.AutoMigrate(&model.Gift{}, &model.GiftCollection{})
 	if err != nil {
 		panic("failed to migrate test database schema")
 	}
@@ -1345,6 +1345,12 @@ func TestSearchGift(t *testing.T) {
 	w8 := httptest.NewRecorder()
 	w9 := httptest.NewRecorder()
 
+	collection := model.GiftCollection{
+		CollectionName: "collection",
+	}
+	err = tx.Create(&collection).Error
+	assert.NoError(t, err)
+
 	// Create Gifts
 	testGift1 := model.Gift{
 		Name:            "gift1",
@@ -1352,9 +1358,9 @@ func TestSearchGift(t *testing.T) {
 		Link:            "link1",
 		Description:     "description1",
 		Demographic:     "demogrpahic1",
-		Category:        "category1",
+		Category:        pq.StringArray{"category1"},
 		Occasion:        "occasion1",
-		GiftCollections: nil,
+		GiftCollections: []*model.GiftCollection{&collection},
 	}
 	err = tx.Create(&testGift1).Error
 	assert.NoError(t, err)
@@ -1365,9 +1371,9 @@ func TestSearchGift(t *testing.T) {
 		Link:            "link1",
 		Description:     "description2",
 		Demographic:     "demogrpahic1",
-		Category:        "category2",
+		Category:        pq.StringArray{"category2"},
 		Occasion:        "occasion1",
-		GiftCollections: nil,
+		GiftCollections: []*model.GiftCollection{&collection},
 	}
 	err = tx.Create(&testGift2).Error
 	assert.NoError(t, err)
@@ -1378,18 +1384,18 @@ func TestSearchGift(t *testing.T) {
 		Link:            "link2",
 		Description:     "description1",
 		Demographic:     "demogrpahic2",
-		Category:        "category1",
+		Category:        pq.StringArray{"category1"},
 		Occasion:        "occasion2",
-		GiftCollections: nil,
+		GiftCollections: []*model.GiftCollection{&collection},
 	}
 	err = tx.Create(&testGift3).Error
 	assert.NoError(t, err)
 
 	// Search for gift by price
-	req1, err := http.NewRequest("GET", "/search?minPrice=0&maxPrice=100", nil)
-	if err != nil {
-		t.Fatalf("Error creating request: %v", err)
-	}
+	req1, err := http.NewRequest("GET", fmt.Sprintf("/search/%d?minPrice=0&maxPrice=100", collection.ID), nil)
+    if err != nil {
+        t.Fatalf("Error creating request: %v", err)
+    }
 	router.ServeHTTP(w1, req1)
 	assert.Equal(t, 200, w1.Code)
 
@@ -1400,10 +1406,10 @@ func TestSearchGift(t *testing.T) {
 
 	assert.GreaterOrEqual(t, len(retrievedPriceGifts), 3)
 
-	req2, err := http.NewRequest("GET", "/search?minPrice=60&maxPrice=100", nil)
-	if err != nil {
-		t.Fatalf("Error creating request: %v", err)
-	}
+	req2, err := http.NewRequest("GET", fmt.Sprintf("/search/%d?minPrice=60&maxPrice=100", collection.ID), nil)
+    if err != nil {
+        t.Fatalf("Error creating request: %v", err)
+    }
 	router.ServeHTTP(w2, req2)
 	assert.Equal(t, 200, w2.Code)
 
@@ -1415,10 +1421,10 @@ func TestSearchGift(t *testing.T) {
 	assert.GreaterOrEqual(t, len(searchOneGift), 1)
 
 	// Search Gift By Demographic
-	req3, err := http.NewRequest("GET", "/search?demographic=demogrpahic1", nil)
-	if err != nil {
-		t.Fatalf("Error creating request: %v", err)
-	}
+	req3, err := http.NewRequest("GET", fmt.Sprintf("/search/%d?demographic=demogrpahic1", collection.ID), nil)
+    if err != nil {
+        t.Fatalf("Error creating request: %v", err)
+    }
 	router.ServeHTTP(w3, req3)
 	assert.Equal(t, 200, w3.Code)
 
@@ -1429,10 +1435,10 @@ func TestSearchGift(t *testing.T) {
 
 	assert.GreaterOrEqual(t, len(retrievedDemographicGifts), 2)
 
-	req4, err := http.NewRequest("GET", "/search?demographic=demogrpahic2", nil)
-	if err != nil {
-		t.Fatalf("Error creating request: %v", err)
-	}
+	req4, err := http.NewRequest("GET", fmt.Sprintf("/search/%d?demographic=demogrpahic2", collection.ID), nil)
+    if err != nil {
+        t.Fatalf("Error creating request: %v", err)
+    }
 	router.ServeHTTP(w4, req4)
 	assert.Equal(t, 200, w4.Code)
 
@@ -1444,10 +1450,10 @@ func TestSearchGift(t *testing.T) {
 	assert.GreaterOrEqual(t, len(retrievedOneDemographicGift), 1)
 
 	// Search Gift By Occasion
-	req5, err := http.NewRequest("GET", "/search?occasion=occasion1", nil)
-	if err != nil {
-		t.Fatalf("Error creating request: %v", err)
-	}
+	req5, err := http.NewRequest("GET", fmt.Sprintf("/search/%d?occasion=occasion1", collection.ID), nil)
+    if err != nil {
+        t.Fatalf("Error creating request: %v", err)
+    }
 	router.ServeHTTP(w5, req5)
 	assert.Equal(t, 200, w5.Code)
 
@@ -1458,10 +1464,10 @@ func TestSearchGift(t *testing.T) {
 
 	assert.GreaterOrEqual(t, len(retrievedOccasionGifts), 2)
 
-	req6, err := http.NewRequest("GET", "/search?occasion=occasion2", nil)
-	if err != nil {
-		t.Fatalf("Error creating request: %v", err)
-	}
+	req6, err := http.NewRequest("GET", fmt.Sprintf("/search/%d?occasion=occasion2", collection.ID), nil)
+    if err != nil {
+        t.Fatalf("Error creating request: %v", err)
+    }
 	router.ServeHTTP(w6, req6)
 	assert.Equal(t, 200, w6.Code)
 
@@ -1473,10 +1479,10 @@ func TestSearchGift(t *testing.T) {
 	assert.GreaterOrEqual(t, len(retrievedOneOccasionGift), 1)
 
 	// Search Gift By Category
-	req7, err := http.NewRequest("GET", "/search?category=category1", nil)
-	if err != nil {
-		t.Fatalf("Error creating request: %v", err)
-	}
+	req7, err := http.NewRequest("GET", fmt.Sprintf("/search/%d?category=category1", collection.ID), nil)
+    if err != nil {
+        t.Fatalf("Error creating request: %v", err)
+    }
 	router.ServeHTTP(w7, req7)
 	assert.Equal(t, 200, w7.Code)
 
@@ -1487,10 +1493,10 @@ func TestSearchGift(t *testing.T) {
 
 	assert.GreaterOrEqual(t, len(retrievedCategoryGifts), 2)
 
-	req8, err := http.NewRequest("GET", "/search?category=category", nil)
-	if err != nil {
-		t.Fatalf("Error creating request: %v", err)
-	}
+	req8, err := http.NewRequest("GET", fmt.Sprintf("/search/%d?category=category2", collection.ID), nil)
+    if err != nil {
+        t.Fatalf("Error creating request: %v", err)
+    }
 	router.ServeHTTP(w8, req8)
 	assert.Equal(t, 200, w8.Code)
 
@@ -1501,11 +1507,11 @@ func TestSearchGift(t *testing.T) {
 
 	assert.GreaterOrEqual(t, len(retrievedOneCategoryGift), 1)
 
-	// Test Empty
-	req9, err := http.NewRequest("GET", "/search", nil)
-	if err != nil {
-		t.Fatalf("Error creating request: %v", err)
-	}
+	// Test Empty 
+	req9, err := http.NewRequest("GET", fmt.Sprintf("/search/%d", collection.ID), nil)
+    if err != nil {
+        t.Fatalf("Error creating request: %v", err)
+    }
 	router.ServeHTTP(w9, req9)
 	assert.Equal(t, 200, w9.Code)
 

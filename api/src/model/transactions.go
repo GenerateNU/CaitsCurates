@@ -2,6 +2,7 @@ package model
 
 import (
 	"gorm.io/gorm"
+	"github.com/lib/pq"
 )
 
 func WriteRequestToDb(db *gorm.DB, inputRequest GiftRequest) (GiftRequest, error) {
@@ -171,10 +172,14 @@ func DeleteGiftCollectionFromDb(db *gorm.DB, id int64) error {
 
 	return nil
 }
-func SearchGiftsDb(db *gorm.DB, searchTerm string, minPrice int, maxPrice int, occasion string, demographic string, category string) ([]Gift, error) {
+func SearchGiftsDb(db *gorm.DB, id int64, searchTerm string, minPrice int, maxPrice int, occasion string, demographic string, category []string) ([]Gift, error) {
 	var gifts []Gift
 
-	query := db.Where("price >= ?", minPrice)
+	query := db.Preload("GiftCollections").Where("id = ?", id).Find(&gifts)
+
+	if minPrice >= 0 {
+		query = db.Where("price >= ?", minPrice)
+	}
 
 	if searchTerm != "" {
 		query = query.Where("to_tsvector('english', name || ' ' || description) @@ to_tsquery('english', ?)", searchTerm)
@@ -192,8 +197,8 @@ func SearchGiftsDb(db *gorm.DB, searchTerm string, minPrice int, maxPrice int, o
 		query = query.Where("demographic = ?", demographic)
 	}
 
-	if category != "" {
-		query = query.Where("category = ?", category)
+	if len(category) > 0 {
+		query = query.Where("category && ?", pq.StringArray(category))
 	}
 
 	if err := query.Find(&gifts).Error; err != nil {
@@ -202,6 +207,7 @@ func SearchGiftsDb(db *gorm.DB, searchTerm string, minPrice int, maxPrice int, o
 
 	return gifts, nil
 }
+
 func GetCompleteGiftRequestsFromDB(db *gorm.DB) ([]GiftRequest, error) {
 	var requests []GiftRequest
 	if err := db.Where("gift_response_id IS NOT NULL").Preload("GiftResponse").Preload("GiftResponse.GiftCollection").Find(&requests).Error; err != nil {
