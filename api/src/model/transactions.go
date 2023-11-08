@@ -3,6 +3,7 @@ package model
 import (
 	"github.com/lib/pq"
 	"gorm.io/gorm"
+	"errors"
 )
 
 func WriteRequestToDb(db *gorm.DB, inputRequest GiftRequest) (GiftRequest, error) {
@@ -336,4 +337,25 @@ func DeleteGiftFromCollectionFromDB(db *gorm.DB, giftID int64, giftCollectionID 
 	}
 
 	return collection, nil
+}
+
+// Update Available Requests for Customers 
+func UpdateCustomerAvailableRequestsFromDB(db *gorm.DB, customerID int64, availableRequests int64) (Customer, error) {
+	var customer Customer
+	if err := db.First(&customer, customerID).Error; err != nil {
+        return Customer{}, err
+    }
+
+	updatedAvailableRequests := int64(customer.AvailableRequests) + availableRequests
+	if updatedAvailableRequests < 0 {
+		return Customer{}, errors.New("Customer doesn't have any AvailableRequests")
+	}
+
+	customer.AvailableRequests = uint(updatedAvailableRequests)
+
+	if err:= db.Save(&customer).Error; err!= nil {
+		return Customer{}, err
+	}
+
+	return customer, nil
 }

@@ -58,10 +58,11 @@ type User struct {
 
 type Customer struct {
 	gorm.Model
-	UserID          uint
-	User            User
-	GiftCollections []*GiftCollection
-	GiftRequests    []*GiftRequest
+	UserID            uint
+	User              User
+	AvailableRequests uint
+	GiftCollections   []*GiftCollection
+	GiftRequests      []*GiftRequest
 }
 
 type Admin struct {
