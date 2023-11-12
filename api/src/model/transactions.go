@@ -258,7 +258,7 @@ func AddGiftToCollectionFromDB(db *gorm.DB, inputGift Gift, id int64) (GiftColle
 
 func AddGiftToCustomerCollectionFromDB(db *gorm.DB, gift Gift, collectionName string, customerId int64) (GiftCollection, error) {
 	var collection GiftCollection
-	if err := db.Where("CollectionName = ? AND CustomerID = ?", collectionName, customerId).First(&collection).Error; err != nil {
+	if err := db.Where("collection_name = ? AND customer_id = ?", collectionName, customerId).First(&collection).Error; err != nil {
 		return GiftCollection{}, err
 	}
 

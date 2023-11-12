@@ -305,7 +305,7 @@ func (pg *PgController) Serve() *gin.Engine {
 	})
 
 	// Add gift to gift collection for given customer id and collection name
-	r.POST("/addGiftCollection/:collectionName/:customerId", func(c *gin.Context) {
+	r.POST("/addCustomerGiftCollection/:collectionName/:customerId", func(c *gin.Context) {
 		var input model.Gift
 
 		collectionName := c.Param("collectionName")
@@ -314,6 +314,12 @@ func (pg *PgController) Serve() *gin.Engine {
 		intId, err := strconv.Atoi(customerId)
 		if err != nil {
 			panic(err)
+		}
+
+		if err := c.BindJSON(&input); err != nil {
+			c.JSON(http.StatusBadRequest, "Failed to unmarshal gift")
+			fmt.Print(err)
+			return
 		}
 
 		giftAddedCollection, err := pg.AddGiftToCustomerCollection(input, collectionName, int64(intId))
