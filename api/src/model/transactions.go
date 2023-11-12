@@ -256,6 +256,21 @@ func AddGiftToCollectionFromDB(db *gorm.DB, inputGift Gift, id int64) (GiftColle
 	return collection, nil
 }
 
+func AddGiftToCustomerCollectionFromDB(db *gorm.DB, gift Gift, collectionName string, customerId int64) (GiftCollection, error) {
+	var collection GiftCollection
+	if err := db.Where("CollectionName = ? AND CustomerID = ?", collectionName, customerId).First(&collection).Error; err != nil {
+		return GiftCollection{}, err
+	}
+
+	collection.Gifts = append(collection.Gifts, &gift)
+
+	if err:= db.Save(&collection).Error; err != nil {
+		return GiftCollection{}, err
+	}
+
+	return collection, nil
+}
+
 func DeleteGiftFromCollectionFromDB(db *gorm.DB, giftID int64, giftCollectionID int64) (GiftCollection, error) {
 	var collection GiftCollection
 	if err := db.Preload("Gifts").First(&collection, giftCollectionID).Error; err != nil {
