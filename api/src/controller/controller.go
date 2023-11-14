@@ -3,10 +3,11 @@ package controller
 import (
 	"CaitsCurates/backend/src/model"
 	"fmt"
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 )
 
 type Controller interface {
@@ -302,6 +303,35 @@ func (pg *PgController) Serve() *gin.Engine {
 
 		c.JSON(http.StatusOK, giftAddedCollection)
 	})
+
+	// Add gift to gift collection for given customer id and collection name
+	r.POST("/addCustomerGiftCollection/:collectionName/:customerId", func(c *gin.Context) {
+		var input model.Gift
+
+		collectionName := c.Param("collectionName")
+		customerId := c.Param("customerId")
+
+		intId, err := strconv.Atoi(customerId)
+		if err != nil {
+			panic(err)
+		}
+
+		if err := c.BindJSON(&input); err != nil {
+			c.JSON(http.StatusBadRequest, "Failed to unmarshal gift")
+			fmt.Print(err)
+			return
+		}
+
+		giftAddedCollection, err := pg.AddGiftToCustomerCollection(input, collectionName, int64(intId))
+
+		if err != nil {
+			c.JSON(http.StatusBadRequest, input)
+			panic(err)
+		}
+
+		c.JSON(http.StatusOK, giftAddedCollection)
+	})
+
 
 	// Delete Gift to Gift Collection
 	r.DELETE("/removeGiftFromGiftCollection/:giftID/:giftCollectionID", func(c *gin.Context) {

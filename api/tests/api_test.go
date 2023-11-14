@@ -1225,3 +1225,88 @@ func TestGetAllCustomerGiftCollection(t *testing.T) {
 	assert.Equal(t, collection_three.Gifts, collectionRetrieved[1].Gifts)
 
 }
+
+func TestAddGiftToCustomerGiftCollection(t *testing.T) {
+	// Database setup
+	dsn := "user=testuser password=testpwd host=localhost port=5433 dbname=testdb sslmode=disable"
+	if dbURL, exists := os.LookupEnv("TEST_DATABASE_URL"); exists {
+		dsn = dbURL
+	}
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("Unable to connect to database: %v", err)
+	}
+	// Put auto migrations here
+	err = db.AutoMigrate(&model.GiftCollection{})
+	if err != nil {
+		panic("failed to migrate test database schema")
+	}
+	// Wrap the DB connection in a transaction
+	tx := db.Begin()
+	defer tx.Rollback()
+
+	// Create Model and Controller
+	m := &model.PgModel{Conn: tx}
+	c := &c.PgController{Model: m}
+	router := c.Serve()
+
+	// Test code
+	w := httptest.NewRecorder()
+
+	// Create a Customer
+	user := model.User{}
+	err = tx.Create(&user).Error
+	assert.NoError(t, err)
+	var retrievedUser model.User
+	err = tx.First(&retrievedUser).Error
+	assert.NoError(t, err)
+	customer := model.Customer{
+		User: retrievedUser,
+	}
+	err = tx.Create(&customer).Error
+	assert.NoError(t, err)
+	var retrievedCustomer model.Customer
+	err = tx.First(&retrievedCustomer).Error
+	assert.NoError(t, err)
+
+	// Create a collection
+	collection := model.GiftCollection{
+		CustomerID: &retrievedCustomer.ID,
+		CollectionName: "test name",
+		Gifts: []*model.Gift{},
+	}
+	err = tx.Create(&collection).Error
+	assert.NoError(t, err)
+	var retrievedCollection model.GiftCollection
+	err = tx.First(&retrievedCollection).Error
+	assert.NoError(t, err)
+
+	// Create a gift
+	gift := model.Gift{
+		Name: "test gift",
+		Price: 25,
+	}
+	giftJSON, err := json.Marshal(gift)
+	if err != nil {
+		t.Fatalf("Error marshaling JSON: %v", err)
+	}
+	assert.NoError(t, err)
+
+	req, err := http.NewRequest(
+		"POST",
+		fmt.Sprintf("/addCustomerGiftCollection/%s/%d", retrievedCollection.CollectionName, retrievedCustomer.ID), 
+		bytes.NewBuffer(giftJSON),
+	)
+	router.ServeHTTP(w, req)
+	assert.Equal(t, 200, w.Code)
+
+	var collectionResponse model.GiftCollection
+	if e := json.Unmarshal(w.Body.Bytes(), &collectionResponse); e != nil {
+		t.Fatalf("Error unmarshaling JSON: %v", e)
+	}
+
+	assert.Equal(t, &retrievedCustomer.ID, collectionResponse.CustomerID)
+	assert.Equal(t, retrievedCollection.CollectionName, collectionResponse.CollectionName)
+	assert.Equal(t, gift.Name, collectionResponse.Gifts[0].Name)
+	assert.Equal(t, gift.Price, collectionResponse.Gifts[0].Price)
+}
