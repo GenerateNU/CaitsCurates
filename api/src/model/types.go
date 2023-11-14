@@ -16,7 +16,7 @@ type Gift struct {
 	Demographic     string
 	Category        pq.StringArray `gorm:"type:text[]"`
 	Occasion        string
-	GiftCollections []*GiftCollection `gorm:"many2many:gift_request_gifts;"`
+	GiftCollections []*GiftCollection `gorm:"many2many:gift_collection_gifts;"`
 }
 
 type GiftRequest struct {
@@ -38,7 +38,7 @@ type GiftCollection struct {
 	CustomerID     *uint
 	Customer       *Customer
 	CollectionName string
-	Gifts          []*Gift `gorm:"many2many:gift_request_gifts;"`
+	Gifts          []*Gift `gorm:"many2many:gift_collection_gifts;"`
 }
 
 type GiftResponse struct {
