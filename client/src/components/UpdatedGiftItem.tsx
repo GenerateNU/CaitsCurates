@@ -22,7 +22,7 @@ function UpdatedGiftItem({ name, price }: GiftItemProps) {
           />
         </svg>
       </div>
-      <div className="" style={{ marginLeft: "40px", marginBottom: "5px"}}>
+      <div className="">
         <h2 className="text-sm text-black font-bold">{name}</h2>
         <h2 className="text-xs text-black">${price}</h2>
       </div>
