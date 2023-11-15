@@ -18,6 +18,12 @@ app.options("/create-checkout-session", cors(corsOptions)); // Enable preflight 
 
 app.use(cors(corsOptions));
 
+app.use((req, res, next) => {
+  res.setHeader("Content-Security-Policy", "img-src 'self' data: https://q.stripe.com");
+  next();
+});
+
+
 const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY);
 
 app.post("/create-checkout-session", cors(corsOptions), async (req, res) => {
