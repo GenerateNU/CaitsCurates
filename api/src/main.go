@@ -10,11 +10,30 @@ import (
 	"os"
 	"time"
 
+	"CaitsCurates/backend/config"
+	"CaitsCurates/backend/routes"
+	"github.com/gin-contrib/cors"
+	"github.com/jinzhu/gorm"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
+var err error
+
 func main() {
+
+	config.DB, err = gorm.Open("mysql", config.DbURL(config.BuildDBConfig()))
+ 	if err != nil {
+  	fmt.Println("Status:", err)
+ 	}
+ 	defer config.DB.Close()
+ 	config.DB.AutoMigrate(&model.Products{})
+ 	r := routes.SetupRouter()
+ 	//running
+	r.Use(cors.Default())
+	 r.Run()
+
 	dbURL, exists := os.LookupEnv("DATABASE_URL")
 	if !exists {
 		dbURL = "host=db user=user password=pwd dbname=CaitsDB port=5432 sslmode=disable"

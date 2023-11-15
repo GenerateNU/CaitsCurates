@@ -1,29 +1,28 @@
-import React from 'react'
 import { useState } from 'react';
 
 const RequestsStripeTest = () => {
 
-  const itemName = "Gift Collections"
-  const itemPrice = 10
+  const itemName = "Gift Collections";
+  const itemPrice = 10;
   const [quantity, setQuantity] = useState(1);
-  const[finalAmount, setFinalAmount] = useState(itemPrice);
-
+  const [finalAmount, setFinalAmount] = useState(itemPrice);
 
   const increment = () => {
-    setQuantity(quantity+1);
-    setFinalAmount(finalAmount+itemPrice);
+    setQuantity(quantity + 1);
+    setFinalAmount(finalAmount + itemPrice);
   }
 
   const decrement = () => {
-    if(quantity <=1){
+    if (quantity <= 1) {
       setQuantity(1);
       setFinalAmount(itemPrice);
     }
-    if(quantity > 1){
+    if (quantity > 1) {
       setQuantity(quantity - 1);
       setFinalAmount(finalAmount - itemPrice);
     }
   }
+
   const checkout = () => {
     fetch('http://localhost:5000/create-checkout-session', {
       method: 'POST',

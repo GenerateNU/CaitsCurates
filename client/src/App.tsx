@@ -7,13 +7,27 @@ import {AdminProvider} from "./Context/AdminContext.tsx";
 import GiftManagementPage from "./pages/GiftManagementPage.tsx";
 import LoginPage  from "./pages/LoginPage.tsx";
 import SignUpPage from "./pages/SignUpPage.tsx";
+//import PaymentForm from "./components/PaymentForm.tsx";
+import Success from "./components/Success.tsx";
+import Cancel from "./components/Cancel.tsx";
 import RequestStripeTest from "./pages/RequestsStripeTest";
+import Completion from "./components/Completion";
 
 function App() {
     return (
         <Router>
             <Routes>
-                <Route path="/" element={<RequestStripeTest/>}/> 
+                <Route path="/" element={<HomePage />} />
+                
+                <Route
+                    path="/orderrequests/"
+                    element={
+                        <RequestStripeTest />
+                    } />
+                    <Route path="/success" element={<Success/>}/>
+                    <Route path="/cancel" element={<Cancel/>}/>
+               
+                <Route path="/completion" element={<Completion />} /> 
                 <Route
                     path="/requests/"
                     element={
