@@ -5,8 +5,8 @@ type GiftItemProps = {
 
 function UpdatedGiftItem({ name, price }: GiftItemProps) {
   return (
-    <div className="relative flex flex-col bg-gray-100 flex-start">
-      <div className="bg-gray-200 w-40 h-40 mx-auto mb-2 relative">
+    <div className="relative flex flex-col flex-start mx-auto mb-4">
+      <div className=" bg-[#F4E6DC] w-80 h-80 mx-auto mb-2 relative">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -22,8 +22,9 @@ function UpdatedGiftItem({ name, price }: GiftItemProps) {
           />
         </svg>
       </div>
-      <div className="" style={{ marginLeft: "40px", marginBottom: "5px"}}>
-        <h2 className="text-sm text-black font-bold">{name}</h2>
+      <div className="" style={{ marginBottom: "5px" }}>
+        <h2 className="text-base text-[#273F2A]">Brand of Item</h2>
+        <h2 className="text-2xl text-amber-950 font-serif font-bold mb-2">{name}</h2>
         <h2 className="text-xs text-black">${price}</h2>
       </div>
     </div>

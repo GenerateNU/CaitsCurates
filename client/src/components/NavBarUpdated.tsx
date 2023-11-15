@@ -12,8 +12,8 @@ const Navbar = () => {
   const activeButtonStyle = "bg-gray-400";
 
   return (
-    <div className="bg-gray-100 p-2">
-      <div className="flex" style={{ maxWidth: "1440px" }}>
+    <div className="p-2">
+      <div className="flex w-full justify-between">
         <div className="flex space-x-2">
           <button
             className={`${buttonStyle} ${
