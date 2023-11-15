@@ -8,8 +8,11 @@ import {
 
 const stripePromise = loadStripe('pk_test_51OAJv1LvSQCInHXR4xvIIOKSghGMZ52FONHQXJefxwlF7E7BqC2aFdoyHZYOh9PEcgxj5vyUlbwofAnRgkgaBurR00tdvcArW1');
 
+
+
 const handleSubmit = async (event: any) => {
   event.preventDefault();
+  
 }
 
 function PaymentForm() {
