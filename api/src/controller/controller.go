@@ -394,7 +394,91 @@ func (pg *PgController) Serve() *gin.Engine {
 		c.JSON(http.StatusOK, giftRemovedCollection)
 	})
 
-	// Update AvailableRequests 
+
+	// Retrieve Giftees based on Giftee ID
+	r.GET("/giftee/:id", func(c *gin.Context) {
+
+		id := c.Param("id")
+		intId, err := strconv.Atoi(id)
+		giftee, err := pg.GetGiftee(int64(intId))
+		if err != nil {
+			panic(err)
+		}
+
+		c.JSON(http.StatusOK, giftee)
+	})
+
+	// Create a new Giftee
+	r.POST("/addGiftee", func(c *gin.Context) {
+		var input model.Giftee
+		fmt.Print(c)
+		if err := c.BindJSON(&input); err != nil {
+			c.JSON(http.StatusBadRequest, "Failed to unmarshal giftee")
+
+			fmt.Print(err)
+
+			return
+		}
+		insertedGiftee, err := pg.AddGiftee(input)
+
+		if err != nil {
+			c.JSON(http.StatusBadRequest, input)
+			panic(err)
+		}
+
+		c.JSON(http.StatusOK, insertedGiftee)
+	})
+
+	// Update Giftee Information
+	r.PUT("/giftee/:id", func(c *gin.Context) {
+
+		// Get Giftee ID
+		id := c.Param("id")
+		intId, err := strconv.Atoi(id)
+		if err != nil {
+			panic(err)
+		}
+
+		var input model.Giftee
+		if err := c.BindJSON(&input); err != nil {
+			c.JSON(http.StatusBadRequest, "Failed to unmarshal giftee")
+
+			fmt.Print(err)
+
+			return
+		}
+
+		updatedGiftee, err := pg.UpdateGiftee(int64(intId), input)
+
+		if err != nil {
+			c.JSON(http.StatusBadRequest, input)
+			panic(err)
+		}
+
+		c.JSON(http.StatusOK, updatedGiftee)
+	})
+
+	// Delete Giftee
+	r.DELETE("/giftee/:id", func(c *gin.Context) {
+
+		// Get Giftee ID
+		id := c.Param("id")
+		intId, err := strconv.Atoi(id)
+		if err != nil {
+			panic(err)
+		}
+
+		err = pg.DeleteGiftee(int64(intId))
+
+		// Delete Giftee
+		if err != nil {
+			c.JSON(http.StatusBadRequest, "Failed to delete giftee")
+			fmt.Print(err)
+			return
+		}
+		c.JSON(http.StatusNoContent, "Deleted Giftee")
+	})
+	// Update AvailableRequests
 	r.PUT("customer/:id", func(c *gin.Context) {
 
 		// Get Customer ID
@@ -403,7 +487,7 @@ func (pg *PgController) Serve() *gin.Engine {
 			panic(err)
 		}
 
-		// Get request amount 
+		// Get request amount
 		updatedRequests := c.Query("requests")
 		requests, err := strconv.Atoi(updatedRequests)
 		if err != nil {

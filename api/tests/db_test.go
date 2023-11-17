@@ -528,3 +528,71 @@ func TestCustomerModel(t *testing.T) {
 	db.Model(&model.Customer{}).Where("id = ?", customer.ID).Count(&count)
 	assert.Equal(t, int64(0), count)
 }
+
+func TestGifteeModel(t *testing.T) {
+	// This code should be the same for each test
+	dsn := "user=testuser password=testpwd host=localhost port=5433 dbname=testdb sslmode=disable"
+	if dbURL, exists := os.LookupEnv("TEST_DATABASE_URL"); exists {
+		dsn = dbURL
+	}
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("Unable to connect to database: %v", err)
+	}
+	// Put auto migrations here
+	err = db.AutoMigrate(&model.Giftee{})
+	if err != nil {
+		panic("failed to migrate test database schema")
+	}
+	// Setup db rollback to revert db changes
+	tx := db.Begin()
+	defer tx.Rollback()
+
+	// Create Giftee
+	giftee := model.Giftee {
+		CustomerID:            1,
+		GifteeName:            "Maya",
+		Gender:                "Female",
+		CustomerRelationship:  "Sister",
+		Age:                   20,
+		Colors:                pq.StringArray{"Green", "Blue"},
+		Interests:             pq.StringArray{"Sports", "Soccer", "Nature", "Coffee", "Candy"},
+	}
+
+	err = tx.Create(&giftee).Error
+	assert.NoError(t, err)
+
+	// Check if Giftee exists
+	var fetchedGiftee model.Giftee
+	err = tx.First(&fetchedGiftee, giftee.ID).Error
+	assert.NoError(t, err)
+	assert.Equal(t, giftee.ID, fetchedGiftee.ID)
+	assert.Equal(t, giftee.CustomerID, fetchedGiftee.CustomerID)
+	assert.Equal(t, giftee.GifteeName, fetchedGiftee.GifteeName)
+	assert.Equal(t, giftee.Gender, fetchedGiftee.Gender)
+	assert.Equal(t, giftee.CustomerRelationship, fetchedGiftee.CustomerRelationship)
+	assert.Equal(t, giftee.Age, fetchedGiftee.Age)
+	assert.Equal(t, giftee.Colors, fetchedGiftee.Colors)
+	assert.Equal(t, giftee.Interests, fetchedGiftee.Interests)
+	assert.Equal(t, giftee.CreatedAt.In(time.UTC).Round(time.Millisecond),
+		fetchedGiftee.CreatedAt.In(time.UTC).Round(time.Millisecond))
+
+	// Update Giftee
+	err = tx.Model(&fetchedGiftee).Update("GifteeName", "Maya Updated").Error
+	assert.NoError(t, err)
+
+	// Check if it's updated
+	var updatedGiftee model.Giftee
+	err = tx.First(&updatedGiftee, fetchedGiftee.ID).Error
+	assert.NoError(t, err)
+	assert.Equal(t, "Maya Updated", updatedGiftee.GifteeName)
+
+	// Delete Giftee
+	err = tx.Delete(&updatedGiftee).Error
+	assert.NoError(t, err)
+
+	//  Check if it's Giftee
+	var count int64
+	tx.Model(&model.Giftee{}).Where("id = ?", updatedGiftee.ID).Count(&count)
+	assert.Equal(t, int64(0), count)
+}

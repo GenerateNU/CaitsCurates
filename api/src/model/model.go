@@ -1,9 +1,10 @@
 package model
 
 import (
-	"gorm.io/gorm"
 	"regexp"
 	"strings"
+
+	"gorm.io/gorm"
 )
 
 type PgModel struct {
@@ -31,10 +32,14 @@ type Model interface {
 	AddGiftToGiftCollection(Gift, int64) (GiftCollection, error)
 	AddGiftToCustomerCollection(Gift, string, int64) (GiftCollection, error)
 	DeleteGiftFromGiftCollection(int64, int64) (GiftCollection, error)
+	GetGiftee(int64) (Giftee, error)
+	AddGiftee(Giftee) (Giftee, error)
+	UpdateGiftee(int64, Giftee) (Giftee, error)
+	DeleteGiftee(int64) error
+
 	DeleteGiftFromCustomerCollection(Gift, string, int64) (GiftCollection, error)
 	UpdateCustomerAvailableRequests(int64, int64) (Customer, error)
 }
-
 
 func (m *PgModel) AddRequest(inputRequest GiftRequest) (GiftRequest, error) {
 
@@ -154,7 +159,6 @@ func (m *PgModel) SearchGifts(id int64, searchTerm string, minPrice int, maxPric
 	var gifts []Gift
 	searchTerm = strings.TrimSpace(searchTerm)
 
-
 	// Convert to lowercase
 	searchTerm = strings.ToLower(searchTerm)
 
@@ -263,6 +267,50 @@ func (m *PgModel) DeleteGiftFromGiftCollection(giftID int64, giftCollectionID in
 	}
 
 	return giftDeletedCollection, nil
+}
+
+func (m *PgModel) GetGiftee(id int64) (Giftee, error) {
+
+	createdGiftee, err := GetGifteeFromDB(m.Conn, id)
+
+	if err != nil {
+		return Giftee{}, err
+	}
+
+	return createdGiftee, nil
+}
+
+func (m *PgModel) AddGiftee(inputGiftee Giftee) (Giftee, error) {
+
+	createdGiftee, err := WriteGifteeToDb(m.Conn, inputGiftee)
+
+	if err != nil {
+		return Giftee{}, err
+	}
+
+	return createdGiftee, nil
+}
+
+func (m *PgModel) UpdateGiftee(id int64, inputGiftee Giftee) (Giftee, error) {
+
+	updatedGiftee, err := UpdateGifteeToDb(m.Conn, id, inputGiftee)
+
+	if err != nil {
+		return Giftee{}, err
+	}
+
+	return updatedGiftee, nil
+}
+
+func (m *PgModel) DeleteGiftee(id int64) error {
+
+	err := DeleteGifteeFromDb(m.Conn, id)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (m *PgModel) UpdateCustomerAvailableRequests(customerID int64, availableRequests int64) (Customer, error) {

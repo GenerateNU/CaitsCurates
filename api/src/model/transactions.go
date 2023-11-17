@@ -244,6 +244,7 @@ func WriteGiftToDb(db *gorm.DB, inputGift Gift) (Gift, error) {
 	}
 	return inputGift, nil
 }
+
 func GetAllResponsesFromDB(db *gorm.DB) ([]GiftResponse, error) {
 	var response []GiftResponse
 	if err := db.Preload("GiftCollection").Find(&response).Error; err != nil {
@@ -339,7 +340,80 @@ func DeleteGiftFromCollectionFromDB(db *gorm.DB, giftID int64, giftCollectionID 
 	return collection, nil
 }
 
-// Update Available Requests for Customers 
+// GetGifteeFromDB fetches an Giftee by ID
+func GetGifteeFromDB(db *gorm.DB, id int64) (Giftee, error) {
+	var giftee Giftee
+	if err := db.Where("id = ?", id).First(&giftee).Error; err != nil {
+		return Giftee{}, err
+	}
+	return giftee, nil
+}
+
+// WriteGifteeToDb saves the Gift and returns it
+func WriteGifteeToDb(db *gorm.DB, inputGiftee Giftee) (Giftee, error) {
+	if err := db.Create(&inputGiftee).Error; err != nil {
+		return Giftee{}, err
+	}
+	return inputGiftee, nil
+}
+
+// UpdateGiftToDb updates the Gift and returns it
+func UpdateGifteeToDb(db *gorm.DB, id int64, inputGiftee Giftee) (Giftee, error) {
+
+	// Fetch Giftee Record
+	var updatedGiftee Giftee
+	if err := db.Where("id = ?", id).First(&updatedGiftee).Error; err != nil {
+		return Giftee{}, err
+	}
+
+	// Update Giftee Record
+	updates := make(map[string]interface{})
+
+	// Check each field in inputGiftee and add it to the updates map if it is non-zero
+	if inputGiftee.CustomerID != 0 {
+		updates["CustomerID"] = inputGiftee.CustomerID
+	}
+	if inputGiftee.GifteeName != "" {
+		updates["GifteeName"] = inputGiftee.GifteeName
+	}
+	if inputGiftee.Gender != "" {
+		updates["Gender"] = inputGiftee.Gender
+	}
+	if inputGiftee.CustomerRelationship != "" {
+		updates["CustomerRelationship"] = inputGiftee.CustomerRelationship
+	}
+	if inputGiftee.Age != 0 {
+		updates["Age"] = inputGiftee.Age
+	}
+	if len(inputGiftee.Colors) != 0 {
+		updates["Colors"] = inputGiftee.Colors
+	}
+	if len(inputGiftee.Interests) != 0 {
+		updates["Interests"] = inputGiftee.Interests
+	}
+
+	if err := db.Model(&updatedGiftee).Updates(updates).Error; err != nil {
+		return Giftee{}, err
+	}
+
+	// Return Updated Giftee Record
+	return updatedGiftee, nil
+}
+
+// DeleteGiftFromDb Delete Giftee
+func DeleteGifteeFromDb(db *gorm.DB, id int64) error {
+	var deletedGiftee Giftee
+	if err := db.Where("id = ?", id).First(&deletedGiftee).Error; err != nil {
+		return err
+	}
+
+	if err := db.Delete(&deletedGiftee).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+// Update Available Requests for Customers
 func UpdateCustomerAvailableRequestsFromDB(db *gorm.DB, customerID int64, availableRequests int64) (Customer, error) {
 	var customer Customer
 	if err := db.First(&customer, customerID).Error; err != nil {

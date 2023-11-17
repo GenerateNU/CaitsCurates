@@ -1688,3 +1688,325 @@ func TestDeleteGiftFromCustomerGiftCollection(t *testing.T) {
 	assert.Equal(t, giftToStay.Name, collectionResponse.Gifts[0].Name)
 	assert.Equal(t, giftToStay.Price, collectionResponse.Gifts[0].Price)
 }
+
+
+func TestGetGiftee(t *testing.T) {
+	// Database setup
+	dsn := "user=testuser password=testpwd host=localhost port=5433 dbname=testdb sslmode=disable"
+	if dbURL, exists := os.LookupEnv("TEST_DATABASE_URL"); exists {
+		dsn = dbURL
+	}
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("Unable to connect to database: %v", err)
+	}
+	// Put auto migrations here
+	err = db.AutoMigrate(&model.Giftee{})
+	if err != nil {
+		panic("failed to migrate test database schema")
+	}
+	// Wrap the DB connection in a transaction
+	tx := db.Begin()
+	defer tx.Rollback()
+
+	// Create Model and Controller
+	m := &model.PgModel{Conn: tx}
+	c := &c.PgController{Model: m}
+	router := c.Serve()
+
+	// Test code
+	w := httptest.NewRecorder()
+
+	// Create Giftee
+	testGiftee := model.Giftee {
+		CustomerID:            1,
+		GifteeName:            "Maya",
+		Gender:                "Female",
+		CustomerRelationship:  "Sister",
+		Age:                   20,
+		Colors:                pq.StringArray{"Green", "Blue"},
+		Interests:             pq.StringArray{"Sports", "Soccer", "Nature", "Coffee", "Candy"},
+	}
+	err = tx.Create(&testGiftee).Error
+	assert.NoError(t, err)
+
+	// Get Giftee from database
+	req1, err := http.NewRequest("GET", fmt.Sprintf("/giftees/%d", testGiftee.ID), nil)
+	if err != nil {
+		t.Fatalf("Error creating request: %v", err)
+	}
+	router.ServeHTTP(w, req1)
+	assert.Equal(t, 200, w.Code)
+
+	var retrievedGiftee model.Giftee
+	if e := json.Unmarshal(w.Body.Bytes(), &retrievedGiftee); e != nil {
+		t.Fatalf("Error unmarshaling JSON: %v", e)
+	}
+
+	// Test Retrieved Giftee Fields
+	var fetchedGiftee model.Giftee
+	err = tx.First(&fetchedGiftee, retrievedGiftee.ID).Error
+	assert.NoError(t, err)
+	assert.Equal(t, retrievedGiftee.ID, fetchedGiftee.ID)
+	assert.Equal(t, retrievedGiftee.CustomerID, fetchedGiftee.CustomerID)
+	assert.Equal(t, retrievedGiftee.GifteeName, fetchedGiftee.GifteeName)
+	assert.Equal(t, retrievedGiftee.Gender, fetchedGiftee.Gender)
+	assert.Equal(t, retrievedGiftee.CustomerRelationship, fetchedGiftee.CustomerRelationship)
+	assert.Equal(t, retrievedGiftee.Age, fetchedGiftee.Age)
+	assert.Equal(t, retrievedGiftee.Colors, fetchedGiftee.Colors)
+	assert.Equal(t, retrievedGiftee.Interests, fetchedGiftee.Interests)
+	assert.Equal(t, retrievedGiftee.CreatedAt.In(time.UTC).Round(time.Millisecond),
+		fetchedGiftee.CreatedAt.In(time.UTC).Round(time.Millisecond))
+}
+
+func TestAddGiftee(t *testing.T) {
+	// Database setup
+	dsn := "user=testuser password=testpwd host=localhost port=5433 dbname=testdb sslmode=disable"
+	if dbURL, exists := os.LookupEnv("TEST_DATABASE_URL"); exists {
+		dsn = dbURL
+	}
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("Unable to connect to database: %v", err)
+	}
+	// Put auto migrations here
+	err = db.AutoMigrate(&model.Giftee{})
+	if err != nil {
+		panic("failed to migrate test database schema")
+	}
+	// Wrap the DB connection in a transaction
+	tx := db.Begin()
+	defer tx.Rollback()
+
+	// Create Model and Controller
+	m := &model.PgModel{Conn: tx}
+	c := &c.PgController{Model: m}
+	router := c.Serve()
+
+	// Test code
+	w := httptest.NewRecorder()
+
+	// Create Giftee
+	testGiftee := model.Giftee {
+		CustomerID:            1,
+		GifteeName:            "Maya",
+		Gender:                "Female",
+		CustomerRelationship:  "Sister",
+		Age:                   20,
+		Colors:                pq.StringArray{"Green", "Blue"},
+		Interests:             pq.StringArray{"Sports", "Soccer", "Nature", "Coffee", "Candy"},
+	}
+
+	// Test Adding Giftee to Database
+	gifteeJson, err := json.Marshal(testGiftee)
+	if err != nil {
+		t.Fatalf("Error marshaling JSON: %v", err)
+	}
+	assert.NoError(t, err)
+
+	req1, err := http.NewRequest("POST", "/addGiftee", bytes.NewBuffer(gifteeJson))
+	if err != nil {
+		t.Fatalf("Error creating request: %v", err)
+	}
+	router.ServeHTTP(w, req1)
+	assert.Equal(t, 200, w.Code)
+
+	// Test Added Giftee Fields
+	var insertedGiftee model.Giftee
+	if e := json.Unmarshal(w.Body.Bytes(), &insertedGiftee); e != nil {
+		t.Fatalf("Error unmarshaling JSON: %v", e)
+	}
+
+	var fetchedGiftee model.Giftee
+	err = tx.First(&fetchedGiftee, insertedGiftee.ID).Error
+	assert.NoError(t, err)
+	assert.Equal(t, insertedGiftee.ID, fetchedGiftee.ID)
+	assert.Equal(t, insertedGiftee.CustomerID, fetchedGiftee.CustomerID)
+	assert.Equal(t, insertedGiftee.GifteeName, fetchedGiftee.GifteeName)
+	assert.Equal(t, insertedGiftee.Gender, fetchedGiftee.Gender)
+	assert.Equal(t, insertedGiftee.CustomerRelationship, fetchedGiftee.CustomerRelationship)
+	assert.Equal(t, insertedGiftee.Age, fetchedGiftee.Age)
+	assert.Equal(t, insertedGiftee.Colors, fetchedGiftee.Colors)
+	assert.Equal(t, insertedGiftee.Interests, fetchedGiftee.Interests)
+	assert.Equal(t, insertedGiftee.CreatedAt.In(time.UTC).Round(time.Millisecond),
+		fetchedGiftee.CreatedAt.In(time.UTC).Round(time.Millisecond))
+
+	//  Check that there's only 1 Giftee
+	var count int64
+	tx.Model(&model.Giftee{}).Where("id = ?", insertedGiftee.ID).Count(&count)
+	assert.Equal(t, int64(1), count)
+}
+
+func TestUpdateGiftee(t *testing.T) {
+	// Database setup
+	dsn := "user=testuser password=testpwd host=localhost port=5433 dbname=testdb sslmode=disable"
+	if dbURL, exists := os.LookupEnv("TEST_DATABASE_URL"); exists {
+		dsn = dbURL
+	}
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("Unable to connect to database: %v", err)
+	}
+	// Put auto migrations here
+	err = db.AutoMigrate(&model.Giftee{})
+	if err != nil {
+		panic("failed to migrate test database schema")
+	}
+	// Wrap the DB connection in a transaction
+	tx := db.Begin()
+	defer tx.Rollback()
+
+	// Create Model and Controller
+	m := &model.PgModel{Conn: tx}
+	c := &c.PgController{Model: m}
+	router := c.Serve()
+
+	// Test code
+	w := httptest.NewRecorder()
+
+	// Create Giftee
+	testGiftee := model.Giftee {
+		CustomerID:            1,
+		GifteeName:            "Maya",
+		Gender:                "Female",
+		CustomerRelationship:  "Sister",
+		Age:                   20,
+		Colors:                pq.StringArray{"Green", "Blue"},
+		Interests:             pq.StringArray{"Sports", "Soccer", "Nature", "Coffee", "Candy"},
+	}
+	err = tx.Create(&testGiftee).Error
+	assert.NoError(t, err)
+
+	// Test Inputted Giftee Fields
+	var fetchedGiftee model.Giftee
+	err = tx.First(&fetchedGiftee, testGiftee.ID).Error
+	assert.NoError(t, err)
+	assert.Equal(t, testGiftee.ID, fetchedGiftee.ID)
+	assert.Equal(t, testGiftee.CustomerID, fetchedGiftee.CustomerID)
+	assert.Equal(t, testGiftee.GifteeName, fetchedGiftee.GifteeName)
+	assert.Equal(t, testGiftee.Gender, fetchedGiftee.Gender)
+	assert.Equal(t, testGiftee.CustomerRelationship, fetchedGiftee.CustomerRelationship)
+	assert.Equal(t, testGiftee.Age, fetchedGiftee.Age)
+	assert.Equal(t, testGiftee.Colors, fetchedGiftee.Colors)
+	assert.Equal(t, testGiftee.Interests, fetchedGiftee.Interests)
+	assert.Equal(t, testGiftee.CreatedAt.In(time.UTC).Round(time.Millisecond),
+		fetchedGiftee.CreatedAt.In(time.UTC).Round(time.Millisecond))
+
+	// Updated Giftee Fields
+	updatedTestGiftee  := model.Giftee {
+		CustomerID:            1,
+		GifteeName:            "Maya Updated",
+		Gender:                "Female",
+		CustomerRelationship:  "Sister",
+		Age:                   25,
+		Colors:                pq.StringArray{"Green", "Blue", "Yellow", "Red"},
+		Interests:             pq.StringArray{"Sports", "Soccer", "Candy"},
+	}
+
+	// Test Updating Giftee Fields
+	gifteeJson, err := json.Marshal(updatedTestGiftee)
+	if err != nil {
+		t.Fatalf("Error marshaling JSON: %v", err)
+	}
+
+	req1, err := http.NewRequest("PUT", fmt.Sprintf("/giftees/%d", testGiftee.ID), bytes.NewBuffer(gifteeJson))
+	if err != nil {
+		t.Fatalf("Error creating request: %v", err)
+	}
+	router.ServeHTTP(w, req1)
+	assert.Equal(t, 200, w.Code)
+
+	var updatedGifteeRetrieved model.Giftee
+	if e := json.Unmarshal(w.Body.Bytes(), &updatedGifteeRetrieved); e != nil {
+		t.Fatalf("Error unmarshaling JSON: %v", e)
+	}
+
+	var fetchedUpdatedGiftee model.Giftee
+	err = tx.First(&fetchedUpdatedGiftee, updatedGifteeRetrieved.ID).Error
+	assert.NoError(t, err)
+	err = tx.First(&updatedGifteeRetrieved, fetchedUpdatedGiftee.ID).Error
+	assert.NoError(t, err)
+	assert.Equal(t, fetchedUpdatedGiftee.ID, updatedGifteeRetrieved.ID)
+	assert.Equal(t, fetchedUpdatedGiftee.CustomerID, updatedGifteeRetrieved.CustomerID)
+	assert.Equal(t, fetchedUpdatedGiftee.GifteeName, updatedGifteeRetrieved.GifteeName)
+	assert.Equal(t, fetchedUpdatedGiftee.Gender, updatedGifteeRetrieved.Gender)
+	assert.Equal(t, fetchedUpdatedGiftee.CustomerRelationship, updatedGifteeRetrieved.CustomerRelationship)
+	assert.Equal(t, fetchedUpdatedGiftee.Age, updatedGifteeRetrieved.Age)
+	assert.Equal(t, fetchedUpdatedGiftee.Colors, updatedGifteeRetrieved.Colors)
+	assert.Equal(t, fetchedUpdatedGiftee.Interests, updatedGifteeRetrieved.Interests)
+	assert.Equal(t, fetchedUpdatedGiftee.CreatedAt.In(time.UTC).Round(time.Millisecond),
+		updatedGifteeRetrieved.CreatedAt.In(time.UTC).Round(time.Millisecond))
+}
+
+func TestDeleteGiftee(t *testing.T) {
+	// Database setup
+	dsn := "user=testuser password=testpwd host=localhost port=5433 dbname=testdb sslmode=disable"
+	if dbURL, exists := os.LookupEnv("TEST_DATABASE_URL"); exists {
+		dsn = dbURL
+	}
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("Unable to connect to database: %v", err)
+	}
+	// Put auto migrations here
+	err = db.AutoMigrate(&model.Giftee{})
+	if err != nil {
+		panic("failed to migrate test database schema")
+	}
+	// Wrap the DB connection in a transaction
+	tx := db.Begin()
+	defer tx.Rollback()
+
+	// Create Model and Controller
+	m := &model.PgModel{Conn: tx}
+	c := &c.PgController{Model: m}
+	router := c.Serve()
+
+	// Test code
+	w := httptest.NewRecorder()
+
+	// Create Giftee
+	testGiftee := model.Giftee {
+		CustomerID:            1,
+		GifteeName:            "Maya",
+		Gender:                "Female",
+		CustomerRelationship:  "Sister",
+		Age:                   20,
+		Colors:                pq.StringArray{"Green", "Blue"},
+		Interests:             pq.StringArray{"Sports", "Soccer", "Nature", "Coffee", "Candy"},
+	}
+	err = tx.Create(&testGiftee).Error
+	assert.NoError(t, err)
+
+	// Test Inputted Giftee Fields
+	var fetchedGiftee model.Giftee
+	err = tx.First(&fetchedGiftee, testGiftee.ID).Error
+	assert.NoError(t, err)
+	assert.Equal(t, testGiftee.ID, fetchedGiftee.ID)
+	assert.Equal(t, testGiftee.CustomerID, fetchedGiftee.CustomerID)
+	assert.Equal(t, testGiftee.GifteeName, fetchedGiftee.GifteeName)
+	assert.Equal(t, testGiftee.Gender, fetchedGiftee.Gender)
+	assert.Equal(t, testGiftee.CustomerRelationship, fetchedGiftee.CustomerRelationship)
+	assert.Equal(t, testGiftee.Age, fetchedGiftee.Age)
+	assert.Equal(t, testGiftee.Colors, fetchedGiftee.Colors)
+	assert.Equal(t, testGiftee.Interests, fetchedGiftee.Interests)
+	assert.Equal(t, testGiftee.CreatedAt.In(time.UTC).Round(time.Millisecond),
+		fetchedGiftee.CreatedAt.In(time.UTC).Round(time.Millisecond))
+
+	// Check that there's only 1 Giftee
+	var count int64
+	tx.Model(&model.Giftee{}).Where("id = ?", testGiftee.ID).Count(&count)
+	assert.Equal(t, int64(1), count)
+
+	req1, err := http.NewRequest("DELETE", fmt.Sprintf("/giftees/%d", testGiftee.ID), nil)
+	if err != nil {
+		t.Fatalf("Error creating request: %v", err)
+	}
+	router.ServeHTTP(w, req1)
+	assert.Equal(t, 204, w.Code)
+
+	// Check that Giftee has been deleted
+	var deletedCount int64
+	tx.Model(&model.Giftee{}).Where("id = ?", testGiftee.ID).Count(&deletedCount)
+	assert.Equal(t, int64(0), deletedCount)
+}
