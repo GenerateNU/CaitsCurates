@@ -1731,7 +1731,7 @@ func TestGetGiftee(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Get Giftee from database
-	req1, err := http.NewRequest("GET", fmt.Sprintf("/giftees/%d", testGiftee.ID), nil)
+	req1, err := http.NewRequest("GET", fmt.Sprintf("/giftee/%d", testGiftee.ID), nil)
 	if err != nil {
 		t.Fatalf("Error creating request: %v", err)
 	}
@@ -1909,7 +1909,7 @@ func TestUpdateGiftee(t *testing.T) {
 		t.Fatalf("Error marshaling JSON: %v", err)
 	}
 
-	req1, err := http.NewRequest("PUT", fmt.Sprintf("/giftees/%d", testGiftee.ID), bytes.NewBuffer(gifteeJson))
+	req1, err := http.NewRequest("PUT", fmt.Sprintf("/giftee/%d", testGiftee.ID), bytes.NewBuffer(gifteeJson))
 	if err != nil {
 		t.Fatalf("Error creating request: %v", err)
 	}
@@ -1998,7 +1998,7 @@ func TestDeleteGiftee(t *testing.T) {
 	tx.Model(&model.Giftee{}).Where("id = ?", testGiftee.ID).Count(&count)
 	assert.Equal(t, int64(1), count)
 
-	req1, err := http.NewRequest("DELETE", fmt.Sprintf("/giftees/%d", testGiftee.ID), nil)
+	req1, err := http.NewRequest("DELETE", fmt.Sprintf("/giftee/%d", testGiftee.ID), nil)
 	if err != nil {
 		t.Fatalf("Error creating request: %v", err)
 	}
