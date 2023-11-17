@@ -123,16 +123,15 @@ const HomePage = () => {
         <div className=" w-1000">
           <GiftSortNavBar />
         </div>
-
   <div className="overflow-y-auto" style={{ maxHeight: '290px', maxWidth: '1000px' }}>
-      <div className="flex flex-wrap justify-between gap-4">
-        {displayCollection.Gifts.map((gift, index) => (
-            <div key={index}>
-              <UpdatedGiftItem name={gift.Name} price={gift.Price} />
-            </div>
-        ))}
+  <div className="flex flex-wrap -mx-2">
+    {displayCollection.Gifts.map((gift, index) => (
+      <div key={index} className="w-1/4 px-2">
+        <UpdatedGiftItem name={gift.Name} price={gift.Price} description={gift.Description}/>
       </div>
+    ))}
   </div>
+</div>
       </div>
     </div>
   );

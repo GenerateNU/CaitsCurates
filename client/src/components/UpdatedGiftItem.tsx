@@ -1,9 +1,17 @@
+import React, { useState } from "react";
+
 type GiftItemProps = {
   name: string;
   price: number;
+  description: string;
 };
 
-function UpdatedGiftItem({ name, price }: GiftItemProps) {
+function UpdatedGiftItem({ name, price, description }: GiftItemProps) {
+    const[expanded, setExpanded] = useState(false);
+    const toggleDescription = () => {
+        setExpanded(!expanded);
+    }
+
   return (
     <div className="relative flex flex-col bg-gray-100 flex-start">
       <div className="bg-gray-200 w-40 h-40 mx-auto mb-2 relative">
@@ -25,6 +33,13 @@ function UpdatedGiftItem({ name, price }: GiftItemProps) {
       <div className="">
         <h2 className="text-sm text-black font-bold">{name}</h2>
         <h2 className="text-xs text-black">${price}</h2>
+          {description.length > 50 && !expanded ? (
+              <p className='text-xs text-gray-500 cursor-pointer' onClick={toggleDescription}>
+                  {description.slice(0,50)}... Show More
+              </p>
+          ) : (
+              <p className='text-xs text-gray-500'>{description}</p>
+          )}
       </div>
     </div>
   );
