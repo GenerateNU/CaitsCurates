@@ -190,6 +190,7 @@ func main() {
 	err = db.Create(&randomGift2).Error
 
 	// Check for errors
+
 	if err != nil {
 		fmt.Println("Error auto-migrating:", err)
 		return

@@ -1,6 +1,7 @@
 package model
 
 import (
+	"github.com/lib/pq"
 	"gorm.io/gorm"
 )
 
@@ -171,17 +172,44 @@ func DeleteGiftCollectionFromDb(db *gorm.DB, id int64) error {
 
 	return nil
 }
-func SearchGiftsDb(db *gorm.DB, searchTerm string, minPrice int, maxPrice int) ([]Gift, error) {
+func SearchGiftsDb(db *gorm.DB, id int64, searchTerm string, minPrice int, maxPrice int, occasion string, demographic string, category []string) ([]Gift, error) {
 	var gifts []Gift
 
-	if err := db.Where("to_tsvector('english', name || ' ' || description) @@ to_tsquery('english', ?)", searchTerm).
-		Where("price >= ? AND price <= ?", minPrice, maxPrice).
-		Find(&gifts).Error; err != nil {
+	query := db.Joins("JOIN gift_collection_gifts ON gifts.id = gift_collection_gifts.gift_id").
+		Where("gift_collection_gifts.gift_collection_id = ?", id)
+
+	if minPrice >= 0 {
+		query = query.Where("price >= ?", minPrice)
+	}
+
+	if searchTerm != "" {
+		query = query.Where("to_tsvector('english', name || ' ' || description) @@ to_tsquery('english', ?)", searchTerm)
+	}
+
+	if maxPrice > 0 {
+		query = query.Where("price <= ?", maxPrice)
+	}
+
+	if occasion != "" {
+		query = query.Where("occasion = ?", occasion)
+	}
+
+	if demographic != "" {
+		query = query.Where("demographic = ?", demographic)
+	}
+
+	if len(category) > 0 {
+		query = query.Where("category && ?", pq.StringArray(category))
+	}
+	query = query.Preload("GiftCollections")
+
+	if err := query.Find(&gifts).Error; err != nil {
 		return nil, err
 	}
 
 	return gifts, nil
 }
+
 func GetCompleteGiftRequestsFromDB(db *gorm.DB) ([]GiftRequest, error) {
 	var requests []GiftRequest
 	if err := db.Where("gift_response_id IS NOT NULL").Preload("GiftResponse").Preload("GiftResponse.GiftCollection").Find(&requests).Error; err != nil {
