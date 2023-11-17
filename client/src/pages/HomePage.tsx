@@ -4,8 +4,8 @@ import SearchBar from "../components/Home/SearchBar.tsx";
 import GiftSortNavBar from "../components/Nav/GiftSortNavBar.tsx";
 import UpdatedGiftItem from "../components/Home/UpdatedGiftItem.tsx";
 import axios from "axios";
-import {useEffect, useState} from "react";
-import {Gift, GiftCollection} from "../types.tsx";
+import { useEffect, useState } from "react";
+import { Gift, GiftCollection, Filters } from "../types.tsx";
 
 const HomePage = () => {
 
@@ -70,34 +70,72 @@ const HomePage = () => {
   const exampleCustomer = {
     ID: 1,
     UserId: 1,
-  }
+  };
 
   const exampleGiftCollection = {
     ID: 1,
-    CustomerID: 1,
+    CustomerId: 1,
     Customer: exampleCustomer,
-    CollectionName: 'Default',
+    CollectionName: "Default",
     Gifts: exampleGifts,
-  }
+  };
 
   const customerID = 1;
   const [collections, setCollections] = useState<GiftCollection[]>([]);
-  const [displayCollection, setDisplayCollection] = useState<GiftCollection>(exampleGiftCollection);
+  const [displayCollection, setDisplayCollection] = useState<GiftCollection>(
+    exampleGiftCollection
+  );
+  const [gifts, setGifts] = useState(exampleGifts);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentFilters, setCurrentFilters] = useState<Filters>({
+    minPrice: 0,
+    maxPrice: 1000,
+    occasion: "Birthday",
+    demographic: "For her",
+    category: "Cooking",
+  });
 
   useEffect(() => {
     getCollection();
+    getGifts();
   }, []);
 
-  const getCollection = async (): Promise<GiftCollection[] | undefined> => {
+  const getCollection = async () => {
     try {
       const response = await axios.get(`/api/collections/${customerID}`);
       setCollections(response.data);
-      return response.data;
+      console.log("CALLING GET COLLECTION");
+      console.log(response);
     } catch (error) {
-      console.error('An error occurred while fetching the collection:', error);
+      console.error("An error occurred while fetching the collection:", error);
     }
   };
 
+  const getGifts = async () => {
+    try {
+      // const response = await axios.get(`/api/search/${displayCollection.ID}`, {
+      const response = await axios.get(`/api/search/${displayCollection.ID}`, {
+        params: {
+          q: searchTerm,
+          minPrice: currentFilters.minPrice,
+          maxPrice: currentFilters.maxPrice,
+          occasion: currentFilters.occasion,
+          demographic: currentFilters.demographic,
+          category: currentFilters.category,
+        },
+      });
+      console.log("CALLING GET GIFTS");
+
+      console.log(response);
+      setGifts(response.data);
+    } catch (error) {
+      console.error("An error occurred while fetching gifts:", error);
+    }
+  };
+
+  const handleSearchChange = (e: string) => {
+    setSearchTerm(e);
+  };
   const handleFavoriteClick = async (gift: Gift, isSaved: boolean) => {
     const baseUrl = isSaved ? "/api/removeCustomerGiftCollection" : "/api/addCustomerGiftCollection"
     try {
@@ -119,7 +157,15 @@ const HomePage = () => {
     <div className="bg-gray-100 h-full text-white flex flex-col">
       <div className="ml-0">
         <NavBar />
-        <SearchBar />
+        <SearchBar updateHomePage={handleSearchChange} />
+      </div>
+      <p>{searchTerm}</p>
+      <div className="text-black">
+        <p>min: {currentFilters.minPrice}</p>
+        <p>max: {currentFilters.maxPrice}</p>{" "}
+        <p>cat: {currentFilters.category}</p>{" "}
+        <p>occ: {currentFilters.occasion}</p>{" "}
+        <p>dem: {currentFilters.demographic}</p>
       </div>
       <div className="w-full bg-gray-300 text-center py-9">
         <h1 className="text-2xl text-black font-seasons">Essential Gifts</h1>
@@ -129,30 +175,43 @@ const HomePage = () => {
         <div className="overflow-x-auto w-full">
           <div className="flex space-x-4">
             {collections.map((collection, index) => (
-                <div
-                    className={`cursor-pointer ${collection.ID === displayCollection.ID ? 'font-bold' : ''}`}
-                    onClick={() => setDisplayCollection(collection)}>
-                  <CollectionItem  key={index} name={collection.CollectionName} gifts={collection.Gifts} />
-                </div>
+              <div
+                key={index}
+                className={`cursor-pointer ${
+                  collection === displayCollection ? "font-bold" : ""
+                }`}
+                onClick={() => setDisplayCollection(collection)}
+              >
+                <CollectionItem
+                  key={index}
+                  name={collection.CollectionName}
+                  gifts={collection.Gifts}
+                />
+              </div>
             ))}
           </div>
         </div>
         <div className=" w-1000">
-          <GiftSortNavBar />
+          <GiftSortNavBar
+            currentFilters={currentFilters}
+            setCurrentFilters={setCurrentFilters}
+          />
         </div>
 
-  <div className="overflow-y-auto" style={{ maxHeight: '290px', maxWidth: '1000px' }}>
-      <div className="flex flex-wrap justify-between gap-4">
-        {displayCollection.Gifts.map((gift, index) => {
-          const isSaved = gift.GiftCollections === null ? false : gift.GiftCollections.some((collection) => collection.CollectionName === "Favorites" && collection.CustomerID === customerID)
-          return (
-            <div key={index}>
-              <UpdatedGiftItem gift={gift} isSaved={isSaved} onFavoriteClick={handleFavoriteClick}/>
-            </div>
-          )
-        })}
-      </div>
-  </div>
+        <div
+          className="overflow-y-auto"
+          style={{ maxHeight: "290px", maxWidth: "1000px" }}>
+          <div className="flex flex-wrap justify-between gap-4">
+            {displayCollection.Gifts.map((gift, index) => {
+                const isSaved = gift.GiftCollections === null ? false : gift.GiftCollections.some((collection) => collection.CollectionName === "Favorites" && collection.CustomerID === customerID)
+                return(
+                <div key={index}>
+                <UpdatedGiftItem name={gift.Name} price={gift.Price} isSaved={isSaved} onFavoriteClick={handleFavoriteClick}  gift={gift}/>
+              </div>
+            )
+            })}
+          </div>
+        </div>
       </div>
     </div>
   );

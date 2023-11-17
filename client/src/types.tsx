@@ -56,3 +56,11 @@ export interface Admin {
   ID: number;
   UserId: number;
 }
+
+export interface Filters {
+  minPrice: number;
+  maxPrice: number;
+  occasion: string;
+  demographic: string;
+  category: string;
+}
