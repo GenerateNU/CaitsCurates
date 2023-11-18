@@ -299,6 +299,25 @@ func AddGiftToCustomerCollectionFromDB(db *gorm.DB, gift Gift, collectionName st
 	return collection, nil
 }
 
+func DeleteGiftFromCustomerCollectionFromDB(db *gorm.DB, gift Gift, collectionName string, customerId int64) (GiftCollection, error) {
+	var collection GiftCollection
+	if err := db.Preload("Gifts").Where("collection_name = ? AND customer_id = ?", collectionName, customerId).First(&collection).Error; err != nil {
+		return GiftCollection{}, err
+	}
+
+	var giftRemovedCollection []*Gift
+	for _, collectionGift := range collection.Gifts {
+		if collectionGift.Name != gift.Name {
+			giftRemovedCollection = append(giftRemovedCollection, collectionGift)
+		}
+	}
+	if err := db.Model(&collection).Association("Gifts").Replace(giftRemovedCollection); err != nil {
+		return GiftCollection{}, err
+	}
+
+	return collection, nil
+}
+
 func DeleteGiftFromCollectionFromDB(db *gorm.DB, giftID int64, giftCollectionID int64) (GiftCollection, error) {
 	var collection GiftCollection
 	if err := db.Preload("Gifts").First(&collection, giftCollectionID).Error; err != nil {
