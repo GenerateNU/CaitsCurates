@@ -1148,7 +1148,7 @@ func TestGetAllCustomerGiftCollection(t *testing.T) {
 	// Test code
 	w := httptest.NewRecorder()
 
-	
+
 	// Create a Customer
 	user := model.User{}
 	err = tx.Create(&user).Error
@@ -1294,7 +1294,7 @@ func TestAddGiftToCustomerGiftCollection(t *testing.T) {
 
 	req, err := http.NewRequest(
 		"POST",
-		fmt.Sprintf("/addCustomerGiftCollection/%s/%d", retrievedCollection.CollectionName, retrievedCustomer.ID), 
+		fmt.Sprintf("/addCustomerGiftCollection/%s/%d", retrievedCollection.CollectionName, retrievedCustomer.ID),
 		bytes.NewBuffer(giftJSON),
 	)
 	router.ServeHTTP(w, req)
@@ -1400,4 +1400,217 @@ func TestDeleteGiftFromCustomerGiftCollection(t *testing.T) {
 	assert.Equal(t, 1, len(collectionResponse.Gifts))
 	assert.Equal(t, giftToStay.Name, collectionResponse.Gifts[0].Name)
 	assert.Equal(t, giftToStay.Price, collectionResponse.Gifts[0].Price)
+}
+
+func TestSearchGift(t *testing.T) {
+	// Database setup
+	dsn := "user=testuser password=testpwd host=localhost port=5433 dbname=testdb sslmode=disable"
+	if dbURL, exists := os.LookupEnv("TEST_DATABASE_URL"); exists {
+		dsn = dbURL
+	}
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("Unable to connect to database: %v", err)
+	}
+	// Put auto migrations here
+	err = db.AutoMigrate(&model.Gift{}, &model.GiftCollection{})
+	if err != nil {
+		panic("failed to migrate test database schema")
+	}
+	// Wrap the DB connection in a transaction
+	tx := db.Begin()
+	defer tx.Rollback()
+
+	// Create Model and Controller
+	m := &model.PgModel{Conn: tx}
+	c := &c.PgController{Model: m}
+	router := c.Serve()
+
+	// Test code
+	w1 := httptest.NewRecorder()
+	w2 := httptest.NewRecorder()
+	w3 := httptest.NewRecorder()
+	w4 := httptest.NewRecorder()
+	w5 := httptest.NewRecorder()
+	w6 := httptest.NewRecorder()
+	w7 := httptest.NewRecorder()
+	w8 := httptest.NewRecorder()
+	w9 := httptest.NewRecorder()
+
+	collection := model.GiftCollection{
+		CollectionName: "collection",
+	}
+	err = tx.Create(&collection).Error
+	assert.NoError(t, err)
+
+	// Create Gifts
+	testGift1 := model.Gift{
+		Name:            "gift1",
+		Price:           50,
+		Link:            "link1",
+		Description:     "description1",
+		Demographic:     "demogrpahic1",
+		Category:        pq.StringArray{"category1"},
+		Occasion:        "occasion1",
+		GiftCollections: []*model.GiftCollection{&collection},
+	}
+	err = tx.Create(&testGift1).Error
+	assert.NoError(t, err)
+
+	testGift2 := model.Gift{
+		Name:            "gift2",
+		Price:           20,
+		Link:            "link1",
+		Description:     "description2",
+		Demographic:     "demogrpahic1",
+		Category:        pq.StringArray{"category2"},
+		Occasion:        "occasion1",
+		GiftCollections: []*model.GiftCollection{&collection},
+	}
+	err = tx.Create(&testGift2).Error
+	assert.NoError(t, err)
+
+	testGift3 := model.Gift{
+		Name:            "gift3",
+		Price:           70,
+		Link:            "link2",
+		Description:     "description1",
+		Demographic:     "demogrpahic2",
+		Category:        pq.StringArray{"category1"},
+		Occasion:        "occasion2",
+		GiftCollections: []*model.GiftCollection{&collection},
+	}
+	err = tx.Create(&testGift3).Error
+	assert.NoError(t, err)
+
+	// Search for gift by price
+	req1, err := http.NewRequest("GET", fmt.Sprintf("/search/%d?minPrice=0&maxPrice=100", collection.ID), nil)
+    if err != nil {
+        t.Fatalf("Error creating request: %v", err)
+    }
+	router.ServeHTTP(w1, req1)
+	assert.Equal(t, 200, w1.Code)
+
+	var retrievedPriceGifts []model.Gift
+	if err := json.Unmarshal(w1.Body.Bytes(), &retrievedPriceGifts); err != nil {
+		t.Fatalf("Error unmarshaling JSON: %v", err)
+	}
+
+	assert.GreaterOrEqual(t, len(retrievedPriceGifts), 3)
+
+	req2, err := http.NewRequest("GET", fmt.Sprintf("/search/%d?minPrice=60&maxPrice=100", collection.ID), nil)
+    if err != nil {
+        t.Fatalf("Error creating request: %v", err)
+    }
+	router.ServeHTTP(w2, req2)
+	assert.Equal(t, 200, w2.Code)
+
+	var searchOneGift []model.Gift
+	if err := json.Unmarshal(w2.Body.Bytes(), &searchOneGift); err != nil {
+		t.Fatalf("Error unmarshaling JSON: %v", err)
+	}
+
+	assert.GreaterOrEqual(t, len(searchOneGift), 1)
+
+	// Search Gift By Demographic
+	req3, err := http.NewRequest("GET", fmt.Sprintf("/search/%d?demographic=demogrpahic1", collection.ID), nil)
+    if err != nil {
+        t.Fatalf("Error creating request: %v", err)
+    }
+	router.ServeHTTP(w3, req3)
+	assert.Equal(t, 200, w3.Code)
+
+	var retrievedDemographicGifts []model.Gift
+	if err := json.Unmarshal(w3.Body.Bytes(), &retrievedDemographicGifts); err != nil {
+		t.Fatalf("Error unmarshaling JSON: %v", err)
+	}
+
+	assert.GreaterOrEqual(t, len(retrievedDemographicGifts), 2)
+
+	req4, err := http.NewRequest("GET", fmt.Sprintf("/search/%d?demographic=demogrpahic2", collection.ID), nil)
+    if err != nil {
+        t.Fatalf("Error creating request: %v", err)
+    }
+	router.ServeHTTP(w4, req4)
+	assert.Equal(t, 200, w4.Code)
+
+	var retrievedOneDemographicGift []model.Gift
+	if err := json.Unmarshal(w4.Body.Bytes(), &retrievedOneDemographicGift); err != nil {
+		t.Fatalf("Error unmarshaling JSON: %v", err)
+	}
+
+	assert.GreaterOrEqual(t, len(retrievedOneDemographicGift), 1)
+
+	// Search Gift By Occasion
+	req5, err := http.NewRequest("GET", fmt.Sprintf("/search/%d?occasion=occasion1", collection.ID), nil)
+    if err != nil {
+        t.Fatalf("Error creating request: %v", err)
+    }
+	router.ServeHTTP(w5, req5)
+	assert.Equal(t, 200, w5.Code)
+
+	var retrievedOccasionGifts []model.Gift
+	if err := json.Unmarshal(w5.Body.Bytes(), &retrievedOccasionGifts); err != nil {
+		t.Fatalf("Error unmarshaling JSON: %v", err)
+	}
+
+	assert.GreaterOrEqual(t, len(retrievedOccasionGifts), 2)
+
+	req6, err := http.NewRequest("GET", fmt.Sprintf("/search/%d?occasion=occasion2", collection.ID), nil)
+    if err != nil {
+        t.Fatalf("Error creating request: %v", err)
+    }
+	router.ServeHTTP(w6, req6)
+	assert.Equal(t, 200, w6.Code)
+
+	var retrievedOneOccasionGift []model.Gift
+	if err := json.Unmarshal(w6.Body.Bytes(), &retrievedOneOccasionGift); err != nil {
+		t.Fatalf("Error unmarshaling JSON: %v", err)
+	}
+
+	assert.GreaterOrEqual(t, len(retrievedOneOccasionGift), 1)
+
+	// Search Gift By Category
+	req7, err := http.NewRequest("GET", fmt.Sprintf("/search/%d?category=category1", collection.ID), nil)
+    if err != nil {
+        t.Fatalf("Error creating request: %v", err)
+    }
+	router.ServeHTTP(w7, req7)
+	assert.Equal(t, 200, w7.Code)
+
+	var retrievedCategoryGifts []model.Gift
+	if err := json.Unmarshal(w7.Body.Bytes(), &retrievedCategoryGifts); err != nil {
+		t.Fatalf("Error unmarshaling JSON: %v", err)
+	}
+
+	assert.GreaterOrEqual(t, len(retrievedCategoryGifts), 2)
+
+	req8, err := http.NewRequest("GET", fmt.Sprintf("/search/%d?category=category2", collection.ID), nil)
+    if err != nil {
+        t.Fatalf("Error creating request: %v", err)
+    }
+	router.ServeHTTP(w8, req8)
+	assert.Equal(t, 200, w8.Code)
+
+	var retrievedOneCategoryGift []model.Gift
+	if err := json.Unmarshal(w8.Body.Bytes(), &retrievedOneCategoryGift); err != nil {
+		t.Fatalf("Error unmarshaling JSON: %v", err)
+	}
+
+	assert.GreaterOrEqual(t, len(retrievedOneCategoryGift), 1)
+
+	// Test Empty 
+	req9, err := http.NewRequest("GET", fmt.Sprintf("/search/%d", collection.ID), nil)
+    if err != nil {
+        t.Fatalf("Error creating request: %v", err)
+    }
+	router.ServeHTTP(w9, req9)
+	assert.Equal(t, 200, w9.Code)
+
+	var retrievedAllGifts []model.Gift
+	if err := json.Unmarshal(w9.Body.Bytes(), &retrievedAllGifts); err != nil {
+		t.Fatalf("Error unmarshaling JSON: %v", err)
+	}
+
+	assert.GreaterOrEqual(t, len(retrievedAllGifts), 3)
 }
