@@ -332,6 +332,33 @@ func (pg *PgController) Serve() *gin.Engine {
 		c.JSON(http.StatusOK, giftAddedCollection)
 	})
 
+	r.POST("/removeCustomerGiftCollection/:collectionName/:customerId", func(c *gin.Context) {
+		var input model.Gift
+
+		collectionName := c.Param("collectionName")
+		customerId := c.Param("customerId")
+
+		intId, err := strconv.Atoi(customerId)
+		if err != nil {
+			panic(err)
+		}
+
+		if err := c.BindJSON(&input); err != nil {
+			c.JSON(http.StatusBadRequest, "Failed to unmarshal gift")
+			fmt.Print(err)
+			return
+		}
+
+		giftRemovedCollection, err := pg.DeleteGiftFromCustomerCollection(input, collectionName, int64(intId))
+
+		if err != nil {
+			c.JSON(http.StatusBadRequest, input)
+			panic(err)
+		}
+
+		c.JSON(http.StatusOK, giftRemovedCollection)
+	})
+
 
 	// Delete Gift to Gift Collection
 	r.DELETE("/removeGiftFromGiftCollection/:giftID/:giftCollectionID", func(c *gin.Context) {

@@ -32,6 +32,7 @@ type Model interface {
 	AddGiftToGiftCollection(Gift, int64) (GiftCollection, error)
 	AddGiftToCustomerCollection(Gift, string, int64) (GiftCollection, error)
 	DeleteGiftFromGiftCollection(int64, int64) (GiftCollection, error)
+	DeleteGiftFromCustomerCollection(Gift, string, int64) (GiftCollection, error)
 }
 
 func (m *PgModel) AddRequest(inputRequest GiftRequest) (GiftRequest, error) {
@@ -238,6 +239,17 @@ func (m *PgModel) AddGiftToCustomerCollection(gift Gift, collectionName string, 
 	}
 
 	return giftAddedCollection, nil
+}
+
+func (m *PgModel) DeleteGiftFromCustomerCollection(gift Gift, collectionName string, customerId int64) (GiftCollection, error) {
+
+	giftDeletedCollection, err := DeleteGiftFromCustomerCollectionFromDB(m.Conn, gift, collectionName, customerId);
+
+	if err != nil {
+		return GiftCollection{}, err
+	}
+
+	return giftDeletedCollection, nil
 }
 
 func (m *PgModel) DeleteGiftFromGiftCollection(giftID int64, giftCollectionID int64) (GiftCollection, error) {
