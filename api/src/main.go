@@ -4,6 +4,7 @@ import (
 	"CaitsCurates/backend/src/controller"
 	"CaitsCurates/backend/src/model"
 	"fmt"
+	"github.com/stripe/stripe-go/v76"
 	"log"
 	"os"
 	"time"
@@ -16,6 +17,7 @@ import (
 )
 
 func main() {
+	stripe.Key = "sk_test_51O9y33LQbsCsABA6zhBXSCI821p8f6y9O4e4B9Pnavh5QwAgipJlUHY0iWPf3ZCfYjoxgzQYhkaW5n1PW6jwtfFu00CPOVBlrr"
 	dbURL, exists := os.LookupEnv("DATABASE_URL")
 	if !exists {
 		dbURL = "host=db user=user password=pwd dbname=CaitsDB port=5432 sslmode=disable"
@@ -190,9 +192,9 @@ func main() {
 		Gifts:          []*model.Gift{&decorativeGift3, &decorativeGift4, &decorativeGift2, &decorativeGift1},
 	}
 	giftCollectionFavorites := model.GiftCollection{
-		CustomerID: &customer1.UserID,
+		CustomerID:     &customer1.UserID,
 		CollectionName: "Favorites",
-		Gifts: []*model.Gift{},
+		Gifts:          []*model.Gift{},
 	}
 	err = db.Create(&giftCollectionToy).Error
 	err = db.Create(&giftCollectionFall).Error
