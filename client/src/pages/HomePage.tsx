@@ -5,7 +5,7 @@ import GiftSortNavBar from "../components/GiftSortNavBar";
 import UpdatedGiftItem from "../components/UpdatedGiftItem";
 import axios from "axios";
 import {useEffect, useState} from "react";
-import {GiftCollection} from "../types.tsx";
+import {Gift, GiftCollection} from "../types.tsx";
 
 const HomePage = () => {
 
@@ -74,7 +74,7 @@ const HomePage = () => {
 
   const exampleGiftCollection = {
     ID: 1,
-    CustomerId: 1,
+    CustomerID: 1,
     Customer: exampleCustomer,
     CollectionName: 'Default',
     Gifts: exampleGifts,
@@ -88,15 +88,32 @@ const HomePage = () => {
     getCollection();
   }, []);
 
-  const getCollection = async ()=> {
+  const getCollection = async (): Promise<GiftCollection[] | undefined> => {
     try {
       const response = await axios.get(`/api/collections/${customerID}`);
       setCollections(response.data);
+      return response.data;
     } catch (error) {
       console.error('An error occurred while fetching the collection:', error);
     }
   };
 
+  const handleFavoriteClick = async (gift: Gift, isSaved: boolean) => {
+    const baseUrl = isSaved ? "/api/removeCustomerGiftCollection" : "/api/addCustomerGiftCollection"
+    try {
+        await axios.post(`${baseUrl}/Favorites/${customerID}`, gift)
+        // refetch customer gift collections
+        const updatedCollection = await getCollection();
+
+        if (updatedCollection) {
+          // on success set state for currently displayed collection
+          const currentCollection = updatedCollection.find((collection) => collection.CollectionName === displayCollection.CollectionName) ?? displayCollection;
+          setDisplayCollection(currentCollection);
+        }
+    } catch (error) {
+      console.error('An error occured while favoriting a gift:', error)
+    }
+  }
 
   return (
     <div className="bg-gray-100 h-full text-white flex flex-col">
@@ -113,7 +130,7 @@ const HomePage = () => {
           <div className="flex space-x-4">
             {collections.map((collection, index) => (
                 <div
-                    className={`cursor-pointer ${collection === displayCollection ? 'font-bold' : ''}`}
+                    className={`cursor-pointer ${collection.CollectionName === displayCollection.CollectionName ? 'font-bold' : ''}`}
                     onClick={() => setDisplayCollection(collection)}>
                   <CollectionItem  key={index} name={collection.CollectionName} gifts={collection.Gifts} />
                 </div>
@@ -126,11 +143,14 @@ const HomePage = () => {
 
   <div className="overflow-y-auto" style={{ maxHeight: '290px', maxWidth: '1000px' }}>
       <div className="flex flex-wrap justify-between gap-4">
-        {displayCollection.Gifts.map((gift, index) => (
+        {displayCollection.Gifts.map((gift, index) => {
+          const isSaved = gift.GiftCollections === null ? false : gift.GiftCollections.some((collection) => collection.CollectionName === "Favorites" && collection.CustomerID === customerID)
+          return (
             <div key={index}>
-              <UpdatedGiftItem name={gift.Name} price={gift.Price} />
+              <UpdatedGiftItem gift={gift} isSaved={isSaved} onFavoriteClick={handleFavoriteClick}/>
             </div>
-        ))}
+          )
+        })}
       </div>
   </div>
       </div>

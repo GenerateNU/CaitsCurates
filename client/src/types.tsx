@@ -12,7 +12,7 @@ export interface Gift {
 
 export interface GiftRequest {
   ID: number;
-  CustomerId: number;
+  CustomerID: number;
   GiftResponseId: number | null;
   RecipientName: string;
   RecipientAge: number;
@@ -26,7 +26,7 @@ export interface GiftRequest {
 
 export interface GiftCollection {
   ID: number;
-  CustomerId: number | null;
+  CustomerID: number | null;
   Customer: Customer;
   CollectionName: string;
   Gifts: Gift[];

@@ -1,19 +1,23 @@
+import { Gift } from "../types";
+
 type GiftItemProps = {
-  name: string;
-  price: number;
+  gift: Gift;
+  isSaved: boolean;
+  onFavoriteClick: (gift: Gift, isSaved: boolean) => void;
 };
 
-function UpdatedGiftItem({ name, price }: GiftItemProps) {
+function UpdatedGiftItem({ gift, isSaved, onFavoriteClick }: GiftItemProps) {
   return (
     <div className="relative flex flex-col bg-gray-100 flex-start">
       <div className="bg-gray-200 w-40 h-40 mx-auto mb-2 relative">
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          fill="none"
+          fill={isSaved ? "red" : "none"}
           viewBox="0 0 24 24"
           strokeWidth="1.5"
           stroke="black"
           className="w-6 h-6 absolute bottom-2 right-2"
+          onClick={() => onFavoriteClick(gift, isSaved)}
         >
           <path
             strokeLinecap="round"
@@ -23,8 +27,8 @@ function UpdatedGiftItem({ name, price }: GiftItemProps) {
         </svg>
       </div>
       <div className="">
-        <h2 className="text-sm text-black font-bold">{name}</h2>
-        <h2 className="text-xs text-black">${price}</h2>
+        <h2 className="text-sm text-black font-bold">{gift.Name}</h2>
+        <h2 className="text-xs text-black">${gift.Price}</h2>
       </div>
     </div>
   );
