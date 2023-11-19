@@ -5,8 +5,8 @@ type GiftItemProps = {
 
 function UpdatedGiftItem({ name, price }: GiftItemProps) {
   return (
-    <div className="relative flex flex-col flex-start mx-auto mb-4">
-      <div className=" bg-[#F4E6DC] w-80 h-80 mx-auto mb-2 relative">
+    <div className="relative flex flex-col flex-start mb-4">
+      <div className=" bg-[#F4E6DC] w-96 h-96 mx-auto mb-2 relative">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"

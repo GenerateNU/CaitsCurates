@@ -6,7 +6,9 @@ import UpdatedGiftItem from "../components/UpdatedGiftItem";
 
 import openGift from "../images/openGift.svg";
 import closedGift from "../images/closedGift.svg";
+import caitsLogo from "../images/caitsCuratesLogo.svg";
 
+import { useMockGifts } from "../Context/MockGiftsContext";
 import { useState } from "react";
 
 const HomePage = () => {
@@ -14,49 +16,8 @@ const HomePage = () => {
   const [giftPageEnd, setGiftPageEnd] = useState(16);
   const [pageNumber, setPageNumber] = useState(1);
 
-
-  const collections = [
-    { name: "Collection 1", gifts: [] },
-    { name: "Collection 2", gifts: [] },
-    { name: "Collection 3", gifts: [] },
-    { name: "Collection 4", gifts: [] },
-    { name: "Collection 5", gifts: [] },
-    { name: "Collection 6", gifts: [] },
-    { name: "Collection 7", gifts: [] },
-    { name: "Collection 8", gifts: [] },
-    { name: "Collection 9", gifts: [] },
-    { name: "Collection 10", gifts: [] },
-    { name: "Collection 11", gifts: [] },
-    { name: "Collection 12", gifts: [] },
-    { name: "Collection 13", gifts: [] },
-    { name: "Collection 14", gifts: [] },
-    { name: "Collection 15", gifts: [] },
-  ];
-
-  const [gifts, setGifts] = useState([
-    { name: "Gift 1", price: 20 },
-    { name: "Gift 2", price: 50 },
-    { name: "Gift 3", price: 30 },
-    { name: "Gift 4", price: 100 },
-    { name: "Gift 5", price: 10 },
-    { name: "Gift 6", price: 30 },
-    { name: "Gift 7", price: 55 },
-    { name: "Gift 8", price: 80 },
-    { name: "Gift 9", price: 20 },
-    { name: "Gift 10", price: 50 },
-    { name: "Gift 11", price: 30 },
-    { name: "Gift 12", price: 100 },
-    { name: "Gift 13", price: 10 },
-    { name: "Gift 14", price: 30 },
-    { name: "Gift 15", price: 55 },
-    { name: "Gift 16", price: 80 },
-    { name: "Gift 17", price: 20 },
-    { name: "Gift 18", price: 50 },
-    { name: "Gift 19", price: 30 },
-    { name: "Gift 20", price: 100 },
-    { name: "Gift 21", price: 10 },
-    { name: "Gift 22", price: 30 },
-  ]);
+  const { gifts } = useMockGifts();
+  const { collections } = useMockGifts();
 
   const handleNext = () => {
     if (gifts.length / 16 <= pageNumber) return;
@@ -72,29 +33,26 @@ const HomePage = () => {
     setPageNumber(pageNumber - 1);
   };
 
-  const sortGifts = () => {
-    if (gifts && setGifts) {
-      const sortedItems = gifts.sort((a: any, b: any) => a.price - b.price);
-      setGifts(sortedItems);
-      console.log("sorted");
-    }
-  };
-
   return (
     <div className="bg-[#FFF9F4] h-full text-white flex flex-col">
       <div className="ml-0">
+
+        <div className="flex justify-center w-full absolute z-0 px-8 py-4">
+          <img src={caitsLogo} alt="caits-logo.svg" className="mx-auto" />
+        </div>
+
         <NavBar />
         <SearchBar />
       </div>
-      <div className="flex flex-row w-full bg-[#F4E6DC] text-center py-20">
-        <img src={openGift} alt="open gift" className="mx-auto" />
+      <div className="flex flex-row w-full bg-[#F4E6DC] text-center py-20 justify-evenly">
+        <img src={openGift} alt="open gift" />
         <div className="flex flex-col items-center w-1/3">
-          <h1 className="text-2xl text-black">Budget-Friendly Bliss</h1>
-          <h1 className="text-sm text-black mt-4">
+          <h1 className="font-serif text-4xl text-black font-medium">Budget-Friendly Bliss</h1>
+          <h1 className="text-base text-black mt-4">
             Thoughtful gift-giving doesn't have to break the bank. That's why we've curated a delightful collection of affordable gifts that are sure to bring smiles.
           </h1>
         </div>
-        <img src={closedGift} alt="closed gift" className="mx-auto" />
+        <img src={closedGift} alt="closed gift" />
       </div>
       <div className="flex flex-col items-center my-8">
         <div className="overflow-x-auto w-full">
@@ -104,18 +62,20 @@ const HomePage = () => {
             ))}
           </div>
         </div>
-        <div className=" w-4/5">
-          <h1 className="text-2xl text-black">{`${gifts.length} Items`}</h1>
-          <GiftSortNavBar sortGifts={sortGifts} />
+        <div className=" w-4/5 ml-8">
+          <h1 className="text-2xl text-black pl-2 pt-5 font-serif">
+            {gifts.length != 1 ? `${gifts.length} Items` : `${gifts.length} Item`}
+          </h1>
+          <GiftSortNavBar />
         </div>
-        <div className="flex flex-wrap -mx-2 w-4/5  gap-5">
+        <div className="flex flex-row items-start flex-wrap -mx-2 gap-5 w-4/5">
           {gifts.slice(giftPageStart, giftPageEnd).map((gift, index) => (
-            <div key={index} className="flex items-center w-80">
+            <div key={index} className="flex items-center w-80 basis-1/5 mx-8">
               <UpdatedGiftItem name={gift.name} price={gift.price} />
             </div>
           ))}
         </div>
-        <div className="flex flex-row justify-center -mx-2 w-full">
+        <div className="relative mx-auto mt-10 flex flex-row justify-center -mx-2 w-full">
           <button
             className=" text-gray-800 font-bold rounded-l px-2"
             onClick={handlePrevious}
