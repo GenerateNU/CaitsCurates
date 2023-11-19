@@ -41,7 +41,7 @@ function CollectionForm({ collection, allGifts, onSave, onClose }: EditFormProps
           CollectionName: editedName,
           Gifts: editedGifts,
           Customer: collection?.Customer,
-          CustomerId: collection?.CustomerId
+          CustomerID: collection?.CustomerID
         };
 
         try {

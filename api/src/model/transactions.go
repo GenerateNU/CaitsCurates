@@ -263,7 +263,7 @@ func GetAllCollectionsFromDB(db *gorm.DB) ([]GiftCollection, error) {
 // GetAllCustomerCollectionsFromDB fetches all GiftCollections that associated with the customer ID or none
 func GetAllCustomerCollectionsFromDB(db *gorm.DB, id int64) ([]GiftCollection, error) {
 	var collections []GiftCollection
-	if err := db.Where("customer_id = ? OR customer_id IS NULL", id).Preload("Gifts").Find(&collections).Error; err != nil {
+	if err := db.Preload("Gifts").Preload("Gifts.GiftCollections").Where("customer_id = ? OR customer_id IS NULL", id).Find(&collections).Error; err != nil {
 		return nil, err
 	}
 	return collections, nil
@@ -293,6 +293,25 @@ func AddGiftToCustomerCollectionFromDB(db *gorm.DB, gift Gift, collectionName st
 	collection.Gifts = append(collection.Gifts, &gift)
 
 	if err:= db.Save(&collection).Error; err != nil {
+		return GiftCollection{}, err
+	}
+
+	return collection, nil
+}
+
+func DeleteGiftFromCustomerCollectionFromDB(db *gorm.DB, gift Gift, collectionName string, customerId int64) (GiftCollection, error) {
+	var collection GiftCollection
+	if err := db.Preload("Gifts").Where("collection_name = ? AND customer_id = ?", collectionName, customerId).First(&collection).Error; err != nil {
+		return GiftCollection{}, err
+	}
+
+	var giftRemovedCollection []*Gift
+	for _, collectionGift := range collection.Gifts {
+		if collectionGift.Name != gift.Name {
+			giftRemovedCollection = append(giftRemovedCollection, collectionGift)
+		}
+	}
+	if err := db.Model(&collection).Association("Gifts").Replace(giftRemovedCollection); err != nil {
 		return GiftCollection{}, err
 	}
 

@@ -4,11 +4,12 @@ import (
 	"CaitsCurates/backend/src/controller"
 	"CaitsCurates/backend/src/model"
 	"fmt"
-	"github.com/lib/pq"
-	"gorm.io/gorm/logger"
 	"log"
 	"os"
 	"time"
+
+	"github.com/lib/pq"
+	"gorm.io/gorm/logger"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -183,9 +184,15 @@ func main() {
 		CollectionName: "Decor Enhancers",
 		Gifts:          []*model.Gift{&decorativeGift3, &decorativeGift4, &decorativeGift2, &decorativeGift1},
 	}
+	giftCollectionFavorites := model.GiftCollection{
+		CustomerID: &customer1.UserID,
+		CollectionName: "Favorites",
+		Gifts: []*model.Gift{},
+	}
 	err = db.Create(&giftCollectionToy).Error
 	err = db.Create(&giftCollectionFall).Error
 	err = db.Create(&giftCollectionDecor).Error
+	err = db.Create(&giftCollectionFavorites).Error
 	err = db.Create(&randomGift1).Error
 	err = db.Create(&randomGift2).Error
 
