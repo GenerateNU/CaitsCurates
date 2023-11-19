@@ -107,7 +107,7 @@ const HomePage = () => {
 
         if (updatedCollection) {
           // on success set state for currently displayed collection
-          const currentCollection = updatedCollection.find((collection) => collection.CollectionName === displayCollection.CollectionName) ?? displayCollection;
+          const currentCollection = updatedCollection.find((collection) => collection.ID === displayCollection.ID) ?? displayCollection;
           setDisplayCollection(currentCollection);
         }
     } catch (error) {
@@ -130,7 +130,7 @@ const HomePage = () => {
           <div className="flex space-x-4">
             {collections.map((collection, index) => (
                 <div
-                    className={`cursor-pointer ${collection.CollectionName === displayCollection.CollectionName ? 'font-bold' : ''}`}
+                    className={`cursor-pointer ${collection.ID === displayCollection.ID ? 'font-bold' : ''}`}
                     onClick={() => setDisplayCollection(collection)}>
                   <CollectionItem  key={index} name={collection.CollectionName} gifts={collection.Gifts} />
                 </div>
