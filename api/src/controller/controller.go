@@ -138,7 +138,6 @@ func (pg *PgController) Serve() *gin.Engine {
 		}
 		c.JSON(http.StatusOK, gift)
 	})
-
 	r.GET("/gifts", func(c *gin.Context) {
 		gifts, err := pg.GetAllGifts()
 		if err != nil {
@@ -393,6 +392,31 @@ func (pg *PgController) Serve() *gin.Engine {
 		}
 
 		c.JSON(http.StatusOK, giftRemovedCollection)
+	})
+
+	// Update AvailableRequests 
+	r.PUT("customer/:id", func(c *gin.Context) {
+
+		// Get Customer ID
+		customerID, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			panic(err)
+		}
+
+		// Get request amount 
+		updatedRequests := c.Query("requests")
+		requests, err := strconv.Atoi(updatedRequests)
+		if err != nil {
+			panic(err)
+		}
+
+		updatedCustomerRequests, err := pg.UpdateCustomerAvailableRequests(int64(customerID), int64(requests))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, "Failed to Update AvailableRequests")
+			panic(err)
+		}
+
+		c.JSON(http.StatusOK, updatedCustomerRequests)
 	})
 
 	return r

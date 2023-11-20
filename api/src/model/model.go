@@ -1,10 +1,9 @@
 package model
 
 import (
+	"gorm.io/gorm"
 	"regexp"
 	"strings"
-
-	"gorm.io/gorm"
 )
 
 type PgModel struct {
@@ -33,6 +32,7 @@ type Model interface {
 	AddGiftToCustomerCollection(Gift, string, int64) (GiftCollection, error)
 	DeleteGiftFromGiftCollection(int64, int64) (GiftCollection, error)
 	DeleteGiftFromCustomerCollection(Gift, string, int64) (GiftCollection, error)
+	UpdateCustomerAvailableRequests(int64, int64) (Customer, error)
 }
 
 
@@ -263,4 +263,15 @@ func (m *PgModel) DeleteGiftFromGiftCollection(giftID int64, giftCollectionID in
 	}
 
 	return giftDeletedCollection, nil
+}
+
+func (m *PgModel) UpdateCustomerAvailableRequests(customerID int64, availableRequests int64) (Customer, error) {
+
+	updatedCustomer, err := UpdateCustomerAvailableRequestsFromDB(m.Conn, customerID, availableRequests)
+
+	if err != nil {
+		return Customer{}, err
+	}
+
+	return updatedCustomer, nil
 }
