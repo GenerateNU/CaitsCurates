@@ -58,11 +58,23 @@ type User struct {
 
 type Customer struct {
 	gorm.Model
-	UserID            uint
-	User              User
+	UserID          uint
+	User            User
 	AvailableRequests uint
-	GiftCollections   []*GiftCollection
-	GiftRequests      []*GiftRequest
+	GiftCollections []*GiftCollection
+	GiftRequests    []*GiftRequest
+	Giftees 	    []*Giftee
+}
+
+type Giftee struct {
+	gorm.Model
+	GifteeName            string
+	CustomerID            uint
+	Gender                string
+	CustomerRelationship  string
+	Age                   uint
+	Colors                pq.StringArray `gorm:"type:text[]"`
+	Interests             pq.StringArray `gorm:"type:text[]"`
 }
 
 type Admin struct {
