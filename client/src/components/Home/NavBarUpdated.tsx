@@ -38,7 +38,7 @@ const Navbar = () => {
             }`}
             onClick={() => handleButtonClick("More")}
           >
-            More
+            About
           </button>
         </div>
         <div className="flex items-center justify-center flex-grow">
