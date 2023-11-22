@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 const AccountSideBar = () => {
   const [isGiftingOpen, setIsGiftingOpen] = useState(false);

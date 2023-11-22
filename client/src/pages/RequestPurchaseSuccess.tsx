@@ -18,7 +18,9 @@ const RequestPurchaseSuccess = () => {
             <div style={{ textAlign: 'left' }}>
               <div style={{ marginBottom: '100px', marginTop: "100px" }}>Gifting</div>
               <div className="text-A65A5A" style={{ marginBottom: '40px' }}>Thank You!</div>
-              <div style={{width: '835px', fontSize: '24px', marginBottom: '40px'}}> We have received your purchase, and you will receive an order confirmation email shortly to johndoe@gmail.com. 
+              <div style={{width: '835px', fontSize: '24px', marginBottom: '40px'}}> 
+                We have received your purchase, and you will receive an order confirmation email shortly to 
+                <span style={{ color: '#BC2C36' }}> johndoe@gmail.com</span>. 
                 In the meantime, submit a request to Cait, or explore her curated gift selections for any occasion!</div>
             </div>
             <div className="flex flex-row space-x-2">
