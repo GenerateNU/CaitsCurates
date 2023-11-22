@@ -13,7 +13,7 @@ const Navbar = () => {
   const activeButtonStyle = "bg-DFB2AA";
 
   return (
-    <div className="bg-FFF9F4 p-4">
+    <div className="bg-FFF9F4 p-5">
       <div className="flex">
         <div className="flex space-x-2">
           <button
