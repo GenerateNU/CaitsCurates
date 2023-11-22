@@ -8,6 +8,7 @@ import GiftManagementPage from "./pages/GiftManagementPage.tsx";
 import LoginPage  from "./pages/LoginPage.tsx";
 import SignUpPage from "./pages/SignUpPage.tsx";
 import RequestsPurchasingPage from "./pages/RequestPurchasingPage.tsx";
+import RequestPurchaseSuccess from "./pages/RequestPurchaseSuccess.tsx";
 
 function App() {
     return (
@@ -46,6 +47,10 @@ function App() {
                 <Route
                     path="/login/"
                     element={<LoginPage/>}
+                />
+                 <Route
+                    path="/success/"
+                    element={<RequestPurchaseSuccess/>}
                 />
             </Routes>
         </Router>

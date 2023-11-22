@@ -47,5 +47,16 @@
       font-size: 24px; 
       font-weight: 700px;
       font-family: 'Proxima Nova, Arial, sans-serif'
-    }    
+    }   
+    .order-summary-rectangle {
+      display: flex;
+      flex-direction: column;
+      width: 835px; 
+      height: 202px; 
+      border: 2px solid #B79D94; 
+      border-radius: 4px; 
+      font-size: 24px; 
+      font-weight: 700px;
+      font-family: 'Proxima Nova, Arial, sans-serif'
+    }     
 }
