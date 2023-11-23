@@ -8,7 +8,6 @@ import { useEffect, useState } from "react";
 import { Gift, GiftCollection, Filters } from "../types.tsx";
 
 const HomePage = () => {
-
   const exampleGifts = [
     {
       ID: 1,
@@ -16,10 +15,11 @@ const HomePage = () => {
       Price: 100,
       Link: "https://example.com/customized-jewelry",
       Occasion: "Anniversary",
-      Description: "A personalized piece of jewelry to celebrate your special day.",
+      Description:
+        "A personalized piece of jewelry to celebrate your special day.",
       Demographic: "Adults",
       GiftCollections: [],
-      Category: ["Jewelry", "Personalized"]
+      Category: ["Jewelry", "Personalized"],
     },
     {
       ID: 2,
@@ -27,10 +27,11 @@ const HomePage = () => {
       Price: 150,
       Link: "https://example.com/tech-gadgets-set",
       Occasion: "Birthday",
-      Description: "A bundle of cutting-edge tech gadgets for the tech enthusiast in your life.",
+      Description:
+        "A bundle of cutting-edge tech gadgets for the tech enthusiast in your life.",
       Demographic: "Tech Enthusiasts",
       GiftCollections: [],
-      Category: ["Tech", "Gadgets"]
+      Category: ["Tech", "Gadgets"],
     },
     {
       ID: 3,
@@ -41,7 +42,7 @@ const HomePage = () => {
       Description: "Treat your loved one to a rejuvenating spa day experience.",
       Demographic: "All Ages",
       GiftCollections: [],
-      Category: ["Wellness", "Experience"]
+      Category: ["Wellness", "Experience"],
     },
     {
       ID: 4,
@@ -52,7 +53,7 @@ const HomePage = () => {
       Description: "A voucher for a fun and educational cooking class.",
       Demographic: "Cooking Enthusiasts",
       GiftCollections: [],
-      Category: ["Experience", "Cooking"]
+      Category: ["Experience", "Cooking"],
     },
     {
       ID: 5,
@@ -60,11 +61,12 @@ const HomePage = () => {
       Price: 30,
       Link: "https://example.com/book-lovers-subscription",
       Occasion: "Bookworm's Delight",
-      Description: "A monthly subscription box filled with curated books and literary goodies.",
+      Description:
+        "A monthly subscription box filled with curated books and literary goodies.",
       Demographic: "Book Lovers",
       GiftCollections: [],
-      Category: ["Books", "Subscription"]
-    }
+      Category: ["Books", "Subscription"],
+    },
   ];
 
   const exampleCustomer = {
@@ -90,15 +92,19 @@ const HomePage = () => {
   const [currentFilters, setCurrentFilters] = useState<Filters>({
     minPrice: 0,
     maxPrice: 1000,
-    occasion: "Birthday",
-    demographic: "For her",
-    category: "Cooking",
+    occasion: "",
+    demographic: "",
+    category: "",
   });
 
   useEffect(() => {
     getCollection();
     getGifts();
   }, []);
+
+  useEffect(() => {
+    getGifts();
+  }, [currentFilters, displayCollection]);
 
   const getCollection = async () => {
     try {
@@ -121,7 +127,7 @@ const HomePage = () => {
           maxPrice: currentFilters.maxPrice,
           occasion: currentFilters.occasion,
           demographic: currentFilters.demographic,
-          category: currentFilters.category,
+          category: [currentFilters.category],
         },
       });
       console.log("CALLING GET GIFTS");

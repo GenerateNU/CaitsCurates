@@ -19,8 +19,13 @@ const FilterSection: React.FC<FilterSectionProps> = ({
   };
 
   const handleClick = (item: any) => {
-    setSelectedItem(item);
-    updateFilters(item);
+    if (item !== selectedItem) {
+      setSelectedItem(item);
+      updateFilters(item);
+    } else {
+      setSelectedItem("");
+      updateFilters("");
+    }
   };
   return (
     <>

@@ -97,6 +97,7 @@ func main() {
 		Description:     "Robot Toy With Laser Eyes",
 		Demographic:     "For Kids",
 		GiftCollections: nil,
+		Occasion: 		 "Birthday",
 	}
 	toyGift2 := model.Gift{
 		Name:            "Angry Teddy Bear",
@@ -128,7 +129,7 @@ func main() {
 		Price:           5.00,
 		Link:            "link.Burger.com",
 		Description:     "Great for grill masters looking to up their game",
-		Demographic:     "All",
+		Demographic:     "For Dad",
 		GiftCollections: nil,
 	}
 	randomGift2 := model.Gift{

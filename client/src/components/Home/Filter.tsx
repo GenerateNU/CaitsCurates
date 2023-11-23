@@ -3,9 +3,8 @@ import FilterSection from "./FilterSection";
 import PriceSection from "./PriceSection";
 import { Filters } from "../types";
 
-const recipients = ["For Her", "For Him", "For Mom", "For Dad"];
+const recipients = ["For Her", "For Him", "For Mom", "For Dad", "For Kids"];
 const category = ["Sports", "Cooking", "Games"];
-const prices = ["Under $25", "Under $50", "Under $100", "Under $500"];
 const occasions = ["Birthday", "Anniversary", "Graduation"];
 
 type FilterProps = {
@@ -18,7 +17,6 @@ type FilterProps = {
 const Filter: React.FC<FilterProps> = ({
   isOpen,
   filterToggle,
-  currentFilters,
   setCurrentFilters,
 }) => {
   const updateOccasion = (item: string) => {
