@@ -31,7 +31,6 @@ type GiftRequest struct {
 	BudgetMax          uint
 	BudgetMin          uint
 	GiftResponse       *GiftResponse
-	Giftee             Giftee
 	DateNeeded         time.Time
 }
 
