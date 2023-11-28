@@ -1,4 +1,4 @@
-import {Gift} from "../types.tsx";
+import {Gift} from "../../types.tsx";
 
 
 

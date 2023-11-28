@@ -1,8 +1,8 @@
-import NavBar from "../components/NavBarUpdated";
-import CollectionItem from "../components/CollectionItemUpdated"; 
-import SearchBar from "../components/SearchBar";
-import GiftSortNavBar from "../components/GiftSortNavBar";
-import UpdatedGiftItem from "../components/UpdatedGiftItem";
+import NavBar from "../components/Home/NavBarUpdated.tsx";
+import CollectionItem from "../components/Home/CollectionItemUpdated.tsx";
+import SearchBar from "../components/Home/SearchBar.tsx";
+import GiftSortNavBar from "../components/Nav/GiftSortNavBar.tsx";
+import UpdatedGiftItem from "../components/Home/UpdatedGiftItem.tsx";
 import axios from "axios";
 import {useEffect, useState} from "react";
 import {Gift, GiftCollection} from "../types.tsx";

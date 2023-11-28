@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
-import CollectionItem from "../components/CollectionItem";
-import EditForm from "../components/CollectionForm";
-import Navbar from "../components/Navbar";
+import CollectionItem from "../components/Admin/CollectionItem.tsx";
+import EditForm from "../components/Admin/CollectionForm.tsx";
+import Navbar from "../components/Admin/Navbar.tsx";
 import {GiftCollection} from "../types.tsx";
 import {useAdmin} from "../Context/AdminContext.tsx";
 import axios from "axios";

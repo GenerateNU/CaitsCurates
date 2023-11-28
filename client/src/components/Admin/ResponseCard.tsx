@@ -1,5 +1,5 @@
 import React from "react";
-import { GiftResponse } from "../types";
+import { GiftResponse } from "../../types.tsx";
 
 const ResponseCard: React.FC<GiftResponse> = ({
                                                   GiftCollection,

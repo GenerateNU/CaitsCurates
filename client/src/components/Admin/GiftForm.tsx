@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import {Gift} from "../types.tsx";
+import {Gift} from "../../types.tsx";
 
 
 const defaultGift: Gift = {

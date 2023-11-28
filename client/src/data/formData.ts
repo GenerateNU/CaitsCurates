@@ -1,4 +1,4 @@
-import { FormData } from "../components/LoginForm";
+import { FormData } from "../components/Login/LoginForm.tsx";
 
 export const loginFormData: FormData = {
     title: "Log In",

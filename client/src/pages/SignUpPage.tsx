@@ -1,4 +1,4 @@
-import LoginForm from "../components/LoginForm";
+import LoginForm from "../components/Login/LoginForm.tsx";
 import { LoginInputs } from "./LoginPage";
 import { signUpFormData } from "../data/formData";
 
