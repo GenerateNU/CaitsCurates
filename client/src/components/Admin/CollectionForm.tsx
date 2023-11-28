@@ -1,5 +1,5 @@
 import  { useState, ChangeEvent, FormEvent } from 'react';
-import {Gift, GiftCollection} from "../types.tsx";
+import {Gift, GiftCollection} from "../../types.tsx";
 
 
 

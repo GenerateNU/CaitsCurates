@@ -1,6 +1,6 @@
 import {useEffect} from "react";
 import Select from "react-select";
-import { useAdmin } from '../Context/AdminContext';
+import { useAdmin } from '../../Context/AdminContext.tsx';
 
 interface CollectionSelectorProps {
     selectedOption: Number | null;

@@ -1,4 +1,4 @@
-import { Gift } from "../types";
+import { Gift } from "../../types.tsx";
 
 type GiftItemProps = {
   gift: Gift;

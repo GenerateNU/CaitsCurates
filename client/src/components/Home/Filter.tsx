@@ -1,5 +1,5 @@
 import React from "react";
-import FilterSection from "./FilterSection";
+import FilterSection from "./FilterSection.tsx";
 
 const recipients = ["For Her", "For Him", "For Mom", "For Dad"];
 const interests = ["Sports", "Cooking", "Games"];

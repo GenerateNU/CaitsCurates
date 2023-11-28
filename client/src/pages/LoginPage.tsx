@@ -1,4 +1,4 @@
-import LoginForm from "../components/LoginForm";
+import LoginForm from "../components/Login/LoginForm.tsx";
 import { loginFormData } from "../data/formData";
 
 export type LoginInputs = {

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Filter from "./Filter";
+import Filter from "../Home/Filter.tsx";
 
 const GiftSortNavbar = () => {
   const [activeButton, setActiveButton] = useState("");

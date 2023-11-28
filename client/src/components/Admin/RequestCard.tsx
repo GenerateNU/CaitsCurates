@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import ResponseCard from "./ResponseCard";
-import ResponseForm from "./ResponseForm";
-import { GiftRequest } from "../types";
+import ResponseCard from "./ResponseCard.tsx";
+import ResponseForm from "./ResponseForm.tsx";
+import { GiftRequest } from "../../types.tsx";
 
 const RequestCard: React.FC<GiftRequest> = ({
                                                 ID,

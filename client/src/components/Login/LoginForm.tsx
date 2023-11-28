@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import FormInput, { FormInputProps } from "./FormInput";
-import { LoginInputs } from "../pages/LoginPage";
+import FormInput, { FormInputProps } from "./FormInput.tsx";
+import { LoginInputs } from "../../pages/LoginPage.tsx";
 
 export type FormData = {
     title: string;

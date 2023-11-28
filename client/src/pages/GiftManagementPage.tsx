@@ -1,8 +1,8 @@
-import GiftItem from '../components/GiftItem'
-import Navbar from "../components/Navbar";
+import GiftItem from '../components/Admin/GiftItem.tsx'
+import Navbar from "../components/Admin/Navbar.tsx";
 import {useAdmin} from "../Context/AdminContext.tsx";
 import {useEffect, useState} from "react";
-import GiftForm from "../components/GiftForm.tsx";
+import GiftForm from "../components/Admin/GiftForm.tsx";
 import {Gift} from "../types.tsx";
 import axios from "axios";
 
