@@ -104,7 +104,7 @@ const HomePage = () => {
 
   useEffect(() => {
     getGifts();
-  }, [currentFilters, displayCollection]);
+  }, [currentFilters, displayCollection, searchTerm]);
 
   const getCollection = async () => {
     try {
@@ -127,7 +127,7 @@ const HomePage = () => {
           maxPrice: currentFilters.maxPrice,
           occasion: currentFilters.occasion,
           demographic: currentFilters.demographic,
-          category: [currentFilters.category],
+          category: currentFilters.category,
         },
       });
       console.log("CALLING GET GIFTS");
@@ -164,14 +164,6 @@ const HomePage = () => {
       <div className="ml-0">
         <NavBar />
         <SearchBar updateHomePage={handleSearchChange} />
-      </div>
-      <p>{searchTerm}</p>
-      <div className="text-black">
-        <p>min: {currentFilters.minPrice}</p>
-        <p>max: {currentFilters.maxPrice}</p>{" "}
-        <p>cat: {currentFilters.category}</p>{" "}
-        <p>occ: {currentFilters.occasion}</p>{" "}
-        <p>dem: {currentFilters.demographic}</p>
       </div>
       <div className="w-full bg-gray-300 text-center py-9">
         <h1 className="text-2xl text-black font-seasons">Essential Gifts</h1>

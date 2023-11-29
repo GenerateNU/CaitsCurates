@@ -1,11 +1,34 @@
-import React, { useState } from "react";
+import React from "react";
 import FilterSection from "./FilterSection";
 import PriceSection from "./PriceSection";
 import { Filters } from "../types";
 
-const recipients = ["For Her", "For Him", "For Mom", "For Dad", "For Kids"];
-const category = ["Sports", "Cooking", "Games"];
-const occasions = ["Birthday", "Anniversary", "Graduation"];
+const recipients = [
+  "For mom",
+  "For dad",
+  "For partners",
+  "For kids",
+  "For women",
+  "For men",
+];
+const category = [
+  "Best selling",
+  "Fun",
+  "Gadgets",
+  "Home",
+  "Jewelry",
+  "Kitchen & bar",
+  "Warm and cozy",
+  "Outdoors",
+];
+const occasions = [
+  "Birthday",
+  "Bridal",
+  "Get well soon",
+  "New baby",
+  "Thinking of you",
+  "Thank you",
+];
 
 type FilterProps = {
   isOpen: boolean;
@@ -55,7 +78,7 @@ const Filter: React.FC<FilterProps> = ({
           {/* Dark overlay */}
           <div className="fixed top-0 left-0 w-full h-full bg-black opacity-50 z-10"></div>
           {/* Filter modal */}
-          <div className="absolute top-0 right-0 mt-16 w-1/4 bg-white p-8 shadow-lg z-20 text-black overflow-y-auto max-h-screen">
+          <div className="absolute top-0 right-0 w-1/4 bg-white p-8 shadow-lg z-20 text-black overflow-y-auto max-h-screen">
             <div className="flex justify-between">
               <h2 className="mb-4 text-lg font-bold">Filter</h2>
               <div className="cursor-pointer" onClick={filterToggle}>

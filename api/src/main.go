@@ -95,17 +95,20 @@ func main() {
 		Price:           50.00,
 		Link:            "link.robot.com",
 		Description:     "Robot Toy With Laser Eyes",
-		Demographic:     "For Kids",
+		Demographic:     "For kids",
 		GiftCollections: nil,
 		Occasion: 		 "Birthday",
+		Category: 		 pq.StringArray{"Fun"},
 	}
 	toyGift2 := model.Gift{
 		Name:            "Angry Teddy Bear",
 		Price:           20.00,
 		Link:            "link.evilTeddy.com",
 		Description:     "A Teddy Bear Toy but Evil!",
-		Demographic:     "For Kids",
+		Demographic:     "For kids",
 		GiftCollections: nil,
+		Occasion: 		 "New baby",
+		Category: 		 pq.StringArray{"Cooking", "Warm and cozy"},
 	}
 	fallGift1 := model.Gift{
 		Name:            "Pumpkin Sweater",
@@ -129,7 +132,8 @@ func main() {
 		Price:           5.00,
 		Link:            "link.Burger.com",
 		Description:     "Great for grill masters looking to up their game",
-		Demographic:     "For Dad",
+		Demographic:     "For dad",
+		Category: 		 pq.StringArray{"Home", "Cooking"},
 		GiftCollections: nil,
 	}
 	randomGift2 := model.Gift{
@@ -153,7 +157,7 @@ func main() {
 		Price:           70,
 		Link:            "link.Rug.com",
 		Description:     "This rug is perfect for those looking for a cozy but stylish addition to the home",
-		Demographic:     "All",
+		Demographic:     "For mom",
 		GiftCollections: nil,
 	}
 	decorativeGift3 := model.Gift{
