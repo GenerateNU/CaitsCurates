@@ -62,15 +62,15 @@ const HomePage = () => {
             ))}
           </div>
         </div>
-        <div className=" w-4/5 ml-8">
+        <div className=" w-2/3">
           <h1 className="text-2xl text-black pl-2 pt-5 font-serif">
             {gifts.length != 1 ? `${gifts.length} Items` : `${gifts.length} Item`}
           </h1>
           <GiftSortNavBar />
         </div>
-        <div className="flex flex-row items-start flex-wrap -mx-2 gap-5 w-4/5">
+        <div className="flex flex-row items-start flex-wrap mx-auto w-2/3">
           {gifts.slice(giftPageStart, giftPageEnd).map((gift, index) => (
-            <div key={index} className="flex items-center w-80 basis-1/5 mx-8">
+            <div key={index} className="flex items-center w-80 justify-center mx-4">
               <UpdatedGiftItem name={gift.name} price={gift.price} />
             </div>
           ))}
