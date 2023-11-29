@@ -158,7 +158,7 @@ func (pg *PgController) Serve() *gin.Engine {
 		maxPriceStr := c.Query("maxPrice")
 		occasion := c.Query("occasion")
 		demographic := c.Query("demographic")
-		category := c.QueryArray("category")
+		category := c.Query("category")
 
 		id := c.Param("giftCollectionId")
 		intId, err := strconv.Atoi(id)

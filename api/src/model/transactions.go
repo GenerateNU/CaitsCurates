@@ -1,7 +1,6 @@
 package model
 
 import (
-	"github.com/lib/pq"
 	"gorm.io/gorm"
 	"errors"
 )
@@ -173,7 +172,7 @@ func DeleteGiftCollectionFromDb(db *gorm.DB, id int64) error {
 
 	return nil
 }
-func SearchGiftsDb(db *gorm.DB, id int64, searchTerm string, minPrice int, maxPrice int, occasion string, demographic string, category []string) ([]Gift, error) {
+func SearchGiftsDb(db *gorm.DB, id int64, searchTerm string, minPrice int, maxPrice int, occasion string, demographic string, category string) ([]Gift, error) {
 	var gifts []Gift
 
 	query := db.Joins("JOIN gift_collection_gifts ON gifts.id = gift_collection_gifts.gift_id").
@@ -199,8 +198,8 @@ func SearchGiftsDb(db *gorm.DB, id int64, searchTerm string, minPrice int, maxPr
 		query = query.Where("demographic = ?", demographic)
 	}
 
-	if len(category) > 0 {
-		query = query.Where("category && ?", pq.StringArray(category))
+	if category != "" {
+		query = query.Where("category has ?", category)
 	}
 	query = query.Preload("GiftCollections")
 
