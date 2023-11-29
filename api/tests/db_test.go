@@ -105,7 +105,7 @@ func TestGiftRequestModel(t *testing.T) {
 		t.Fatalf("Unable to connect to database: %v", err)
 	}
 	// Put auto migrations here
-	err = db.AutoMigrate(&model.GiftRequest{}, &model.GiftResponse{}, &model.GiftCollection{})
+	err = db.AutoMigrate(&model.GiftRequest{}, &model.GiftResponse{}, &model.GiftCollection{}, &model.Giftee{}, &model.User{}, &model.Customer{})
 	if err != nil {
 		panic("failed to migrate test admin database schema")
 	}
@@ -114,17 +114,45 @@ func TestGiftRequestModel(t *testing.T) {
 	tx := db.Begin()
 	defer tx.Rollback()
 
+	// Create User
+	user := model.User{Email: "example@northeastern.edu", FirstName: "PersonFirstName", LastName: "PersonLastName", Password: "dgeeg32"}
+	err = tx.Create(&user).Error
+
+	// Create Customer
+	customer := model.Customer{User: user, UserID: user.ID}
+	err = tx.Create(&customer).Error
+	assert.NoError(t, err)
+
+	// Create Giftee
+	giftee := model.Giftee {
+		CustomerID:            customer.ID,
+		GifteeName:            "Maya",
+		Gender:                "Female",
+		CustomerRelationship:  "Sister",
+		Age:                   20,
+		Colors:                pq.StringArray{"Green", "Blue"},
+		Interests:             pq.StringArray{"Sports", "Soccer", "Nature", "Coffee", "Candy"},
+	}
+	err = tx.Create(&giftee).Error
+	assert.NoError(t, err)
+
+
 	// Create GiftResponse
 	giftResponse := model.GiftResponse{CustomMessage: "This is a custom message", GiftCollection: model.GiftCollection{CollectionName: "Name"}}
 	err = tx.Create(&giftResponse).Error
 	assert.NoError(t, err)
 
 	// Create GiftRequest
-	giftRequest := model.GiftRequest{GiftResponse: &giftResponse, Occasion: pq.StringArray{"Birthday"}, RecipientInterests: pq.StringArray{"Soccer"}}
-	user := model.User{Email: "example1@northeastern.edu", FirstName: "person1", LastName: "lastname1", Password: "dgeeg32"}
-	customer := model.Customer{GiftRequests: []*model.GiftRequest{&giftRequest}, User: user}
-	err = tx.Create(&customer).Error
+	giftRequest := model.GiftRequest{
+		CustomerID: 		customer.ID,
+		GiftResponse: 		&giftResponse,
+		GifteeID: 			giftee.ID,
+		Occasion: 			pq.StringArray{"Birthday"}, 
+		RecipientInterests: pq.StringArray{"Soccer"},
+	}
+	err = tx.Create(&giftRequest).Error
 	assert.NoError(t, err)
+
 
 	// Check Relationship between GiftRequest and GiftResponse
 	var giftRequests []model.GiftRequest
@@ -151,6 +179,7 @@ func TestGiftRequestModel(t *testing.T) {
 	assert.Equal(t, giftRequest.GiftResponseID, fetchedGiftRequest.GiftResponseID)
 	assert.Equal(t, giftRequest.Occasion, fetchedGiftRequest.Occasion)
 	assert.Equal(t, giftRequest.RecipientInterests, fetchedGiftRequest.RecipientInterests)
+	assert.Equal(t, giftRequest.GifteeID, fetchedGiftRequest.GifteeID)
 	assert.Equal(t, giftRequest.CreatedAt.In(time.UTC).Round(time.Millisecond),
 		fetchedGiftRequest.CreatedAt.In(time.UTC).Round(time.Millisecond))
 
