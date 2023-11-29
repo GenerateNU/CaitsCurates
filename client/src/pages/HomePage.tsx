@@ -110,8 +110,6 @@ const HomePage = () => {
     try {
       const response = await axios.get(`/api/collections/${customerID}`);
       setCollections(response.data);
-      console.log("CALLING GET COLLECTION");
-      console.log(response);
     } catch (error) {
       console.error("An error occurred while fetching the collection:", error);
     }
@@ -119,7 +117,6 @@ const HomePage = () => {
 
   const getGifts = async () => {
     try {
-      // const response = await axios.get(`/api/search/${displayCollection.ID}`, {
       const response = await axios.get(`/api/search/${displayCollection.ID}`, {
         params: {
           q: searchTerm,
@@ -130,9 +127,6 @@ const HomePage = () => {
           category: currentFilters.category,
         },
       });
-      console.log("CALLING GET GIFTS");
-
-      console.log(response);
       setGifts(response.data);
     } catch (error) {
       console.error("An error occurred while fetching gifts:", error);
