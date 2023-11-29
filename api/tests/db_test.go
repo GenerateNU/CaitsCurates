@@ -540,7 +540,7 @@ func TestGifteeModel(t *testing.T) {
 		t.Fatalf("Unable to connect to database: %v", err)
 	}
 	// Put auto migrations here
-	err = db.AutoMigrate(&model.Giftee{})
+	err = db.AutoMigrate(&model.Giftee{}, &model.GiftRequest{}, &model.Customer{})
 	if err != nil {
 		panic("failed to migrate test database schema")
 	}
@@ -548,15 +548,31 @@ func TestGifteeModel(t *testing.T) {
 	tx := db.Begin()
 	defer tx.Rollback()
 
+	// Create User
+	user := model.User{Email: "example@northeastern.edu", FirstName: "PersonFirstName", LastName: "PersonLastName", Password: "dgeeg32"}
+	err = tx.Create(&user).Error
+
+	// Create a Request
+	request := model.GiftRequest{
+		RecipientName: "Me",
+	}
+	assert.NoError(t, err)
+
+	// Create Customer
+	customer := model.Customer{User: user, GiftRequests: []*model.GiftRequest{&request}}
+	err = tx.Create(&customer).Error
+	assert.NoError(t, err)
+
 	// Create Giftee
 	giftee := model.Giftee {
-		CustomerID:            1,
+		CustomerID:            customer.ID,
 		GifteeName:            "Maya",
 		Gender:                "Female",
 		CustomerRelationship:  "Sister",
 		Age:                   20,
 		Colors:                pq.StringArray{"Green", "Blue"},
 		Interests:             pq.StringArray{"Sports", "Soccer", "Nature", "Coffee", "Candy"},
+		GiftRequests:		   []*model.GiftRequest{&request},
 	}
 
 	err = tx.Create(&giftee).Error
@@ -574,6 +590,7 @@ func TestGifteeModel(t *testing.T) {
 	assert.Equal(t, giftee.Age, fetchedGiftee.Age)
 	assert.Equal(t, giftee.Colors, fetchedGiftee.Colors)
 	assert.Equal(t, giftee.Interests, fetchedGiftee.Interests)
+	assert.Equal(t, giftee.GiftRequests, fetchedGiftee.GiftRequests)
 	assert.Equal(t, giftee.CreatedAt.In(time.UTC).Round(time.Millisecond),
 		fetchedGiftee.CreatedAt.In(time.UTC).Round(time.Millisecond))
 
