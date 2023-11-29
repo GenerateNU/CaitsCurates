@@ -552,14 +552,8 @@ func TestGifteeModel(t *testing.T) {
 	user := model.User{Email: "example@northeastern.edu", FirstName: "PersonFirstName", LastName: "PersonLastName", Password: "dgeeg32"}
 	err = tx.Create(&user).Error
 
-	// Create a Request
-	request := model.GiftRequest{
-		RecipientName: "Me",
-	}
-	assert.NoError(t, err)
-
 	// Create Customer
-	customer := model.Customer{User: user, GiftRequests: []*model.GiftRequest{&request}}
+	customer := model.Customer{User: user, UserID: user.ID}
 	err = tx.Create(&customer).Error
 	assert.NoError(t, err)
 
@@ -572,10 +566,17 @@ func TestGifteeModel(t *testing.T) {
 		Age:                   20,
 		Colors:                pq.StringArray{"Green", "Blue"},
 		Interests:             pq.StringArray{"Sports", "Soccer", "Nature", "Coffee", "Candy"},
-		GiftRequests:		   []*model.GiftRequest{&request},
 	}
-
 	err = tx.Create(&giftee).Error
+	assert.NoError(t, err)
+
+	// Create a Request
+	request := model.GiftRequest{
+		RecipientName: 	"Me",
+		CustomerID: 	customer.ID,
+		GifteeID: 		giftee.ID,
+	}
+	err = tx.Create(&request).Error
 	assert.NoError(t, err)
 
 	// Check if Giftee exists
