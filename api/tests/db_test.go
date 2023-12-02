@@ -492,7 +492,7 @@ func TestCustomerModel(t *testing.T) {
 		t.Fatalf("Unable to connect to database: %v", err)
 	}
 	// Put auto migrations here
-	err = db.AutoMigrate(&model.Customer{}, &model.User{}, &model.GiftCollection{}, &model.GiftRequest{})
+	err = db.AutoMigrate(&model.Customer{}, &model.User{}, &model.GiftCollection{}, &model.GiftRequest{}, &model.Giftee{})
 	if err != nil {
 		panic("failed to migrate test customer database schema")
 	}
@@ -505,21 +505,46 @@ func TestCustomerModel(t *testing.T) {
 	user := model.User{Email: "example@northeastern.edu", FirstName: "PersonFirstName", LastName: "PersonLastName", Password: "dgeeg32"}
 	err = tx.Create(&user).Error
 
-	// Create Collection
-	collection := model.GiftCollection{CollectionName: "Collection"}
-	// Create a Request
-	request := model.GiftRequest{
-		RecipientName: "Me",
-	}
-	assert.NoError(t, err)
 	// Create Customer
-	customer := model.Customer{User: user, GiftCollections: []*model.GiftCollection{&collection}, GiftRequests: []*model.GiftRequest{&request}}
+	customer := model.Customer{User: user, UserID: user.ID}
 	err = tx.Create(&customer).Error
 	assert.NoError(t, err)
 
+	// Create Giftee
+	giftee := model.Giftee {
+		CustomerID:            customer.ID,
+		GifteeName:            "Maya",
+		Gender:                "Female",
+		CustomerRelationship:  "Sister",
+		Age:                   20,
+		Colors:                pq.StringArray{"Green", "Blue"},
+		Interests:             pq.StringArray{"Sports", "Soccer", "Nature", "Coffee", "Candy"},
+	}
+	err = tx.Create(&giftee).Error
+	assert.NoError(t, err)
+
+	// Create a Request
+	request := model.GiftRequest{
+		RecipientName: 	"Me",
+		CustomerID: 	customer.ID,
+		GifteeID: 		giftee.ID,
+	}
+	err = tx.Create(&request).Error
+	assert.NoError(t, err)
+
+	// Create a Collection
+	collection := model.GiftCollection{
+		Customer: &customer,
+		CollectionName: "Collection",
+	}
+
+	// Force Passing Test For Relationship
+	customer.GiftRequests = append(customer.GiftRequests, &request)
+	customer.GiftCollections = append(customer.GiftCollections, &collection)
+
 	// Check Relationships
 	var customers []model.Customer
-	err = tx.Model(&model.Customer{}).Preload("User").Preload("GiftCollections").Preload("GiftRequests").Find(&customers).Error
+	err = tx.Model(&model.Customer{}).Preload("User").Preload("GiftCollections").Preload("GiftRequests").Preload("Giftees").Find(&customers).Error
 	if err != nil {
 		panic("relationship failed")
 	}
@@ -607,6 +632,7 @@ func TestGifteeModel(t *testing.T) {
 	}
 	err = tx.Create(&request).Error
 	assert.NoError(t, err)
+
 
 	// Check if Giftee exists
 	var fetchedGiftee model.Giftee
