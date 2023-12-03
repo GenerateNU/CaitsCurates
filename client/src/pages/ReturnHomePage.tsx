@@ -33,7 +33,7 @@ const ReturnHomePage = () => {
                     />
                     <img className="pl-20" src={CaitThumbnail1} />
                 </div>
-                <div className="grid grid-cols-1 bg-beige px-[5rem] py-[5rem] md:px-[13rem] lg:grid-cols-3">
+                <div className="grid grid-cols-1 bg-beige px-[5rem] py-[5rem] md:px-[13rem] lg:grid-cols-3 lg:px-[5rem] xl:px-[10.5rem]">
                     <HomePrompt
                         className="justify-center"
                         textStyle="text-[1.5rem]"
@@ -45,11 +45,11 @@ const ReturnHomePage = () => {
                         onClick={handleBrowsingClick}
                     />
                     <div className="row-start-1 flex flex-col items-center px-12 lg:row-start-auto">
-                        <div className="text-4xl font-seasons font-bold">
+                        <div className="text-3xl font-seasons font-bold xl:text-4xl">
                             {"How it Works"}
                         </div>
-                        <img className="h-0 w-0 mt-20 sm:w-32 lg:h-32" src={Or} />
-                        <div className="relative bottom-[4.8rem] text-[0] text-white font-seasons font-bold lg:text-3xl"> {"or"} </div>
+                        <img className="h-0 w-0 mt-20 sm:w-40 lg:h-40" src={Or} />
+                        <div className="relative bottom-[6rem] text-[0] text-white font-seasons font-bold lg:text-3xl"> {"or"} </div>
                     </div>
                     <HomePrompt
                         className="justify-center mt-20 lg:mt-0"
