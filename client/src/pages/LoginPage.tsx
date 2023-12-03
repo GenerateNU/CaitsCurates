@@ -1,3 +1,4 @@
+import Navbar from "../components/Home/NavBarUpdated.tsx";
 import LoginForm from "../components/Login/LoginForm.tsx";
 import { loginFormData } from "../data/formData";
 
@@ -19,15 +20,14 @@ const LoginPage = () => {
 
     return (
         <div>
-            {/* add navbar */}
-            <div className="flex">
+            <Navbar />
+            <div className="bg-eggshell flex justify-center">
+                {/* add navbar */}
                 <LoginForm
                     formData={loginFormData}
                     initialState={initialState}
                     onSubmit={handleOnSubmit}
                 />
-                {/* replace with image */}
-                <div className="w-[512px] bg-slate-700 lg:w-1/2" />
             </div>
         </div>
     );
