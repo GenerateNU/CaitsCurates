@@ -22,7 +22,6 @@ const LoginPage = () => {
         <div>
             <Navbar />
             <div className="bg-eggshell flex justify-center">
-                {/* add navbar */}
                 <LoginForm
                     formData={loginFormData}
                     initialState={initialState}

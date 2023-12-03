@@ -1,4 +1,3 @@
-import React from "react";
 import HomePrompt from "../components/Home/HomePrompt";
 import CaitThumbnail1 from "../images/cait_thumbnail_1.svg";
 import CaitThumbnail2 from "../images/cait_thumbnail_2.svg";

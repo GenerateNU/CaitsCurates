@@ -28,8 +28,6 @@ const LoginForm = <T extends LoginInputs>({formData, initialState, onSubmit}: Pr
             ...prevState,
             [e.target.name]: e.target.value
         }));
-
-        // additional error validation here
     }
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
