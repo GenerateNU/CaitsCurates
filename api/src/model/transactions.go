@@ -199,7 +199,7 @@ func SearchGiftsDb(db *gorm.DB, id int64, searchTerm string, minPrice int, maxPr
 	}
 
 	if category != "" {
-		query = query.Where("category has ?", category)
+		query = query.Where("? = ANY(category)", category)
 	}
 	query = query.Preload("GiftCollections")
 
@@ -293,7 +293,7 @@ func AddGiftToCustomerCollectionFromDB(db *gorm.DB, gift Gift, collectionName st
 
 	collection.Gifts = append(collection.Gifts, &gift)
 
-	if err:= db.Save(&collection).Error; err != nil {
+	if err := db.Save(&collection).Error; err != nil {
 		return GiftCollection{}, err
 	}
 
