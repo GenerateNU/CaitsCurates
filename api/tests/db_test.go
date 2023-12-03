@@ -2,6 +2,7 @@ package tests
 
 import (
 	"CaitsCurates/backend/src/model"
+	"fmt"
 	"os"
 	"testing"
 	"time"
@@ -124,18 +125,17 @@ func TestGiftRequestModel(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Create Giftee
-	giftee := model.Giftee {
-		CustomerID:            customer.ID,
-		GifteeName:            "Maya",
-		Gender:                "Female",
-		CustomerRelationship:  "Sister",
-		Age:                   20,
-		Colors:                pq.StringArray{"Green", "Blue"},
-		Interests:             pq.StringArray{"Sports", "Soccer", "Nature", "Coffee", "Candy"},
+	giftee := model.Giftee{
+		CustomerID:           customer.ID,
+		GifteeName:           "Maya",
+		Gender:               "Female",
+		CustomerRelationship: "Sister",
+		Age:                  20,
+		Colors:               pq.StringArray{"Green", "Blue"},
+		Interests:            pq.StringArray{"Sports", "Soccer", "Nature", "Coffee", "Candy"},
 	}
 	err = tx.Create(&giftee).Error
 	assert.NoError(t, err)
-
 
 	// Create GiftResponse
 	giftResponse := model.GiftResponse{CustomMessage: "This is a custom message", GiftCollection: model.GiftCollection{CollectionName: "Name"}}
@@ -144,15 +144,14 @@ func TestGiftRequestModel(t *testing.T) {
 
 	// Create GiftRequest
 	giftRequest := model.GiftRequest{
-		CustomerID: 		customer.ID,
-		GiftResponse: 		&giftResponse,
-		GifteeID: 			giftee.ID,
-		Occasion: 			pq.StringArray{"Birthday"}, 
+		CustomerID:         customer.ID,
+		GiftResponse:       &giftResponse,
+		GifteeID:           giftee.ID,
+		Occasion:           pq.StringArray{"Birthday"},
 		RecipientInterests: pq.StringArray{"Soccer"},
 	}
 	err = tx.Create(&giftRequest).Error
 	assert.NoError(t, err)
-
 
 	// Check Relationship between GiftRequest and GiftResponse
 	var giftRequests []model.GiftRequest
@@ -291,7 +290,7 @@ func TestGiftResponseModel(t *testing.T) {
 		Link:            "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
 		Description:     "Really great content. Highly recommend",
 		Demographic:     "Unknown...",
-		Category: 		 pq.StringArray{"Best selling"},
+		Category:        pq.StringArray{"Best selling"},
 		GiftCollections: nil,
 	}
 
@@ -301,7 +300,7 @@ func TestGiftResponseModel(t *testing.T) {
 		Link:            "https://www.youtube.com/Penguinz0",
 		Description:     "Really great content. Highly recommend",
 		Demographic:     "Unknown...",
-		Category: 		 pq.StringArray{"Best selling"},
+		Category:        pq.StringArray{"Best selling"},
 		GiftCollections: nil,
 	}
 
@@ -511,53 +510,52 @@ func TestCustomerModel(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Create Giftee
-	giftee := model.Giftee {
-		CustomerID:            customer.ID,
-		GifteeName:            "Maya",
-		Gender:                "Female",
-		CustomerRelationship:  "Sister",
-		Age:                   20,
-		Colors:                pq.StringArray{"Green", "Blue"},
-		Interests:             pq.StringArray{"Sports", "Soccer", "Nature", "Coffee", "Candy"},
+	giftee := model.Giftee{
+		CustomerID:           customer.ID,
+		GifteeName:           "Maya",
+		Gender:               "Female",
+		CustomerRelationship: "Sister",
+		Age:                  20,
+		Colors:               pq.StringArray{"Green", "Blue"},
+		Interests:            pq.StringArray{"Sports", "Soccer", "Nature", "Coffee", "Candy"},
 	}
 	err = tx.Create(&giftee).Error
 	assert.NoError(t, err)
 
 	// Create a Request
 	request := model.GiftRequest{
-		RecipientName: 	"Me",
-		CustomerID: 	customer.ID,
-		GifteeID: 		giftee.ID,
+		RecipientName: "Me",
+		CustomerID:    customer.ID,
+		GifteeID:      giftee.ID,
 	}
 	err = tx.Create(&request).Error
 	assert.NoError(t, err)
 
 	// Create a Collection
 	collection := model.GiftCollection{
-		Customer: &customer,
+		Customer:       &customer,
 		CollectionName: "Collection",
 	}
-
-	// Force Passing Test For Relationship
-	customer.GiftRequests = append(customer.GiftRequests, &request)
-	customer.GiftCollections = append(customer.GiftCollections, &collection)
+	err = tx.Create(&collection).Error
+	assert.NoError(t, err)
 
 	// Check Relationships
-	var customers []model.Customer
-	err = tx.Model(&model.Customer{}).Preload("User").Preload("GiftCollections").Preload("GiftRequests").Preload("Giftees").Find(&customers).Error
+	var customerRetrieved model.Customer
+	err = tx.Model(&model.Customer{}).Preload("User").Preload("GiftCollections").Preload("GiftRequests").Preload("Giftees").Find(&customerRetrieved).Error
 	if err != nil {
 		panic("relationship failed")
 	}
-
+	fmt.Println("Customer ID:", customerRetrieved.ID)
+	t.Log("Customer details:", customerRetrieved)
 	// Check User information
-	customerUser := customers[0].User
+	customerUser := customerRetrieved.User
 	var fetchedUser model.User
 	err = tx.First(&fetchedUser, user.ID).Error
 	assert.NoError(t, err)
 	assert.Equal(t, customerUser.ID, fetchedUser.ID)
 	assert.Equal(t, customerUser.FirstName, fetchedUser.FirstName)
-	assert.Equal(t, customer.GiftRequests[0].RecipientName, request.RecipientName)
-	assert.Equal(t, customer.GiftCollections[0].CollectionName, collection.CollectionName)
+	assert.Equal(t, customerRetrieved.GiftRequests[0].RecipientName, request.RecipientName)
+	assert.Equal(t, customerRetrieved.GiftCollections[0].CollectionName, collection.CollectionName)
 	assert.Equal(t, customerUser.LastName, fetchedUser.LastName)
 	assert.Equal(t, customerUser.Email, fetchedUser.Email)
 	assert.Equal(t, customerUser.Password, fetchedUser.Password)
@@ -612,27 +610,26 @@ func TestGifteeModel(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Create Giftee
-	giftee := model.Giftee {
-		CustomerID:            customer.ID,
-		GifteeName:            "Maya",
-		Gender:                "Female",
-		CustomerRelationship:  "Sister",
-		Age:                   20,
-		Colors:                pq.StringArray{"Green", "Blue"},
-		Interests:             pq.StringArray{"Sports", "Soccer", "Nature", "Coffee", "Candy"},
+	giftee := model.Giftee{
+		CustomerID:           customer.ID,
+		GifteeName:           "Maya",
+		Gender:               "Female",
+		CustomerRelationship: "Sister",
+		Age:                  20,
+		Colors:               pq.StringArray{"Green", "Blue"},
+		Interests:            pq.StringArray{"Sports", "Soccer", "Nature", "Coffee", "Candy"},
 	}
 	err = tx.Create(&giftee).Error
 	assert.NoError(t, err)
 
 	// Create a Request
 	request := model.GiftRequest{
-		RecipientName: 	"Me",
-		CustomerID: 	customer.ID,
-		GifteeID: 		giftee.ID,
+		RecipientName: "Me",
+		CustomerID:    customer.ID,
+		GifteeID:      giftee.ID,
 	}
 	err = tx.Create(&request).Error
 	assert.NoError(t, err)
-
 
 	// Check if Giftee exists
 	var fetchedGiftee model.Giftee
