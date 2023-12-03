@@ -1,8 +1,8 @@
 package model
 
 import (
-	"gorm.io/gorm"
 	"errors"
+	"gorm.io/gorm"
 )
 
 func WriteRequestToDb(db *gorm.DB, inputRequest GiftRequest) (GiftRequest, error) {
@@ -273,6 +273,14 @@ func GetAllCustomerCollectionsFromDB(db *gorm.DB, id int64) ([]GiftCollection, e
 	return collections, nil
 }
 
+func GetAllCustomerRequestsFromDB(db *gorm.DB, id int64) ([]GiftRequest, error) {
+	var requests []GiftRequest
+	if err := db.Preload("GiftResponse").Preload("GiftResponse.GiftCollection").Preload("GiftResponse.GiftCollection.Gifts").Where("customer_id = ?", id).Find(&requests).Error; err != nil {
+		return nil, err
+	}
+	return requests, nil
+}
+
 func AddGiftToCollectionFromDB(db *gorm.DB, inputGift Gift, id int64) (GiftCollection, error) {
 	var collection GiftCollection
 	if err := db.Where("id = ?", id).First(&collection).Error; err != nil {
@@ -415,12 +423,13 @@ func DeleteGifteeFromDb(db *gorm.DB, id int64) error {
 
 	return nil
 }
+
 // Update Available Requests for Customers
 func UpdateCustomerAvailableRequestsFromDB(db *gorm.DB, customerID int64, availableRequests int64) (Customer, error) {
 	var customer Customer
 	if err := db.First(&customer, customerID).Error; err != nil {
-        return Customer{}, err
-    }
+		return Customer{}, err
+	}
 
 	updatedAvailableRequests := int64(customer.AvailableRequests) + availableRequests
 	if updatedAvailableRequests < 0 {
@@ -429,7 +438,7 @@ func UpdateCustomerAvailableRequestsFromDB(db *gorm.DB, customerID int64, availa
 
 	customer.AvailableRequests = uint(updatedAvailableRequests)
 
-	if err:= db.Save(&customer).Error; err!= nil {
+	if err := db.Save(&customer).Error; err != nil {
 		return Customer{}, err
 	}
 
