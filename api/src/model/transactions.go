@@ -43,6 +43,9 @@ func UpdateGiftRequestToDb(db *gorm.DB, inputRequest GiftRequest) (GiftRequest, 
 	if inputRequest.GiftResponseID != nil {
 		updates["GiftResponseID"] = inputRequest.GiftResponseID
 	}
+	if inputRequest.GifteeID != 0 {
+		updates["GifteeID"] = inputRequest.GifteeID
+	}
 
 	if err := db.Model(&updatedGiftRequest).Updates(updates).Error; err != nil {
 		return GiftRequest{}, err
@@ -95,7 +98,7 @@ func UpdateCollectionToDb(db *gorm.DB, inputCollection GiftCollection) (GiftColl
 }
 func GetIncompleteGiftRequestsFromDB(db *gorm.DB) ([]GiftRequest, error) {
 	var requests []GiftRequest
-	if err := db.Where("gift_response_id IS NULL").Preload("GiftResponse").Find(&requests).Error; err != nil {
+	if err := db.Where("gift_response_id IS NULL").Preload("GiftResponse").Preload("Giftee").Find(&requests).Error; err != nil {
 		return nil, err
 	}
 	return requests, nil
@@ -212,7 +215,7 @@ func SearchGiftsDb(db *gorm.DB, id int64, searchTerm string, minPrice int, maxPr
 
 func GetCompleteGiftRequestsFromDB(db *gorm.DB) ([]GiftRequest, error) {
 	var requests []GiftRequest
-	if err := db.Where("gift_response_id IS NOT NULL").Preload("GiftResponse").Preload("GiftResponse.GiftCollection").Find(&requests).Error; err != nil {
+	if err := db.Where("gift_response_id IS NOT NULL").Preload("GiftResponse").Preload("GiftResponse.GiftCollection").Preload("Giftee").Find(&requests).Error; err != nil {
 		return nil, err
 	}
 	return requests, nil
