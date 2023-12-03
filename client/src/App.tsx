@@ -7,6 +7,8 @@ import {AdminProvider} from "./Context/AdminContext.tsx";
 import GiftManagementPage from "./pages/GiftManagementPage.tsx";
 import LoginPage  from "./pages/LoginPage.tsx";
 import SignUpPage from "./pages/SignUpPage.tsx";
+import RequestsPurchasingPage from "./pages/RequestPurchasingPage.tsx";
+import RequestPurchaseSuccess from "./pages/RequestPurchaseSuccess.tsx";
 
 function App() {
     return (
@@ -39,8 +41,16 @@ function App() {
                     element={<SignUpPage/>}
                 />
                 <Route
+                    path="/purchase-requests/"
+                    element={<RequestsPurchasingPage/>}
+                />
+                <Route
                     path="/login/"
                     element={<LoginPage/>}
+                />
+                 <Route
+                    path="/success/"
+                    element={<RequestPurchaseSuccess/>}
                 />
             </Routes>
         </Router>
