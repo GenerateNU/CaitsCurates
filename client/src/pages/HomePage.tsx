@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { Gift, GiftCollection, Filters } from "../types.tsx";
 import homeGiftsImage from "../images/home_gifts_image.svg";
 import Footer from "../components/Home/Footer.tsx";
+import GiftRequests from "../components/Profile/GiftRequestsTable.tsx";
 
 const HomePage = () => {
   const exampleGifts = [
