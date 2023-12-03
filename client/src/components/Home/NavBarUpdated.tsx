@@ -1,11 +1,22 @@
 import { useState } from "react";
+import RequestModal from "../Requests/RequestModal";
 import logoImage from "../../images/logo.svg"
 
 const Navbar = () => {
   const [activeButton, setActiveButton] = useState("");
+  const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
 
   const handleButtonClick = (buttonName: any) => {
     setActiveButton(buttonName);
+
+    if (buttonName === "Request") {
+      setIsRequestModalOpen(true);
+    }
+  };
+
+  const closeRequestModal = () => {
+    setIsRequestModalOpen(false);
+
   };
 
   const buttonStyle =
@@ -77,6 +88,12 @@ const Navbar = () => {
             </button>
           </div>
         </div>
+          {isRequestModalOpen && (
+              <RequestModal isOpen={isRequestModalOpen} onClose={closeRequestModal}>
+                  {/* Add content for the RequestModal if needed */}
+                  <p className="text-black">This is the modal content</p>
+              </RequestModal>
+          )}
       </div>
   );
 };
