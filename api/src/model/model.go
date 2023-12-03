@@ -24,7 +24,7 @@ type Model interface {
 	UpdateGift(int64, Gift) (Gift, error)
 	DeleteGift(int64) error
 	DeleteGiftCollection(int64) error
-	SearchGifts(int64, string, int, int, string, string, []string) ([]Gift, error)
+	SearchGifts(int64, string, int, int, string, string, string) ([]Gift, error)
 	AllGiftResponses() ([]GiftResponse, error)
 	AllCollections() ([]GiftCollection, error)
 	AllCustomerCollections(id int64) ([]GiftCollection, error)
@@ -155,7 +155,7 @@ func (m *PgModel) DeleteGift(id int64) error {
 
 	return nil
 }
-func (m *PgModel) SearchGifts(id int64, searchTerm string, minPrice int, maxPrice int, occasion string, demographic string, category []string) ([]Gift, error) {
+func (m *PgModel) SearchGifts(id int64, searchTerm string, minPrice int, maxPrice int, occasion string, demographic string, category string) ([]Gift, error) {
 	var gifts []Gift
 	searchTerm = strings.TrimSpace(searchTerm)
 

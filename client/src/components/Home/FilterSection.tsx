@@ -3,18 +3,29 @@ import React, { useState } from "react";
 type FilterSectionProps = {
   title: string;
   items: string[];
-  additional?: any;
+  updateFilters: (e: string) => void;
 };
 
 const FilterSection: React.FC<FilterSectionProps> = ({
   title,
   items,
-  additional,
+  updateFilters,
 }) => {
   const [sectionOpen, setSectionOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState("");
 
   const toggle = () => {
     setSectionOpen(!sectionOpen);
+  };
+
+  const handleClick = (item: any) => {
+    if (item !== selectedItem) {
+      setSelectedItem(item);
+      updateFilters(item);
+    } else {
+      setSelectedItem("");
+      updateFilters("");
+    }
   };
   return (
     <>
@@ -27,11 +38,16 @@ const FilterSection: React.FC<FilterSectionProps> = ({
       </div>
       {sectionOpen &&
         items.map((item) => (
-          <h2 key={item} className="mb-2">
+          <h2
+            key={item}
+            onClick={() => handleClick(item)}
+            className={`mb-2 cursor-pointer ${
+              item === selectedItem ? "font-bold" : ""
+            }`}
+          >
             {item}
           </h2>
         ))}
-      {sectionOpen && additional}
     </>
   );
 };

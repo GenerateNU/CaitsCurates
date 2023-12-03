@@ -1,7 +1,17 @@
 import { useState } from "react";
+import {Filters} from "../../types.tsx";
 import Filter from "../Home/Filter.tsx";
 
-const GiftSortNavbar = () => {
+
+type GiftSortNavBarProps = {
+  currentFilters: Filters;
+  setCurrentFilters: React.Dispatch<React.SetStateAction<Filters>>;
+};
+
+const GiftSortNavbar: React.FC<GiftSortNavBarProps> = ({
+  currentFilters,
+  setCurrentFilters,
+}) => {
   const [activeButton, setActiveButton] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
@@ -88,12 +98,16 @@ const GiftSortNavbar = () => {
                   >
                     Occasion
                   </li>
-                  {/* Add more options here */}
                 </ul>
               </div>
             )}
           </div>
-          <Filter isOpen={filterOpen} filterToggle={handleFilterToggle} />
+          <Filter
+            isOpen={filterOpen}
+            filterToggle={handleFilterToggle}
+            currentFilters={currentFilters}
+            setCurrentFilters={setCurrentFilters}
+          />
         </div>
       </div>
     </div>
