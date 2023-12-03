@@ -1,4 +1,4 @@
-import Navbar from "../components/NavBarUpdated";
+import Navbar from "../components/Home/NavBarUpdated";
 import { useState } from 'react';
 import PurchaseOneCredit from "../components/PurchaseOneCredit";
 import PurchaseThreeCredits from "../components/PurchaseThreeCredits";

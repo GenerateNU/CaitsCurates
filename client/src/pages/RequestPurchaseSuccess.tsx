@@ -1,6 +1,6 @@
-import Navbar from "../components/NavBarUpdated";
 import AccountSideBar from "../components/AccountSideBar";
 import SampleOrderSummary from "../components/SampleOrderSummary";
+import Navbar from "../components/Home/NavBarUpdated";
 
 const RequestPurchaseSuccess = () => {
 

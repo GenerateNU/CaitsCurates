@@ -1,5 +1,5 @@
 import { useState } from "react";
-import logoImage from "../images/logo.png"
+import logoImage from "../../images/logo.png"
 
 const Navbar = () => {
   const [activeButton, setActiveButton] = useState("");
