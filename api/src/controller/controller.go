@@ -45,7 +45,6 @@ func (pg *PgController) CreateStripeCheckoutSession(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	log.Println("Session URL:", s.URL)
 	c.JSON(http.StatusOK, gin.H{"url": s.URL})
 }
 func (pg *PgController) Serve() *gin.Engine {
@@ -71,7 +70,7 @@ func (pg *PgController) Serve() *gin.Engine {
 		c.JSON(http.StatusOK, gifts)
 	})
 
-	// Add a Gift Response 
+	// Add a Gift Response
 	r.POST("/addGiftResponse", func(c *gin.Context) {
 		var input model.GiftResponse
 		if err := c.BindJSON(&input); err != nil {
@@ -110,7 +109,7 @@ func (pg *PgController) Serve() *gin.Engine {
 
 		c.JSON(http.StatusOK, updatedGiftRequest)
 	})
-	// Create a new Gift Request 
+	// Create a new Gift Request
 	r.POST("/addGiftRequest", func(c *gin.Context) {
 		var input model.GiftRequest
 		if err := c.BindJSON(&input); err != nil {
@@ -435,7 +434,6 @@ func (pg *PgController) Serve() *gin.Engine {
 
 		c.JSON(http.StatusOK, giftRemovedCollection)
 	})
-
 
 	// Retrieve Giftees based on Giftee ID
 	r.GET("/giftee/:id", func(c *gin.Context) {
