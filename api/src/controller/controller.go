@@ -70,6 +70,17 @@ func (pg *PgController) Serve() *gin.Engine {
 		c.JSON(http.StatusOK, gifts)
 	})
 
+	// Get customer gift requests
+	r.GET("/requests/:id", func(c *gin.Context) {
+		id := c.Param("id")
+		intId, err := strconv.Atoi(id)
+		requests, err := pg.GetCustomerRequests(int64(intId))
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, "Oops")
+		}
+		c.JSON(http.StatusOK, requests)
+	})
+
 	// Add a Gift Response
 	r.POST("/addGiftResponse", func(c *gin.Context) {
 		var input model.GiftResponse
