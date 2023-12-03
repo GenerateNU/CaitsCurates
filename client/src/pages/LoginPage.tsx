@@ -19,9 +19,9 @@ const LoginPage = () => {
     }
 
     return (
-        <div>
+        <div className="bg-eggshell h-screen">
             <Navbar />
-            <div className="bg-eggshell flex justify-center">
+            <div className="flex justify-center">
                 <LoginForm
                     formData={loginFormData}
                     initialState={initialState}

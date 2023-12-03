@@ -28,6 +28,7 @@ const FormInput = ({label, className, type, value, includeValidation = false, ..
                     id={label}
                     className="border-brown border-solid border-[1.5px] bg-pearl rounded-md w-full text-base text-coffee font-proxima px-2 p-1"
                     type={type}
+                    pattern={type === "password" && includeValidation ? "(?=.*(\\d|\\W))(?=.*[a-z])(?=.*[A-Z]).{8,}" : undefined}
                     {...rest}
                 />
                 {type === "password" &&

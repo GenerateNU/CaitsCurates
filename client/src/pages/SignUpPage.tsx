@@ -23,9 +23,9 @@ const SignUpPage = () => {
     }
 
     return (
-        <div>
+        <div className="bg-eggshell">
             <Navbar />
-            <div className="bg-eggshell flex justify-center pb-10">
+            <div className="flex justify-center pb-10">
                 <LoginForm
                     formData={signUpFormData}
                     initialState={initialState}

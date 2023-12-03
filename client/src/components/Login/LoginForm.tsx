@@ -39,7 +39,7 @@ const LoginForm = <T extends LoginInputs>({formData, initialState, onSubmit}: Pr
 
     return (
         <form
-        className="w-[512px] h-screen shrink-0 flex flex-col px-14 pt-8 pr-28 lg:w-1/2"
+        className="w-[512px] shrink-0 flex flex-col px-14 pt-8 pr-28 lg:w-1/2"
         onSubmit={handleSubmit}
     >
         <div className="text-4xl mt-4 font-seasons font-bold"> {formData.title} </div>
