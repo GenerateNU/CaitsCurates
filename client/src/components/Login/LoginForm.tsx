@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import FormInput, { FormInputProps } from "./FormInput.tsx";
 import { LoginInputs } from "../../pages/LoginPage.tsx";
+import GoogleIcon from "../../images/google.svg";
 
 export type FormData = {
     title: string;
@@ -27,8 +28,6 @@ const LoginForm = <T extends LoginInputs>({formData, initialState, onSubmit}: Pr
             ...prevState,
             [e.target.name]: e.target.value
         }));
-
-        // additional error validation here
     }
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -40,11 +39,11 @@ const LoginForm = <T extends LoginInputs>({formData, initialState, onSubmit}: Pr
 
     return (
         <form
-        className="w-[512px] h-screen shrink-0 flex flex-col px-14 pt-8 pr-28 lg:w-1/2"
+        className="w-[512px] shrink-0 flex flex-col px-14 pt-8 pr-28 lg:w-1/2"
         onSubmit={handleSubmit}
     >
-        <div className="text-3xl mt-4"> {formData.title} </div>
-        <div className="text-sm mt-4"> {formData.subText} </div>
+        <div className="text-4xl mt-4 font-seasons font-bold"> {formData.title} </div>
+        <div className="text-base text-drkbrown mt-4 font-proxima"> {formData.subText} </div>
         {formData.inputs.map((props, index) => {
             const [field, value] = Object.entries(formState)[index];
             return (
@@ -59,7 +58,7 @@ const LoginForm = <T extends LoginInputs>({formData, initialState, onSubmit}: Pr
             )
         }
         )}
-        <div className="mt-5 text-sm">
+        <div className="mt-5 text-base text-coffee font-proxima">
             <span> {formData.additionalText} </span>
             <Link 
                 className="underline"
@@ -76,14 +75,13 @@ const LoginForm = <T extends LoginInputs>({formData, initialState, onSubmit}: Pr
         </button>
         <div className="flex items-center mt-8">
             <span className={`${lineStyle}`}/>
-            <span className="px-3 text-center text-sm"> {"or"} </span>
+            <span className="px-3 text-center text-base font-proxima"> {"or"} </span>
             <span className={`${lineStyle}`} />
         </div>
-        <div className="flex justify-center space-x-6 mt-4">
-            {/* replace with icons */}
-            <span className="w-14 h-14 rounded-full bg-orange-900"/>
-            <span className="w-14 h-14 rounded-full bg-orange-900"/>
-            <span className="w-14 h-14 rounded-full bg-orange-900"/>
+        <div className="flex justify-center space-x-12 mt-4">
+            <div className="w-16 h-16 rounded-full bg-petalpink flex items-center justify-center">
+                <img src={GoogleIcon} className="w-8 h-8" />
+            </div>
         </div>
     </form>
     )

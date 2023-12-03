@@ -4,7 +4,7 @@
 
 @layer components {
     .btn-primary {
-      @apply py-2 bg-green rounded-md text-sm text-white
+      @apply py-2 bg-evergreen rounded-md text-sm text-white font-proxima font-bold
     }
     .bg-DFB2AA {
       background-color: #DFB2AA;
