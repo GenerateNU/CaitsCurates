@@ -24,6 +24,13 @@ export interface GiftRequest {
   DateNeeded: string;
 }
 
+export type AuthenticatedUser = {
+  type: 'Admin' | 'Customer';
+  details: User;
+  additionalInfo: Customer | Admin;
+};
+
+
 export interface GiftCollection {
   ID: number;
   CustomerID: number | null;
@@ -44,7 +51,6 @@ export interface User {
   Email: string;
   FirstName: string;
   LastName: string;
-  Password: string;
 }
 
 export interface Customer {
