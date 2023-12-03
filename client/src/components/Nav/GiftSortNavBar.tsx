@@ -1,6 +1,7 @@
 import { useState } from "react";
-import Filter from "./Filter";
-import { Filters } from "../types";
+import {Filters} from "../../types.tsx";
+import Filter from "../Home/Filter.tsx";
+
 
 type GiftSortNavBarProps = {
   currentFilters: Filters;

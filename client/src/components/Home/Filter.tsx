@@ -1,7 +1,8 @@
 import React from "react";
-import FilterSection from "./FilterSection";
-import PriceSection from "./PriceSection";
-import { Filters } from "../types";
+import {Filters} from "../../types.tsx";
+import FilterSection from "./FilterSection.tsx";
+import PriceSection from "../PriceSection.tsx";
+
 
 const recipients = [
   "For mom",
