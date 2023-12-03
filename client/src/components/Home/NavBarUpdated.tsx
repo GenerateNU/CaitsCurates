@@ -16,7 +16,7 @@ const Navbar = () => {
 
   const closeRequestModal = () => {
     setIsRequestModalOpen(false);
-
+    setActiveButton("");
   };
 
   const buttonStyle =
