@@ -88,12 +88,12 @@ const Navbar = () => {
             </button>
           </div>
         </div>
-          {isRequestModalOpen && (
-              <RequestModal isOpen={isRequestModalOpen} onClose={closeRequestModal}>
-                  {/* Add content for the RequestModal if needed */}
-                  <p className="text-black">This is the modal content</p>
-              </RequestModal>
-          )}
+        {isRequestModalOpen && (
+            <RequestModal isOpen={isRequestModalOpen} onClose={closeRequestModal}>
+              {/* Add content for the RequestModal if needed */}
+              <p className="text-black">This is the modal content</p>
+            </RequestModal>
+        )}
       </div>
   );
 };
