@@ -1,5 +1,5 @@
 import { useState } from "react";
-import RequestModal from "../Requests/RequestModal";
+import RequestModal from "../Requests/ModalScreenOne";
 import logoImage from "../../images/logo.svg"
 
 const Navbar = () => {
