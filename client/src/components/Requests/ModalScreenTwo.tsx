@@ -26,12 +26,12 @@ const ModalScreenTwo: React.FC<ModalScreenTwoProps> = ({ isOpen, onClose, childr
     ? 'bg-FFF9F4 rounded-md text-black shadow-md flex flex-col'
     : 'hidden';
 
-    const handleAddGifteeClick = () => {
+    const handleAddGifteeClick = (buttonName: any) => {
         setShowModalThree(true);
         setShowModalOne(false);
       };
 
-    const handleBackClick = () => {
+    const handleBackClick = (buttonName: any) => {
         setShowModalOne(true);
         setShowModalThree(false);
       };
@@ -49,7 +49,7 @@ const ModalScreenTwo: React.FC<ModalScreenTwoProps> = ({ isOpen, onClose, childr
             <>
       <div className="flex flex-row ml-10 items-center mt-10">
       <button className=''
-              onClick={() => handleBackClick()}
+              onClick={() => handleBackClick("Back")}
             >
               Back
             </button>
@@ -70,7 +70,7 @@ const ModalScreenTwo: React.FC<ModalScreenTwoProps> = ({ isOpen, onClose, childr
           </div>
           <div className="flex items-center ml-0">
           <div>
-          <h1 className="text-black mr-80 mb-60 text-xl w-full flex justify-start font-seasons">My Giftees</h1>
+          <h1 className="text-black mr-80 mb-60 text-xl font-seasons">My Giftees</h1>
           </div>
             <img
               src={OrPicture}
@@ -80,7 +80,7 @@ const ModalScreenTwo: React.FC<ModalScreenTwoProps> = ({ isOpen, onClose, childr
             <div className="mr-0">
             <button
               className={`${buttonStyle} ${activeButtonStyle}`}
-              onClick={() => handleAddGifteeClick()}
+              onClick={() => handleAddGifteeClick("AddNew")}
               style={{ width: "265px", height: "69px" }}
             >
               Add New Giftee

@@ -6,7 +6,6 @@ import TextBox from '../Admin/TextBox'
 import AgeDropdown from '../Admin/AgeDropdown';
 import GenderDropdown from '../Admin/GenderDropdown';
 import ColorDropdown from '../Admin/ColorDropdown';
-import {Giftee} from '../../types.tsx'
 
 interface ModalScreenThreeProps {
   isOpen: boolean;
@@ -15,52 +14,30 @@ interface ModalScreenThreeProps {
 }
 
 const ModalScreenThree: React.FC<ModalScreenThreeProps> = ({ isOpen, onClose, children }) => {
-    const [showModalTwo, setShowModalTwo] = useState(false);
-    const [showModalFour, setShowModalFour] = useState(false);
+    const [nameNickname, setNameNickname] = useState<string>('');
 
-    const [giftee, setGiftee] = useState<Giftee>({
-        Name: '',
-        Relationship: '',
-        Age: 0,
-        Gender: '',
-        FavoriteColors: [],
-        Interests: [],
-      });
+    const handleAgeChange = (selectedAge: number) => {
+        console.log(`Selected age: ${selectedAge}`);
 
-      const handleAgeChange = (selectedAge: number) => {
-        setGiftee((prevGiftee) => ({ ...prevGiftee, Age: selectedAge }));
-      };
-    
-      const handleGenderChange = (selectedGender: string) => {
-        setGiftee((prevGiftee) => ({ ...prevGiftee, Gender: selectedGender }));
-      };
-    
-      const handleColorChange = (selectedColors: string[]) => {
-        setGiftee((prevGiftee) => ({ ...prevGiftee, FavoriteColors: selectedColors }));
       };
 
-      const handleNameChange = (selectedName: string) => {
-        console.log(`Selected Name: ${selectedName}`);
-        setGiftee((prevGiftee) => ({ ...prevGiftee, Name: selectedName }));
+      const handleGenderChange = (selectedGender: String) => {
+        console.log(`Selected Gender: ${selectedGender}`);
+
       };
 
-      const handleRelationshipChange = (selectedRelationship: string) => {
-        console.log(`Selected Relationship: ${selectedRelationship}`);
-        setGiftee((prevGiftee) => ({ ...prevGiftee, Relationship: selectedRelationship }));
+      const handleColorChange = (selectedColors: String[]) => {
+        console.log(`Selected Colors: ${selectedColors}`);
+
       };
 
-      const handleInterestsChange = (selectedInterests: string) => {
-        console.log(`Selected Relationship: ${selectedInterests}`);
-        const interestsArray = selectedInterests.split(',').map(item => item.trim());
-
-        setGiftee((prevGiftee) => ({ ...prevGiftee, Interests: interestsArray }));
-      };
-    
       const handleNextClick = () => {
-        console.log('Giftee data:', giftee);
-    
+        setNameNickname(nameNickname);
         setShowModalFour(true);
       };
+
+  const [showModalTwo, setShowModalTwo] = useState(false);
+  const [showModalFour, setShowModalFour] = useState(false);
 
   const buttonStyle = "px-4 py-2 ml-40 text-FFF9F4 text-s bg-273F2A rounded-md";
   const activeButtonStyle = "bg-273F2A";
@@ -73,7 +50,7 @@ const ModalScreenThree: React.FC<ModalScreenThreeProps> = ({ isOpen, onClose, ch
     ? 'bg-FFF9F4 rounded-md shadow-md flex flex-col px-50 items-center'
     : 'hidden';
 
-    const handleBackClick = () => {
+    const handleBackClick = (buttonName: any) => {
         setShowModalTwo(true);
       };
 
@@ -84,13 +61,9 @@ const ModalScreenThree: React.FC<ModalScreenThreeProps> = ({ isOpen, onClose, ch
               <ModalScreenTwo isOpen={isOpen} onClose={onClose} children={children} />
             ) : (
                 <> 
-                {showModalFour ? (
-          <ModalScreenFour isOpen={isOpen} onClose={onClose} children={children} giftee={giftee} />
-        ) : (
-            <>
           <div className="flex ml-10 items-center mt-10">
           <button className=''
-                  onClick={() => handleBackClick()}
+                  onClick={() => handleBackClick("Back")}
                 >
                   Back
                 </button>
@@ -107,15 +80,16 @@ const ModalScreenThree: React.FC<ModalScreenThreeProps> = ({ isOpen, onClose, ch
                 <h1 className="mb-10 text-3xl text-center items-center w-full font-seasons">Add New Giftee</h1>
                
                 <div className= "flex flex-row">
-                <TextBox
-                    placeholder="Name or Nickname"
-                    onChange={handleNameChange}
+                <TextBox 
+                placeholder="Name or Nickname"
+               
+              
                 />
                 <ColorDropdown onChange={handleColorChange}/>
                 </div>
                 <div className= "flex flex-row ">
-                 <TextBox placeholder="Relationship to You" onChange={handleRelationshipChange}/> 
-                 <TextBox placeholder="Type to Add Interests" onChange={handleInterestsChange}/> 
+                 <TextBox placeholder="Relationship to You" />
+                 <TextBox placeholder="Type to Add Interests" />
                 </div>
                 <div className='flew-col'>
                     <AgeDropdown onChange={handleAgeChange}/>
@@ -136,8 +110,6 @@ const ModalScreenThree: React.FC<ModalScreenThreeProps> = ({ isOpen, onClose, ch
                 </div>
             </>
             )}
-            </>
-        )}
           </div>
         </div>
       );

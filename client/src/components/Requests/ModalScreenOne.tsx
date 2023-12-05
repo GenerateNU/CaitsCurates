@@ -9,6 +9,7 @@ interface ModalProps {
 }
 
 const ModalScreenOne: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
+  const [gifteeName, setGifteeName] = useState("");
   const [activeButton, setActiveButton] = useState("");
   const [showModalTwo, setShowModalTwo] = useState(false);
 

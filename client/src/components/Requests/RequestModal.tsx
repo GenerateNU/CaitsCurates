@@ -1,4 +1,5 @@
 import React, { ReactNode, useState } from 'react';
+import ModalScreenOne from 'ModalScreenOne.tsx';
 
 interface ModalProps {
   isOpen: boolean;
@@ -8,7 +9,6 @@ interface ModalProps {
 
 const RequestModal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
     const [gifteeName, setGifteeName] = useState("");
-    const []
 
     
     const overlayStyles = isOpen
