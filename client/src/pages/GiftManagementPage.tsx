@@ -56,12 +56,12 @@ const GiftManagementPage = () => {
                 <div className="grid grid-cols-4 gap-x-10">
                 {gifts.map((gift) => (
                     <div key={gift.ID} className="m-2">
-                <GiftItem
-                    gift={gift}
-                    onEditClick={() => handleEditingGift(gift)}
-                    onDeleteClick={() => handleDelete(gift)}
-                />
-                </div>
+                        <GiftItem
+                            gift={gift}
+                            onEditClick={() => handleEditingGift(gift)}
+                            onDeleteClick={() => handleDelete(gift)}
+                        />
+                    </div>
             ))}</div>
 
             {showForm &&

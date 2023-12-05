@@ -8,8 +8,8 @@ type GiftItemProps = {
 
 function UpdatedGiftItem({ gift, isSaved, onFavoriteClick }: GiftItemProps) {
   return (
-    <div className="relative flex flex-col bg-gray-100 flex-start">
-      <div className="bg-gray-200 w-40 h-40 mx-auto mb-2 relative">
+    <div className="relative flex flex-col flex-start mb-4">
+      <div className=" bg-[#F4E6DC] w-80 h-80 mx-auto mb-2 relative">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill={isSaved ? "red" : "none"}
@@ -26,7 +26,8 @@ function UpdatedGiftItem({ gift, isSaved, onFavoriteClick }: GiftItemProps) {
           />
         </svg>
       </div>
-      <div className="">
+
+      <div className="" style={{ marginBottom: "5px" }}>
         <h2 className="text-sm text-black font-bold">{gift.Name}</h2>
         <h2 className="text-xs text-black">${gift.Price}</h2>
       </div>

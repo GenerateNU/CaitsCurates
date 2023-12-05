@@ -8,7 +8,7 @@ const SearchBar = () => {
   };
 
   return (
-    <div className="bg-gray-100 p-4 w-full">
+    <div className="p-4 w-full">
       <div className="flex items-center relative">
         <input
           type="text"
