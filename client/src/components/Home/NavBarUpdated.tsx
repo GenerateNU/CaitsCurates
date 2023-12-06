@@ -1,7 +1,6 @@
 import { useState } from "react";
 import logoImage from "../../images/logo.png"
-import RequestModal from "../Requests/RequestModal";
-import RequestModal2 from "../Requests/ModalScreenOne";
+import RequestModal from "../Requests/ModalScreenOne";
 
 const Navbar = () => {
   const [activeButton, setActiveButton] = useState("");
