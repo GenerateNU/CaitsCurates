@@ -31,7 +31,7 @@ const ColorDropdown: React.FC<ColorDropdownProps> = ({ onChange }) => {
     width: '455px',
     color: '#B79D94',
     height: '42px',
-    padding: '4px',
+    padding: '10px',
     appearance: 'none',
     marginTop: '16px',
     marginRight: '16px',
@@ -48,14 +48,13 @@ const ColorDropdown: React.FC<ColorDropdownProps> = ({ onChange }) => {
     display: optionsVisible ? 'block' : 'none',
     position: 'absolute',
     color: '#B79D94',
-    
     backgroundColor: '#FFFEFC',
     zIndex: 1000,
     
   };
 
   const optionStyle: React.CSSProperties = {
-    padding: '8px', // Adjust padding as needed
+    padding: '8px', 
   };
 
   return (
