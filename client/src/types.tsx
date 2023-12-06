@@ -83,5 +83,5 @@ export interface Giftee {
   Age: number;
   Gender: string,
   FavoriteColors: string[];
-  Interests: string;
+  Interests: string[];
 }

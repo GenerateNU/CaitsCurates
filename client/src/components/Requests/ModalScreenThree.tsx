@@ -24,7 +24,7 @@ const ModalScreenThree: React.FC<ModalScreenThreeProps> = ({ isOpen, onClose, ch
         Age: 0,
         Gender: '',
         FavoriteColors: [],
-        Interests: '',
+        Interests: [],
       });
 
       const handleAgeChange = (selectedAge: number) => {
@@ -51,7 +51,9 @@ const ModalScreenThree: React.FC<ModalScreenThreeProps> = ({ isOpen, onClose, ch
 
       const handleInterestsChange = (selectedInterests: string) => {
         console.log(`Selected Relationship: ${selectedInterests}`);
-        setGiftee((prevGiftee) => ({ ...prevGiftee, Interests: selectedInterests }));
+        const interestsArray = selectedInterests.split(',').map(item => item.trim());
+
+        setGiftee((prevGiftee) => ({ ...prevGiftee, Interests: interestsArray }));
       };
     
       const handleNextClick = () => {
