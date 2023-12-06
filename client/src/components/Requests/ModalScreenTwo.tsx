@@ -70,7 +70,7 @@ const ModalScreenTwo: React.FC<ModalScreenTwoProps> = ({ isOpen, onClose, childr
           </div>
           <div className="flex items-center ml-0">
           <div>
-          <h1 className="text-black mr-80 mb-60 text-xl font-seasons">My Giftees</h1>
+          <h1 className="text-black mr-80 mb-60 text-xl w-full flex justify-start font-seasons">My Giftees</h1>
           </div>
             <img
               src={OrPicture}
