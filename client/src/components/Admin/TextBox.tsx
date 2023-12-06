@@ -1,33 +1,40 @@
 import React, { useState } from 'react';
 
 interface TextBoxProps {
-  placeholder: string;
-}
+    placeholder: string;
+    onChange: (value: string) => void;
+  }
 
-const TextBox: React.FC<TextBoxProps> = ({ placeholder }) => {
-  const [searchText, setSearchText] = useState("");
+const TextBox: React.FC<TextBoxProps> = ({ placeholder, onChange }) => {
 
-  const handleInputChange = (e: any) => {
-    setSearchText(e.target.value);
-  };
+    const [searchText, setSearchText] = useState('');
 
-  return (
-    <div className="p-4 w-full">
-      <div className="flex items-center relative">
-        <input
-          type="text"
-          style={{ width: '455px', color: '#B79D94', height: '42px', border: '1px solid #B79D94',
-          borderWidth: '1.5px'}}
-          className="w-full px-4 py-2 rounded-m pl-2"  
-          value={searchText}
-          onChange={handleInputChange}
-          placeholder={placeholder} 
-        
-        />
+    const handleInputChange = (e: any) => {
+        setSearchText(e.target.value);
+        onChange(e.target.value);
+    };
+  
+    return (
+      <div className="p-4 w-full">
+        <div className="flex items-center relative">
+          <input
+            type="text"
+            style={{
+              width: '455px',
+              color: '#B79D94',
+              height: '42px',
+              border: '1px solid #B79D94',
+              borderWidth: '1.5px',
+            }}
+            className="w-full px-4 py-2 rounded-m pl-2"
+            value={searchText}
+            placeholder={placeholder}
+            onChange={handleInputChange}
+          />
+        </div>
       </div>
-    </div>
-  );
-};
-
-export default TextBox;
-
+    );
+  };
+  
+  export default TextBox;
+  

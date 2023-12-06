@@ -31,7 +31,7 @@ const ColorDropdown: React.FC<ColorDropdownProps> = ({ onChange }) => {
     width: '455px',
     color: '#B79D94',
     height: '42px',
-    padding: '4px',
+    padding: '10px',
     appearance: 'none',
     marginTop: '16px',
     marginRight: '16px',

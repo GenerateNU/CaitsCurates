@@ -75,13 +75,3 @@ export interface Filters {
   demographic: string;
   category: string;
 }
-
-
-export interface Giftee {
-  Name: string;
-  Relationship: string;
-  Age: number;
-  Gender: string,
-  FavoriteColors: string[];
-  Interests: string[];
-}

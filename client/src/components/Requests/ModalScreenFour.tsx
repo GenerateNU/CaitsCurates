@@ -1,14 +1,15 @@
 // ModalScreenFour.tsx
 import React from 'react';
+import {Giftee} from '../../types.tsx'
 
 interface ModalScreenFourProps {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
-  nameNickname: string;
+  giftee: Giftee;
 }
 
-const ModalScreenFour: React.FC<ModalScreenFourProps> = ({ isOpen, onClose, children, nameNickname }) => {
+const ModalScreenFour: React.FC<ModalScreenFourProps> = ({ isOpen, onClose, children, giftee}) => {
   const overlayStyles = isOpen
     ? 'fixed top-0 left-0 w-full h-full flex justify-center items-center z-50'
     : 'hidden';
@@ -25,7 +26,7 @@ const ModalScreenFour: React.FC<ModalScreenFourProps> = ({ isOpen, onClose, chil
         </div>
         <div>
           <h1 className="mb-10 text-3xl text-center items-center w-full font-seasons">Modal Four Title</h1>
-          <p>Name or Nickname: {nameNickname}</p>
+          <p></p>
           {/* Add additional elements to display other information */}
         </div>
       </div>
