@@ -7,17 +7,17 @@ const dropdownArrowSVG = `
   </svg>
 `;
 
-interface GenderDropdownProps {
-  onChange: (selectedGender: string) => void;
+interface OccasionDropdownProps {
+  onChange: (selectedOccasion: string) => void;
 }
 
-const GenderDropdown: React.FC<GenderDropdownProps> = ({ onChange }) => {
-  const [selectedGender, setSelectedGender] = useState<string | null>(null);
+const OccasionDropdown: React.FC<OccasionDropdownProps> = ({ onChange }) => {
+  const [selectedOccasion, setSelectedOccasion] = useState<string | null>(null);
 
-  const handleGenderChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const gender = e.target.value;
-    setSelectedGender(gender);
-    onChange(gender);
+  const handleOccasionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const occasion = e.target.value;
+    setSelectedOccasion(occasion);
+    onChange(occasion);
   };
 
   const dropdownStyle: React.CSSProperties = {
@@ -28,29 +28,32 @@ const GenderDropdown: React.FC<GenderDropdownProps> = ({ onChange }) => {
     margin: '10px',
     marginLeft: '16px',
     appearance: 'none',
-    marginTop: '18px',
+    marginTop: '12px',
     backgroundImage: `url("data:image/svg+xml,${encodeURIComponent(dropdownArrowSVG)}")`,
     backgroundRepeat: 'no-repeat',
     backgroundPosition: 'right center',
-    border: '1.5px solid #B79D94',
+    border: '2px solid #B79D94',
     borderRadius: '5px',
     borderWidth: '1.5px'
   };
 
   return (
     <select
-      value={selectedGender || ''}
-      onChange={handleGenderChange}
+      value={selectedOccasion || ''}
+      onChange={handleOccasionChange}
       style={dropdownStyle}
     >
       <option value="" disabled>
-        Gender
+        Occasion
       </option>
-      <option value="male">Male</option>
-      <option value="female">Female</option>
-      <option value="other">Other</option>
+      <option value="birthday">Birthday</option>
+      <option value="wedding">Wedding</option>
+      <option value="christmas">Christmas</option>
+      <option value="fathers">Father's Day</option>
+      <option value="mothers">Mother's Day</option>
+      <option value="anniversary">Anniversary</option>
     </select>
   );
 };
 
-export default GenderDropdown;
+export default OccasionDropdown;

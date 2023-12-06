@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import OrPicture from '../../images/or_modal.svg';
 import ModalScreenOne from './ModalScreenOne';
 import ModalScreenThree from './ModalScreenThree';
-import ModalX from '../../images/modal_x_out.svg'
+import ModalX from '../../images/modal_x_out.svg';
 
 interface ModalScreenTwoProps {
   isOpen: boolean;

@@ -1,12 +1,13 @@
 import React, {useState} from 'react';
 import ModalScreenTwo from './ModalScreenTwo';
 import ModalScreenFour from './ModalScreenFour';
-import ModalX from '../../images/modal_x_out.svg'
-import TextBox from '../Admin/TextBox'
+import ModalX from '../../images/modal_x_out.svg';
+import TextBox from '../Admin/TextBox';
 import AgeDropdown from '../Admin/AgeDropdown';
 import GenderDropdown from '../Admin/GenderDropdown';
 import ColorDropdown from '../Admin/ColorDropdown';
-import {Giftee} from '../../types.tsx'
+import {Giftee} from '../../types.tsx';
+import axios from 'axios';
 
 interface ModalScreenThreeProps {
   isOpen: boolean;
@@ -58,9 +59,31 @@ const ModalScreenThree: React.FC<ModalScreenThreeProps> = ({ isOpen, onClose, ch
     
       const handleNextClick = () => {
         console.log('Giftee data:', giftee);
-    
+        
+        makeGiftee();
         setShowModalFour(true);
       };
+
+  // Endpoint Calls
+  const makeGiftee = async () => {
+    try {
+        const response = await axios.post("/api/addGiftee", {
+            params: {
+                CustomerID:           1,   // Need to switch  
+                GifteeName:           giftee.Name,  
+                Gender:               giftee.Gender,
+                CustomerRelationship: giftee.Relationship,
+                Age:                  giftee.Age,
+                Colors:               giftee.FavoriteColors,
+                Interests:            giftee.Interests,          
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error("An error occured while making Giftee");
+    }
+  };
+
 
   const buttonStyle = "px-4 py-2 ml-40 text-FFF9F4 text-s bg-273F2A rounded-md";
   const activeButtonStyle = "bg-273F2A";
@@ -94,7 +117,7 @@ const ModalScreenThree: React.FC<ModalScreenThreeProps> = ({ isOpen, onClose, ch
                 >
                   Back
                 </button>
-                <div className="mr-0 mr-auto ml-80">
+                <div className="mr-auto ml-80">
                 <img
                   src={ModalX}
                   alt="caits-logo.svg"
@@ -108,8 +131,8 @@ const ModalScreenThree: React.FC<ModalScreenThreeProps> = ({ isOpen, onClose, ch
                
                 <div className= "flex flex-row">
                 <TextBox
-                    placeholder="Name or Nickname"
-                    onChange={handleNameChange}
+                  placeholder="Name or Nickname"
+                  onChange={handleNameChange}
                 />
                 <ColorDropdown onChange={handleColorChange}/>
                 </div>

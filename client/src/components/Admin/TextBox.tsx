@@ -23,8 +23,9 @@ const TextBox: React.FC<TextBoxProps> = ({ placeholder, onChange }) => {
               width: '455px',
               color: '#B79D94',
               height: '42px',
-              border: '1px solid #B79D94',
-              borderWidth: '1.5px',
+              border: '1.5px solid #B79D94',
+              borderRadius: '5px',
+              borderWidth: '1.5px'
             }}
             className="w-full px-4 py-2 rounded-m pl-2"
             value={searchText}

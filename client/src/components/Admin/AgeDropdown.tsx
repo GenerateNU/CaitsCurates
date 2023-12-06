@@ -32,7 +32,8 @@ const AgeDropdown: React.FC<AgeDropdownProps> = ({ onChange }) => {
     backgroundImage: `url("data:image/svg+xml,${encodeURIComponent(dropdownArrowSVG)}")`,
     backgroundRepeat: 'no-repeat',
     backgroundPosition: 'right center',
-    border: '1px solid #B79D94',
+    border: '2px solid #B79D94',
+    borderRadius: '5px',
     borderWidth: '1.5px'
   };
 
