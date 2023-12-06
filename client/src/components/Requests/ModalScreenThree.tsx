@@ -71,7 +71,7 @@ const ModalScreenThree: React.FC<ModalScreenThreeProps> = ({ isOpen, onClose, ch
     ? 'bg-FFF9F4 rounded-md shadow-md flex flex-col px-50 items-center'
     : 'hidden';
 
-    const handleBackClick = (buttonName: any) => {
+    const handleBackClick = () => {
         setShowModalTwo(true);
       };
 
@@ -88,7 +88,7 @@ const ModalScreenThree: React.FC<ModalScreenThreeProps> = ({ isOpen, onClose, ch
             <>
           <div className="flex ml-10 items-center mt-10">
           <button className=''
-                  onClick={() => handleBackClick("Back")}
+                  onClick={() => handleBackClick()}
                 >
                   Back
                 </button>
