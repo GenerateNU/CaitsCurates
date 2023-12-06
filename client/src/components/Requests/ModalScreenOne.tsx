@@ -1,6 +1,7 @@
 import React, { ReactNode, useState } from 'react';
 import CaitPhoto from '../../images/modal_cait.svg';
 import ModalScreenTwo from './ModalScreenTwo.tsx';
+import axios from 'axios';
 
 interface ModalProps {
   isOpen: boolean;
@@ -12,10 +13,21 @@ const ModalScreenOne: React.FC<ModalProps> = ({ isOpen, onClose, children }) => 
   const [activeButton, setActiveButton] = useState("");
   const [showModalTwo, setShowModalTwo] = useState(false);
 
+  const [availableRequests, setAvailableRequests] = useState(0);
+
   const handleButtonClick = (buttonName: any) => {
     setActiveButton(buttonName);
     setShowModalTwo(true);
   };
+
+  // Endpoint
+  const getAvailableRequests = async () => {
+    try {
+        return;
+    } catch (error) {
+        console.log("An error when occured while getting Available Requests");
+    }
+   };
 
   const buttonStyle = "px-4 py-2 text-FFF9F4 text-s bg-273F2A rounded-md";
   const activeButtonStyle = "bg-273F2A";
@@ -46,8 +58,9 @@ const ModalScreenOne: React.FC<ModalProps> = ({ isOpen, onClose, children }) => 
                 <h1 className="text-black mb-10 text-3xl font-seasons">Let Cait Do it For You</h1>
                 <h1 className="text-black mb-10 text-xl font-seasons">Submit a Gift Request to receive personalized gift recommendations for your friends and loved ones. Simply tell me a little about
                 your giftee and I’ll take it from there!</h1>
-                <h1 className="text-black mb-10 text-xl font-seasons">You currently have <strong>0 Gift Requests.</strong></h1>
+                <h1 className="text-black mb-10 text-xl font-seasons">You currently have <strong>{availableRequests} Gift Requests.</strong></h1>
               </div>
+              {availableRequests == 0 ? (
               <button
                 className={`${buttonStyle} ${activeButton === "Purchase" ? activeButtonStyle : ""}`}
                 onClick={() => handleButtonClick("Purchase")}
@@ -55,6 +68,16 @@ const ModalScreenOne: React.FC<ModalProps> = ({ isOpen, onClose, children }) => 
               >
                 Purchase Gift Requests
               </button>
+              ) : (
+                <button
+                className={`${buttonStyle} ${activeButton === "Purchase" ? activeButtonStyle : ""}`}
+                onClick={() => handleButtonClick("Purchase")}
+                style={{ width: "455px", height: "50px" }}
+                >
+                  Start Quiz!
+                </button>
+              )
+              }
             </div>
           </>
         )}
