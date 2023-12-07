@@ -15,6 +15,7 @@ type Model interface {
 	AddRequest(GiftRequest) (GiftRequest, error)
 	AddResponse(GiftResponse) (GiftResponse, error)
 	AddCollection(GiftCollection) (GiftCollection, error)
+	GetCustomerRequests(int64) ([]GiftRequest, error)
 	IncompleteRequests() ([]GiftRequest, error)
 	CompleteRequests() ([]GiftRequest, error)
 	UpdateGiftRequest(GiftRequest) (GiftRequest, error)
@@ -24,7 +25,7 @@ type Model interface {
 	UpdateGift(int64, Gift) (Gift, error)
 	DeleteGift(int64) error
 	DeleteGiftCollection(int64) error
-	SearchGifts(int64, string, int, int, string, string, []string) ([]Gift, error)
+	SearchGifts(int64, string, int, int, string, string, string) ([]Gift, error)
 	AllGiftResponses() ([]GiftResponse, error)
 	AllCollections() ([]GiftCollection, error)
 	AllCustomerCollections(id int64) ([]GiftCollection, error)
@@ -50,6 +51,17 @@ func (m *PgModel) AddRequest(inputRequest GiftRequest) (GiftRequest, error) {
 	}
 
 	return createdRequest, nil
+}
+
+func (m *PgModel) GetCustomerRequests(customerId int64) ([]GiftRequest, error) {
+
+	requests, err := GetAllCustomerRequestsFromDB(m.Conn, customerId)
+
+	if err != nil {
+		return []GiftRequest{}, err
+	}
+
+	return requests, nil
 }
 func (m *PgModel) AddResponse(inputResponse GiftResponse) (GiftResponse, error) {
 
@@ -155,7 +167,7 @@ func (m *PgModel) DeleteGift(id int64) error {
 
 	return nil
 }
-func (m *PgModel) SearchGifts(id int64, searchTerm string, minPrice int, maxPrice int, occasion string, demographic string, category []string) ([]Gift, error) {
+func (m *PgModel) SearchGifts(id int64, searchTerm string, minPrice int, maxPrice int, occasion string, demographic string, category string) ([]Gift, error) {
 	var gifts []Gift
 	searchTerm = strings.TrimSpace(searchTerm)
 
@@ -238,7 +250,7 @@ func (m *PgModel) AddGiftToGiftCollection(inputGift Gift, id int64) (GiftCollect
 
 func (m *PgModel) AddGiftToCustomerCollection(gift Gift, collectionName string, customerId int64) (GiftCollection, error) {
 
-	giftAddedCollection, err := AddGiftToCustomerCollectionFromDB(m.Conn, gift, collectionName, customerId);
+	giftAddedCollection, err := AddGiftToCustomerCollectionFromDB(m.Conn, gift, collectionName, customerId)
 
 	if err != nil {
 		return GiftCollection{}, err
@@ -249,7 +261,7 @@ func (m *PgModel) AddGiftToCustomerCollection(gift Gift, collectionName string, 
 
 func (m *PgModel) DeleteGiftFromCustomerCollection(gift Gift, collectionName string, customerId int64) (GiftCollection, error) {
 
-	giftDeletedCollection, err := DeleteGiftFromCustomerCollectionFromDB(m.Conn, gift, collectionName, customerId);
+	giftDeletedCollection, err := DeleteGiftFromCustomerCollectionFromDB(m.Conn, gift, collectionName, customerId)
 
 	if err != nil {
 		return GiftCollection{}, err

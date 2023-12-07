@@ -1,6 +1,7 @@
-import LoginForm from "../components/LoginForm";
+import LoginForm from "../components/Login/LoginForm.tsx";
 import { LoginInputs } from "./LoginPage";
 import { signUpFormData } from "../data/formData";
+import Navbar from "../components/Home/NavBarUpdated.tsx";
 
 
 type SignUpInputs = LoginInputs & {
@@ -22,16 +23,14 @@ const SignUpPage = () => {
     }
 
     return (
-        <div>
-            {/* add navbar */}
-            <div className="flex">
+        <div className="bg-eggshell">
+            <Navbar />
+            <div className="flex justify-center pb-10">
                 <LoginForm
                     formData={signUpFormData}
                     initialState={initialState}
                     onSubmit={handleOnSubmit}
                 />
-                {/* replace with image */}
-                <div className="w-[512px] bg-slate-700 lg:w-1/2" />
             </div>
         </div>
     );

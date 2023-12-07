@@ -1,4 +1,4 @@
-import {Gift} from "../types.tsx";
+import {Gift} from "../../types.tsx";
 
 
 
@@ -10,6 +10,9 @@ interface GiftProps {
 }
 
 const GiftItem = (props: GiftProps) => {
+    const giftElements = props.gift?.Category?.map((category) => (
+        <span key={category} className="px-2 py-1 bg-gray-200 rounded-full">{category}</span>
+    ));
     return (
         <div className='border-2 rounded flex flex-col justify-between p-4 max-w-full' style={{ margin: '20px 20px' }}>
             <h2>{props.gift.Name}</h2>
@@ -22,7 +25,10 @@ const GiftItem = (props: GiftProps) => {
                     >Link</a>
                 </div>
                 <p>Demographic: {props.gift.Demographic}</p>
-                <p>Categories: {props.gift.Category}</p>
+                <p>Categories:</p>
+                <div className='flex flex-wrap gap-1'>
+                    {giftElements}
+                </div>
                 <p>Description: {props.gift.Description}</p>
                 <p>Description: {props.gift.Occasion}</p>
             </div>

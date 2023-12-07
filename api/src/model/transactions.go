@@ -1,9 +1,8 @@
 package model
 
 import (
-	"github.com/lib/pq"
-	"gorm.io/gorm"
 	"errors"
+	"gorm.io/gorm"
 )
 
 func WriteRequestToDb(db *gorm.DB, inputRequest GiftRequest) (GiftRequest, error) {
@@ -43,6 +42,9 @@ func UpdateGiftRequestToDb(db *gorm.DB, inputRequest GiftRequest) (GiftRequest, 
 	}
 	if inputRequest.GiftResponseID != nil {
 		updates["GiftResponseID"] = inputRequest.GiftResponseID
+	}
+	if inputRequest.GifteeID != 0 {
+		updates["GifteeID"] = inputRequest.GifteeID
 	}
 
 	if err := db.Model(&updatedGiftRequest).Updates(updates).Error; err != nil {
@@ -96,7 +98,7 @@ func UpdateCollectionToDb(db *gorm.DB, inputCollection GiftCollection) (GiftColl
 }
 func GetIncompleteGiftRequestsFromDB(db *gorm.DB) ([]GiftRequest, error) {
 	var requests []GiftRequest
-	if err := db.Where("gift_response_id IS NULL").Preload("GiftResponse").Find(&requests).Error; err != nil {
+	if err := db.Where("gift_response_id IS NULL").Preload("GiftResponse").Preload("Giftee").Find(&requests).Error; err != nil {
 		return nil, err
 	}
 	return requests, nil
@@ -173,7 +175,7 @@ func DeleteGiftCollectionFromDb(db *gorm.DB, id int64) error {
 
 	return nil
 }
-func SearchGiftsDb(db *gorm.DB, id int64, searchTerm string, minPrice int, maxPrice int, occasion string, demographic string, category []string) ([]Gift, error) {
+func SearchGiftsDb(db *gorm.DB, id int64, searchTerm string, minPrice int, maxPrice int, occasion string, demographic string, category string) ([]Gift, error) {
 	var gifts []Gift
 
 	query := db.Joins("JOIN gift_collection_gifts ON gifts.id = gift_collection_gifts.gift_id").
@@ -199,8 +201,8 @@ func SearchGiftsDb(db *gorm.DB, id int64, searchTerm string, minPrice int, maxPr
 		query = query.Where("demographic = ?", demographic)
 	}
 
-	if len(category) > 0 {
-		query = query.Where("category && ?", pq.StringArray(category))
+	if category != "" {
+		query = query.Where("? = ANY(category)", category)
 	}
 	query = query.Preload("GiftCollections")
 
@@ -213,7 +215,7 @@ func SearchGiftsDb(db *gorm.DB, id int64, searchTerm string, minPrice int, maxPr
 
 func GetCompleteGiftRequestsFromDB(db *gorm.DB) ([]GiftRequest, error) {
 	var requests []GiftRequest
-	if err := db.Where("gift_response_id IS NOT NULL").Preload("GiftResponse").Preload("GiftResponse.GiftCollection").Find(&requests).Error; err != nil {
+	if err := db.Where("gift_response_id IS NOT NULL").Preload("GiftResponse").Preload("GiftResponse.GiftCollection").Preload("Giftee").Find(&requests).Error; err != nil {
 		return nil, err
 	}
 	return requests, nil
@@ -271,6 +273,14 @@ func GetAllCustomerCollectionsFromDB(db *gorm.DB, id int64) ([]GiftCollection, e
 	return collections, nil
 }
 
+func GetAllCustomerRequestsFromDB(db *gorm.DB, id int64) ([]GiftRequest, error) {
+	var requests []GiftRequest
+	if err := db.Preload("GiftResponse").Preload("GiftResponse.GiftCollection").Preload("GiftResponse.GiftCollection.Gifts").Where("customer_id = ?", id).Find(&requests).Error; err != nil {
+		return nil, err
+	}
+	return requests, nil
+}
+
 func AddGiftToCollectionFromDB(db *gorm.DB, inputGift Gift, id int64) (GiftCollection, error) {
 	var collection GiftCollection
 	if err := db.Where("id = ?", id).First(&collection).Error; err != nil {
@@ -294,7 +304,7 @@ func AddGiftToCustomerCollectionFromDB(db *gorm.DB, gift Gift, collectionName st
 
 	collection.Gifts = append(collection.Gifts, &gift)
 
-	if err:= db.Save(&collection).Error; err != nil {
+	if err := db.Save(&collection).Error; err != nil {
 		return GiftCollection{}, err
 	}
 
@@ -413,12 +423,13 @@ func DeleteGifteeFromDb(db *gorm.DB, id int64) error {
 
 	return nil
 }
+
 // Update Available Requests for Customers
 func UpdateCustomerAvailableRequestsFromDB(db *gorm.DB, customerID int64, availableRequests int64) (Customer, error) {
 	var customer Customer
 	if err := db.First(&customer, customerID).Error; err != nil {
-        return Customer{}, err
-    }
+		return Customer{}, err
+	}
 
 	updatedAvailableRequests := int64(customer.AvailableRequests) + availableRequests
 	if updatedAvailableRequests < 0 {
@@ -427,7 +438,7 @@ func UpdateCustomerAvailableRequestsFromDB(db *gorm.DB, customerID int64, availa
 
 	customer.AvailableRequests = uint(updatedAvailableRequests)
 
-	if err:= db.Save(&customer).Error; err!= nil {
+	if err := db.Save(&customer).Error; err != nil {
 		return Customer{}, err
 	}
 

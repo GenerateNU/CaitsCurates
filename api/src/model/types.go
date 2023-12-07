@@ -23,6 +23,7 @@ type GiftRequest struct {
 	gorm.Model
 	CustomerID         uint
 	GiftResponseID     *uint
+	GifteeID		   uint
 	RecipientName      string
 	RecipientAge       uint
 	Occasion           pq.StringArray `gorm:"type:text[]"`
@@ -75,6 +76,7 @@ type Giftee struct {
 	Age                   uint
 	Colors                pq.StringArray `gorm:"type:text[]"`
 	Interests             pq.StringArray `gorm:"type:text[]"`
+	GiftRequests    	  []*GiftRequest
 }
 
 type Admin struct {

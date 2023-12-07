@@ -1,4 +1,4 @@
-import CollectionSelector from "./CollectionSelector";
+import CollectionSelector from "./CollectionSelector.tsx";
 import axios from "axios";
 import React, {useState} from "react";
 

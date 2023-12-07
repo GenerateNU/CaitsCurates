@@ -1,7 +1,7 @@
-import Navbar from "../components/Navbar";
-import RequestCard from "../components/RequestCard";
+import Navbar from "../components/Admin/Navbar.tsx";
+import RequestCard from "../components/Admin/RequestCard.tsx";
 import {useEffect, useState} from "react";
-import Select, {ActionMeta} from "react-select";
+import Select from "react-select";
 import {GiftRequest} from "../types.tsx";
 import axios from "axios";
 

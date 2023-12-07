@@ -4,6 +4,7 @@ import (
 	"CaitsCurates/backend/src/controller"
 	"CaitsCurates/backend/src/model"
 	"fmt"
+	"github.com/stripe/stripe-go/v76"
 	"log"
 	"os"
 	"time"
@@ -16,6 +17,7 @@ import (
 )
 
 func main() {
+	stripe.Key = "sk_test_51O9y33LQbsCsABA6zhBXSCI821p8f6y9O4e4B9Pnavh5QwAgipJlUHY0iWPf3ZCfYjoxgzQYhkaW5n1PW6jwtfFu00CPOVBlrr"
 	dbURL, exists := os.LookupEnv("DATABASE_URL")
 	if !exists {
 		dbURL = "host=db user=user password=pwd dbname=CaitsDB port=5432 sslmode=disable"
@@ -95,16 +97,20 @@ func main() {
 		Price:           50.00,
 		Link:            "link.robot.com",
 		Description:     "Robot Toy With Laser Eyes",
-		Demographic:     "For Kids",
+		Demographic:     "For kids",
 		GiftCollections: nil,
+		Occasion: 		 "Birthday",
+		Category: 		 pq.StringArray{"Fun"},
 	}
 	toyGift2 := model.Gift{
 		Name:            "Angry Teddy Bear",
 		Price:           20.00,
 		Link:            "link.evilTeddy.com",
 		Description:     "A Teddy Bear Toy but Evil!",
-		Demographic:     "For Kids",
+		Demographic:     "For kids",
 		GiftCollections: nil,
+		Occasion: 		 "New baby",
+		Category: 		 pq.StringArray{"Cooking", "Warm and cozy"},
 	}
 	fallGift1 := model.Gift{
 		Name:            "Pumpkin Sweater",
@@ -128,7 +134,8 @@ func main() {
 		Price:           5.00,
 		Link:            "link.Burger.com",
 		Description:     "Great for grill masters looking to up their game",
-		Demographic:     "All",
+		Demographic:     "For dad",
+		Category: 		 pq.StringArray{"Home", "Cooking"},
 		GiftCollections: nil,
 	}
 	randomGift2 := model.Gift{
@@ -152,7 +159,7 @@ func main() {
 		Price:           70,
 		Link:            "link.Rug.com",
 		Description:     "This rug is perfect for those looking for a cozy but stylish addition to the home",
-		Demographic:     "All",
+		Demographic:     "For mom",
 		GiftCollections: nil,
 	}
 	decorativeGift3 := model.Gift{
@@ -185,9 +192,9 @@ func main() {
 		Gifts:          []*model.Gift{&decorativeGift3, &decorativeGift4, &decorativeGift2, &decorativeGift1},
 	}
 	giftCollectionFavorites := model.GiftCollection{
-		CustomerID: &customer1.UserID,
+		CustomerID:     &customer1.UserID,
 		CollectionName: "Favorites",
-		Gifts: []*model.Gift{},
+		Gifts:          []*model.Gift{},
 	}
 	err = db.Create(&giftCollectionToy).Error
 	err = db.Create(&giftCollectionFall).Error

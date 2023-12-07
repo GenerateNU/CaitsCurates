@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import {Gift} from "../types.tsx";
+import {Gift} from "../../types.tsx";
 
 
 const defaultGift: Gift = {
@@ -23,6 +23,23 @@ const GiftForm: React.FC<Props> = ({ initialGift = defaultGift, mode, onGiftChan
         }));
     };
 
+    // handles multiple selection input
+    const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const { name, options } = e.target;
+        const values = [];
+
+        for (let i = 0; i < options.length; i++) {
+            if (options[i].selected) {
+                values.push(options[i].value);
+            }
+        }
+
+        setGift(prevState => ({
+            ...prevState,
+            [name]: values,
+        }));
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
@@ -32,6 +49,7 @@ const GiftForm: React.FC<Props> = ({ initialGift = defaultGift, mode, onGiftChan
             }
             if (mode === 'add') {
                 await axios.post('/api/addGift', sentGift);
+                console.log("sentGift", sentGift);
             } else if (mode === 'edit' && gift.ID) {
                 await axios.put(`/api/gifts/${gift.ID}`, sentGift);
             }
@@ -82,16 +100,63 @@ const GiftForm: React.FC<Props> = ({ initialGift = defaultGift, mode, onGiftChan
             </div>
             <div className="mb-4">
                 <label htmlFor="occasion" className="block text-sm font-medium text-gray-700">
-                    Description:
+                    Occasion:
                 </label>
-                <input
-                    type="text"
+                <select
                     id="occasion"
                     name="Occasion"
                     value={gift.Occasion}
                     onChange={handleInputChange}
                     className="mt-1 p-2 w-full border-2 border-gray-300 rounded-md"
-                />
+                >
+                    <option value="Birthday">Birthday</option>
+                    <option value="Bridal">Bridal</option>
+                    <option value="Get well soon">Get well soon</option>
+                    <option value="New baby">New baby</option>
+                    <option value="Thinking of you">Thinking of you</option>
+                    <option value="Thank you">Thank you</option>
+                </select>
+            </div>
+            <div className="mb-4">
+                <label htmlFor="demographic" className="block text-sm font-medium text-gray-700">
+                    Demographic:
+                </label>
+                <select
+                    id="demographic"
+                    name="Demographic"
+                    value={"" || gift.Demographic}
+                    onChange={handleInputChange}
+                    className="mt-1 p-2 w-full border-2 border-gray-300 rounded-md"
+                >
+                    <option value="For mom">For mom</option>
+                    <option value="For dad">For dad</option>
+                    <option value="For kids">For kids</option>
+                    <option value="For partners">For partners</option>
+                    <option value="For men">For men</option>
+                    <option value="For women">For women</option>
+                </select>
+            </div>
+            <div className="mb-4">
+                <label htmlFor="category" className="block text-sm font-medium text-gray-700">
+                    Category:
+                </label>
+                <select
+                    id="category"
+                    name="Category"
+                    value={gift.Category}
+                    onChange={handleSelectChange}
+                    className="mt-1 p-2 w-full border-2 border-gray-300 rounded-md"
+                    multiple
+                >
+                    <option value="Best selling">Best selling</option>
+                    <option value="Fun">Fun</option>
+                    <option value="Gadgets">Gadgets</option>
+                    <option value="Home">Home</option>
+                    <option value="Jewelry">Jewelry</option>
+                    <option value="Kitchen & bar">Kitchen & bar</option>
+                    <option value="Warm and cozy">Warm and cozy</option>
+                    <option value="Outdoors">Outdoors</option>
+                </select>
             </div>
             <div className="mb-4">
                 <label htmlFor="price" className="block text-sm font-medium text-gray-700">
@@ -119,20 +184,7 @@ const GiftForm: React.FC<Props> = ({ initialGift = defaultGift, mode, onGiftChan
                     className="mt-1 p-2 w-full border-2 border-gray-300 rounded-md"
                 />
             </div>
-            <div className="mb-4">
-                <label htmlFor="demographic" className="block text-sm font-medium text-gray-700">
-                    Demographic:
-                </label>
-                <input
-                    type="text"
-                    id="demographic"
-                    name="Demographic"
-                    value={gift.Demographic}
-                    onChange={handleInputChange}
-                    className="mt-1 p-2 w-full border-2 border-gray-300 rounded-md"
-                />
-            </div>
-                <button type="submit">{mode === 'add' ? 'Add' : 'Save'}</button>
+            <button type="submit">{mode === 'add' ? 'Add' : 'Save'}</button>
         </form>
     );
 };

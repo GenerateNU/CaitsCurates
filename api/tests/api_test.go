@@ -104,6 +104,108 @@ func TestGetIncompleteGiftRequests(t *testing.T) {
 		requestsRetrieved[0].DateNeeded.In(time.UTC).Round(time.Millisecond))
 }
 
+func TestGetCustomerGiftRequests(t *testing.T) {
+	// Database setup
+	dsn := "user=testuser password=testpwd host=localhost port=5433 dbname=testdb sslmode=disable"
+	if dbURL, exists := os.LookupEnv("TEST_DATABASE_URL"); exists {
+		dsn = dbURL
+	}
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("Unable to connect to database: %v", err)
+	}
+	// Put auto migrations here
+	err = db.AutoMigrate(&model.GiftCollection{}, &model.Giftee{}, &model.User{}, &model.Customer{}, &model.GiftRequest{}, &model.GiftResponse{})
+	if err != nil {
+		panic("failed to migrate test database schema")
+	}
+	// Wrap the DB connection in a transaction
+	tx := db.Begin()
+	defer tx.Rollback()
+
+	// Create Model and Controller
+	m := &model.PgModel{Conn: tx}
+	c := &c.PgController{Model: m}
+	router := c.Serve()
+
+	// Test code
+	w := httptest.NewRecorder()
+
+	// Create GiftResponse
+	giftResponse := model.GiftResponse{CustomMessage: "This is a custom message", GiftCollection: model.GiftCollection{CollectionName: "Name"}}
+	err = tx.Create(&giftResponse).Error
+	assert.NoError(t, err)
+	// Create GiftRequest
+	user := model.User{}
+	err = tx.Create(&user).Error
+	assert.NoError(t, err)
+	var retrievedUser model.User
+	err = tx.First(&retrievedUser).Error
+	assert.NoError(t, err)
+	customer := model.Customer{
+		User: retrievedUser,
+	}
+	err = tx.Create(&customer).Error
+	assert.NoError(t, err)
+	testGiftee := model.Giftee{
+		CustomerID:           customer.ID,
+		GifteeName:           "Maya",
+		Gender:               "Female",
+		CustomerRelationship: "Sister",
+		Age:                  20,
+		Colors:               pq.StringArray{"Green", "Blue"},
+		Interests:            pq.StringArray{"Sports", "Soccer", "Nature", "Coffee", "Candy"},
+	}
+	err = tx.Create(&testGiftee).Error
+	assert.NoError(t, err)
+	var retrievedCustomer model.Customer
+	err = tx.First(&retrievedCustomer).Error
+	request := model.GiftRequest{
+		CustomerID:         retrievedCustomer.ID,
+		GiftResponse:       &giftResponse,
+		RecipientName:      "Friend",
+		RecipientAge:       25,
+		Occasion:           pq.StringArray{"Birthday", "Anniversary"},
+		RecipientInterests: pq.StringArray{"Reading", "Gaming"},
+		BudgetMax:          50,
+		BudgetMin:          15,
+		GifteeID:           testGiftee.ID,
+		DateNeeded:         time.Now(),
+	}
+	request2 := model.GiftRequest{
+		CustomerID:         retrievedCustomer.ID,
+		RecipientName:      "Timmy",
+		RecipientAge:       25,
+		Occasion:           pq.StringArray{"Birthday", "Anniversary"},
+		RecipientInterests: pq.StringArray{"Reading", "Gaming"},
+		BudgetMax:          50,
+		GifteeID:           testGiftee.ID,
+		BudgetMin:          15,
+		DateNeeded:         time.Now(),
+	}
+	// Create the GiftRequest and call the endpoint
+	err = tx.Create(&request).Error
+
+	assert.NoError(t, err)
+	err = tx.Create(&request2).Error
+	assert.NoError(t, err)
+
+	req1, err := http.NewRequest("GET", fmt.Sprintf("/requests/1"), nil)
+	router.ServeHTTP(w, req1)
+
+	assert.Equal(t, 200, w.Code)
+
+	var requestsRetrieved []model.GiftRequest
+	if e := json.Unmarshal(w.Body.Bytes(), &requestsRetrieved); e != nil {
+		t.Fatalf("Error unmarshaling JSON: %v", e)
+	}
+	fmt.Println(customer.ID)
+	fmt.Println(requestsRetrieved)
+	assert.Equal(t, len(requestsRetrieved), 2)
+	//assert.Equal(t, requestsRetrieved[0].GiftResponse, nil)
+	assert.Equal(t, requestsRetrieved[0].GiftResponse.GiftCollection.CollectionName, "Name")
+
+}
 func TestGetCompleteGiftRequests(t *testing.T) {
 	// Database setup
 	dsn := "user=testuser password=testpwd host=localhost port=5433 dbname=testdb sslmode=disable"
@@ -241,8 +343,8 @@ func TestAddRequest(t *testing.T) {
 	var retrievedCustomer model.Customer
 	err = tx.First(&retrievedCustomer).Error
 	request := model.GiftRequest{
-		CustomerID:    retrievedCustomer.ID,
-		RecipientName: "Friend",
+		CustomerID:         retrievedCustomer.ID,
+		RecipientName:      "Friend",
 		Occasion:           pq.StringArray{"Birthday", "Anniversary"},
 		RecipientInterests: pq.StringArray{"Reading", "Gaming"},
 	}
@@ -403,7 +505,6 @@ func TestAddCollection(t *testing.T) {
 	assert.Equal(t, retrievedCollection.CollectionName, addedCollection.CollectionName)
 	assert.Equal(t, retrievedCollection.Gifts[0].Name, addedCollection.Gifts[0].Name)
 }
-
 
 func TestGetGift(t *testing.T) {
 	// Database setup
@@ -1009,7 +1110,7 @@ func TestAddGiftToCollection(t *testing.T) {
 
 	// Add Gift to Gift Collection
 	gift := model.Gift{
-		Name: "Gift1",
+		Name:     "Gift1",
 		Category: pq.StringArray{"Best selling", "Gadgets"},
 	}
 	giftJSON, err := json.Marshal(gift)
@@ -1132,11 +1233,11 @@ func TestGetAllCustomerGiftCollection(t *testing.T) {
 		t.Fatalf("Unable to connect to database: %v", err)
 	}
 	// Put auto migrations here
-	err = db.AutoMigrate(&model.GiftCollection{})
+	err = db.AutoMigrate(&model.GiftCollection{}, &model.Giftee{}, &model.User{}, &model.Customer{}, &model.GiftRequest{}, &model.GiftResponse{})
 	if err != nil {
 		panic("failed to migrate test database schema")
 	}
-	// Wrap the DB connection in a transaction
+	// Wrap the DB connection in a transaction,
 	tx := db.Begin()
 	defer tx.Rollback()
 
@@ -1148,7 +1249,6 @@ func TestGetAllCustomerGiftCollection(t *testing.T) {
 	// Test code
 	w := httptest.NewRecorder()
 
-	
 	// Create a Customer
 	user := model.User{}
 	err = tx.Create(&user).Error
@@ -1253,7 +1353,6 @@ func TestUpdateCustomerAvailableRequests(t *testing.T) {
 	w1 := httptest.NewRecorder()
 	w2 := httptest.NewRecorder()
 
-
 	// Create a Customer
 	user := model.User{}
 	err = tx.Create(&user).Error
@@ -1262,7 +1361,7 @@ func TestUpdateCustomerAvailableRequests(t *testing.T) {
 	err = tx.First(&retrievedUser).Error
 	assert.NoError(t, err)
 	customer := model.Customer{
-		User: retrievedUser,
+		User:              retrievedUser,
 		AvailableRequests: uint(10),
 	}
 	err = tx.Create(&customer).Error
@@ -1345,9 +1444,9 @@ func TestAddGiftToCustomerGiftCollection(t *testing.T) {
 
 	// Create a collection
 	collection := model.GiftCollection{
-		CustomerID: &retrievedCustomer.ID,
+		CustomerID:     &retrievedCustomer.ID,
 		CollectionName: "test name",
-		Gifts: []*model.Gift{},
+		Gifts:          []*model.Gift{},
 	}
 	err = tx.Create(&collection).Error
 	assert.NoError(t, err)
@@ -1357,7 +1456,7 @@ func TestAddGiftToCustomerGiftCollection(t *testing.T) {
 
 	// Create a gift
 	gift := model.Gift{
-		Name: "test gift",
+		Name:  "test gift",
 		Price: 25,
 	}
 	giftJSON, err := json.Marshal(gift)
@@ -1467,9 +1566,9 @@ func TestSearchGift(t *testing.T) {
 
 	// Search for gift by price
 	req1, err := http.NewRequest("GET", fmt.Sprintf("/search/%d?minPrice=0&maxPrice=100", collection.ID), nil)
-    if err != nil {
-        t.Fatalf("Error creating request: %v", err)
-    }
+	if err != nil {
+		t.Fatalf("Error creating request: %v", err)
+	}
 	router.ServeHTTP(w1, req1)
 	assert.Equal(t, 200, w1.Code)
 
@@ -1481,9 +1580,9 @@ func TestSearchGift(t *testing.T) {
 	assert.GreaterOrEqual(t, len(retrievedPriceGifts), 3)
 
 	req2, err := http.NewRequest("GET", fmt.Sprintf("/search/%d?minPrice=60&maxPrice=100", collection.ID), nil)
-    if err != nil {
-        t.Fatalf("Error creating request: %v", err)
-    }
+	if err != nil {
+		t.Fatalf("Error creating request: %v", err)
+	}
 	router.ServeHTTP(w2, req2)
 	assert.Equal(t, 200, w2.Code)
 
@@ -1496,9 +1595,9 @@ func TestSearchGift(t *testing.T) {
 
 	// Search Gift By Demographic
 	req3, err := http.NewRequest("GET", fmt.Sprintf("/search/%d?demographic=demogrpahic1", collection.ID), nil)
-    if err != nil {
-        t.Fatalf("Error creating request: %v", err)
-    }
+	if err != nil {
+		t.Fatalf("Error creating request: %v", err)
+	}
 	router.ServeHTTP(w3, req3)
 	assert.Equal(t, 200, w3.Code)
 
@@ -1510,9 +1609,9 @@ func TestSearchGift(t *testing.T) {
 	assert.GreaterOrEqual(t, len(retrievedDemographicGifts), 2)
 
 	req4, err := http.NewRequest("GET", fmt.Sprintf("/search/%d?demographic=demogrpahic2", collection.ID), nil)
-    if err != nil {
-        t.Fatalf("Error creating request: %v", err)
-    }
+	if err != nil {
+		t.Fatalf("Error creating request: %v", err)
+	}
 	router.ServeHTTP(w4, req4)
 	assert.Equal(t, 200, w4.Code)
 
@@ -1525,9 +1624,9 @@ func TestSearchGift(t *testing.T) {
 
 	// Search Gift By Occasion
 	req5, err := http.NewRequest("GET", fmt.Sprintf("/search/%d?occasion=occasion1", collection.ID), nil)
-    if err != nil {
-        t.Fatalf("Error creating request: %v", err)
-    }
+	if err != nil {
+		t.Fatalf("Error creating request: %v", err)
+	}
 	router.ServeHTTP(w5, req5)
 	assert.Equal(t, 200, w5.Code)
 
@@ -1539,9 +1638,9 @@ func TestSearchGift(t *testing.T) {
 	assert.GreaterOrEqual(t, len(retrievedOccasionGifts), 2)
 
 	req6, err := http.NewRequest("GET", fmt.Sprintf("/search/%d?occasion=occasion2", collection.ID), nil)
-    if err != nil {
-        t.Fatalf("Error creating request: %v", err)
-    }
+	if err != nil {
+		t.Fatalf("Error creating request: %v", err)
+	}
 	router.ServeHTTP(w6, req6)
 	assert.Equal(t, 200, w6.Code)
 
@@ -1554,9 +1653,9 @@ func TestSearchGift(t *testing.T) {
 
 	// Search Gift By Category
 	req7, err := http.NewRequest("GET", fmt.Sprintf("/search/%d?category=category1", collection.ID), nil)
-    if err != nil {
-        t.Fatalf("Error creating request: %v", err)
-    }
+	if err != nil {
+		t.Fatalf("Error creating request: %v", err)
+	}
 	router.ServeHTTP(w7, req7)
 	assert.Equal(t, 200, w7.Code)
 
@@ -1568,9 +1667,9 @@ func TestSearchGift(t *testing.T) {
 	assert.GreaterOrEqual(t, len(retrievedCategoryGifts), 2)
 
 	req8, err := http.NewRequest("GET", fmt.Sprintf("/search/%d?category=category2", collection.ID), nil)
-    if err != nil {
-        t.Fatalf("Error creating request: %v", err)
-    }
+	if err != nil {
+		t.Fatalf("Error creating request: %v", err)
+	}
 	router.ServeHTTP(w8, req8)
 	assert.Equal(t, 200, w8.Code)
 
@@ -1583,9 +1682,9 @@ func TestSearchGift(t *testing.T) {
 
 	// Test Empty
 	req9, err := http.NewRequest("GET", fmt.Sprintf("/search/%d", collection.ID), nil)
-    if err != nil {
-        t.Fatalf("Error creating request: %v", err)
-    }
+	if err != nil {
+		t.Fatalf("Error creating request: %v", err)
+	}
 	router.ServeHTTP(w9, req9)
 	assert.Equal(t, 200, w9.Code)
 
@@ -1596,7 +1695,6 @@ func TestSearchGift(t *testing.T) {
 
 	assert.GreaterOrEqual(t, len(retrievedAllGifts), 3)
 }
-
 
 func TestDeleteGiftFromCustomerGiftCollection(t *testing.T) {
 	// Database setup
@@ -1643,11 +1741,11 @@ func TestDeleteGiftFromCustomerGiftCollection(t *testing.T) {
 
 	// Create gifts
 	giftToRemove := model.Gift{
-		Name: "gift to remove",
+		Name:  "gift to remove",
 		Price: 25,
 	}
 	giftToStay := model.Gift{
-		Name: "gift to stay",
+		Name:  "gift to stay",
 		Price: 25,
 	}
 	giftJSON, err := json.Marshal(giftToRemove)
@@ -1658,15 +1756,15 @@ func TestDeleteGiftFromCustomerGiftCollection(t *testing.T) {
 
 	// Create a collection
 	collection := model.GiftCollection{
-		CustomerID: &retrievedCustomer.ID,
+		CustomerID:     &retrievedCustomer.ID,
 		CollectionName: "test name",
-		Gifts: []*model.Gift{&giftToRemove, &giftToStay},
+		Gifts:          []*model.Gift{&giftToRemove, &giftToStay},
 	}
 
 	err = tx.Create(&collection).Error
 	assert.NoError(t, err)
 	var retrievedCollection model.GiftCollection
-	err = tx.Preload("Gifts").First(&retrievedCollection).Error;
+	err = tx.Preload("Gifts").First(&retrievedCollection).Error
 	assert.NoError(t, err)
 
 	req, err := http.NewRequest(
@@ -1689,7 +1787,6 @@ func TestDeleteGiftFromCustomerGiftCollection(t *testing.T) {
 	assert.Equal(t, giftToStay.Price, collectionResponse.Gifts[0].Price)
 }
 
-
 func TestGetGiftee(t *testing.T) {
 	// Database setup
 	dsn := "user=testuser password=testpwd host=localhost port=5433 dbname=testdb sslmode=disable"
@@ -1701,7 +1798,7 @@ func TestGetGiftee(t *testing.T) {
 		t.Fatalf("Unable to connect to database: %v", err)
 	}
 	// Put auto migrations here
-	err = db.AutoMigrate(&model.Giftee{})
+	err = db.AutoMigrate(&model.Giftee{}, &model.User{}, &model.Customer{})
 	if err != nil {
 		panic("failed to migrate test database schema")
 	}
@@ -1717,19 +1814,27 @@ func TestGetGiftee(t *testing.T) {
 	// Test code
 	w := httptest.NewRecorder()
 
+	// Create User
+	user := model.User{Email: "example@northeastern.edu", FirstName: "PersonFirstName", LastName: "PersonLastName", Password: "dgeeg32"}
+	err = tx.Create(&user).Error
+
+	// Create Customer
+	customer := model.Customer{User: user, UserID: user.ID}
+	err = tx.Create(&customer).Error
+	assert.NoError(t, err)
+
 	// Create Giftee
-	testGiftee := model.Giftee {
-		CustomerID:            1,
-		GifteeName:            "Maya",
-		Gender:                "Female",
-		CustomerRelationship:  "Sister",
-		Age:                   20,
-		Colors:                pq.StringArray{"Green", "Blue"},
-		Interests:             pq.StringArray{"Sports", "Soccer", "Nature", "Coffee", "Candy"},
+	testGiftee := model.Giftee{
+		CustomerID:           customer.ID,
+		GifteeName:           "Maya",
+		Gender:               "Female",
+		CustomerRelationship: "Sister",
+		Age:                  20,
+		Colors:               pq.StringArray{"Green", "Blue"},
+		Interests:            pq.StringArray{"Sports", "Soccer", "Nature", "Coffee", "Candy"},
 	}
 	err = tx.Create(&testGiftee).Error
 	assert.NoError(t, err)
-
 	// Get Giftee from database
 	req1, err := http.NewRequest("GET", fmt.Sprintf("/giftee/%d", testGiftee.ID), nil)
 	if err != nil {
@@ -1755,6 +1860,7 @@ func TestGetGiftee(t *testing.T) {
 	assert.Equal(t, retrievedGiftee.Age, fetchedGiftee.Age)
 	assert.Equal(t, retrievedGiftee.Colors, fetchedGiftee.Colors)
 	assert.Equal(t, retrievedGiftee.Interests, fetchedGiftee.Interests)
+	assert.Equal(t, retrievedGiftee.GiftRequests, fetchedGiftee.GiftRequests)
 	assert.Equal(t, retrievedGiftee.CreatedAt.In(time.UTC).Round(time.Millisecond),
 		fetchedGiftee.CreatedAt.In(time.UTC).Round(time.Millisecond))
 }
@@ -1770,7 +1876,7 @@ func TestAddGiftee(t *testing.T) {
 		t.Fatalf("Unable to connect to database: %v", err)
 	}
 	// Put auto migrations here
-	err = db.AutoMigrate(&model.Giftee{})
+	err = db.AutoMigrate(&model.Giftee{}, &model.User{}, &model.Customer{})
 	if err != nil {
 		panic("failed to migrate test database schema")
 	}
@@ -1786,15 +1892,24 @@ func TestAddGiftee(t *testing.T) {
 	// Test code
 	w := httptest.NewRecorder()
 
+	// Create User
+	user := model.User{Email: "example@northeastern.edu", FirstName: "PersonFirstName", LastName: "PersonLastName", Password: "dgeeg32"}
+	err = tx.Create(&user).Error
+
+	// Create Customer
+	customer := model.Customer{User: user, UserID: user.ID}
+	err = tx.Create(&customer).Error
+	assert.NoError(t, err)
+
 	// Create Giftee
-	testGiftee := model.Giftee {
-		CustomerID:            1,
-		GifteeName:            "Maya",
-		Gender:                "Female",
-		CustomerRelationship:  "Sister",
-		Age:                   20,
-		Colors:                pq.StringArray{"Green", "Blue"},
-		Interests:             pq.StringArray{"Sports", "Soccer", "Nature", "Coffee", "Candy"},
+	testGiftee := model.Giftee{
+		CustomerID:           customer.ID,
+		GifteeName:           "Maya",
+		Gender:               "Female",
+		CustomerRelationship: "Sister",
+		Age:                  20,
+		Colors:               pq.StringArray{"Green", "Blue"},
+		Interests:            pq.StringArray{"Sports", "Soccer", "Nature", "Coffee", "Candy"},
 	}
 
 	// Test Adding Giftee to Database
@@ -1848,7 +1963,7 @@ func TestUpdateGiftee(t *testing.T) {
 		t.Fatalf("Unable to connect to database: %v", err)
 	}
 	// Put auto migrations here
-	err = db.AutoMigrate(&model.Giftee{})
+	err = db.AutoMigrate(&model.Giftee{}, &model.User{}, &model.Customer{})
 	if err != nil {
 		panic("failed to migrate test database schema")
 	}
@@ -1864,15 +1979,24 @@ func TestUpdateGiftee(t *testing.T) {
 	// Test code
 	w := httptest.NewRecorder()
 
+	// Create User
+	user := model.User{Email: "example@northeastern.edu", FirstName: "PersonFirstName", LastName: "PersonLastName", Password: "dgeeg32"}
+	err = tx.Create(&user).Error
+
+	// Create Customer
+	customer := model.Customer{User: user, UserID: user.ID}
+	err = tx.Create(&customer).Error
+	assert.NoError(t, err)
+
 	// Create Giftee
-	testGiftee := model.Giftee {
-		CustomerID:            1,
-		GifteeName:            "Maya",
-		Gender:                "Female",
-		CustomerRelationship:  "Sister",
-		Age:                   20,
-		Colors:                pq.StringArray{"Green", "Blue"},
-		Interests:             pq.StringArray{"Sports", "Soccer", "Nature", "Coffee", "Candy"},
+	testGiftee := model.Giftee{
+		CustomerID:           customer.ID,
+		GifteeName:           "Maya",
+		Gender:               "Female",
+		CustomerRelationship: "Sister",
+		Age:                  20,
+		Colors:               pq.StringArray{"Green", "Blue"},
+		Interests:            pq.StringArray{"Sports", "Soccer", "Nature", "Coffee", "Candy"},
 	}
 	err = tx.Create(&testGiftee).Error
 	assert.NoError(t, err)
@@ -1889,18 +2013,18 @@ func TestUpdateGiftee(t *testing.T) {
 	assert.Equal(t, testGiftee.Age, fetchedGiftee.Age)
 	assert.Equal(t, testGiftee.Colors, fetchedGiftee.Colors)
 	assert.Equal(t, testGiftee.Interests, fetchedGiftee.Interests)
+	assert.Equal(t, testGiftee.GiftRequests, fetchedGiftee.GiftRequests)
 	assert.Equal(t, testGiftee.CreatedAt.In(time.UTC).Round(time.Millisecond),
 		fetchedGiftee.CreatedAt.In(time.UTC).Round(time.Millisecond))
 
 	// Updated Giftee Fields
-	updatedTestGiftee  := model.Giftee {
-		CustomerID:            1,
-		GifteeName:            "Maya Updated",
-		Gender:                "Female",
-		CustomerRelationship:  "Sister",
-		Age:                   25,
-		Colors:                pq.StringArray{"Green", "Blue", "Yellow", "Red"},
-		Interests:             pq.StringArray{"Sports", "Soccer", "Candy"},
+	updatedTestGiftee := model.Giftee{
+		GifteeName:           "Maya Updated",
+		Gender:               "Female",
+		CustomerRelationship: "Sister",
+		Age:                  25,
+		Colors:               pq.StringArray{"Green", "Blue", "Yellow", "Red"},
+		Interests:            pq.StringArray{"Sports", "Soccer", "Candy"},
 	}
 
 	// Test Updating Giftee Fields
@@ -1934,6 +2058,7 @@ func TestUpdateGiftee(t *testing.T) {
 	assert.Equal(t, fetchedUpdatedGiftee.Age, updatedGifteeRetrieved.Age)
 	assert.Equal(t, fetchedUpdatedGiftee.Colors, updatedGifteeRetrieved.Colors)
 	assert.Equal(t, fetchedUpdatedGiftee.Interests, updatedGifteeRetrieved.Interests)
+	assert.Equal(t, fetchedUpdatedGiftee.GiftRequests, updatedGifteeRetrieved.GiftRequests)
 	assert.Equal(t, fetchedUpdatedGiftee.CreatedAt.In(time.UTC).Round(time.Millisecond),
 		updatedGifteeRetrieved.CreatedAt.In(time.UTC).Round(time.Millisecond))
 }
@@ -1949,7 +2074,7 @@ func TestDeleteGiftee(t *testing.T) {
 		t.Fatalf("Unable to connect to database: %v", err)
 	}
 	// Put auto migrations here
-	err = db.AutoMigrate(&model.Giftee{})
+	err = db.AutoMigrate(&model.Giftee{}, &model.User{}, &model.Customer{})
 	if err != nil {
 		panic("failed to migrate test database schema")
 	}
@@ -1965,15 +2090,24 @@ func TestDeleteGiftee(t *testing.T) {
 	// Test code
 	w := httptest.NewRecorder()
 
+	// Create User
+	user := model.User{Email: "example@northeastern.edu", FirstName: "PersonFirstName", LastName: "PersonLastName", Password: "dgeeg32"}
+	err = tx.Create(&user).Error
+
+	// Create Customer
+	customer := model.Customer{User: user, UserID: user.ID}
+	err = tx.Create(&customer).Error
+	assert.NoError(t, err)
+
 	// Create Giftee
-	testGiftee := model.Giftee {
-		CustomerID:            1,
-		GifteeName:            "Maya",
-		Gender:                "Female",
-		CustomerRelationship:  "Sister",
-		Age:                   20,
-		Colors:                pq.StringArray{"Green", "Blue"},
-		Interests:             pq.StringArray{"Sports", "Soccer", "Nature", "Coffee", "Candy"},
+	testGiftee := model.Giftee{
+		CustomerID:           customer.ID,
+		GifteeName:           "Maya",
+		Gender:               "Female",
+		CustomerRelationship: "Sister",
+		Age:                  20,
+		Colors:               pq.StringArray{"Green", "Blue"},
+		Interests:            pq.StringArray{"Sports", "Soccer", "Nature", "Coffee", "Candy"},
 	}
 	err = tx.Create(&testGiftee).Error
 	assert.NoError(t, err)
@@ -1990,6 +2124,7 @@ func TestDeleteGiftee(t *testing.T) {
 	assert.Equal(t, testGiftee.Age, fetchedGiftee.Age)
 	assert.Equal(t, testGiftee.Colors, fetchedGiftee.Colors)
 	assert.Equal(t, testGiftee.Interests, fetchedGiftee.Interests)
+	assert.Equal(t, testGiftee.GiftRequests, fetchedGiftee.GiftRequests)
 	assert.Equal(t, testGiftee.CreatedAt.In(time.UTC).Round(time.Millisecond),
 		fetchedGiftee.CreatedAt.In(time.UTC).Round(time.Millisecond))
 

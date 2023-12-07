@@ -1,8 +1,9 @@
-import { FormData } from "../components/LoginForm";
+import { FormData } from "../components/Login/LoginForm.tsx";
+import { ValidationAlertProps } from "../components/Login/ValidationAlert.tsx"
 
 export const loginFormData: FormData = {
     title: "Log In",
-    subText: "Log in to continue your gift giving journey",
+    subText: "Log in to continue your gift giving journey!",
     inputs: [
         {
             className: "mt-10",
@@ -43,7 +44,8 @@ export const signUpFormData: FormData = {
         {
             className: "mt-4",
             label: "Password",
-            type: "password" 
+            type: "password" ,
+            includeValidation: true
         }
     ],
     additionalText: "Already have an account? ",
@@ -51,3 +53,23 @@ export const signUpFormData: FormData = {
     link: "/login",
     buttonText: "Sign Up"
 };
+
+export const passwordValidation: Omit<ValidationAlertProps, "fieldText">[] = [
+    {
+        validationText: "Contains uppercase letters",
+        validationRule: new RegExp("[A-Z]")
+    },
+    {
+        validationText: "Contains lowercase letters",
+        validationRule: new RegExp("[a-z]")
+    },
+    {
+        validationText: "Contains 8 characters",
+        validationRule: new RegExp(".{8,}")
+    },
+    {
+        validationText: "Contains a number or symbol",
+        validationRule: new RegExp("\\d|\\W")
+    }
+
+];

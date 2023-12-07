@@ -1,4 +1,4 @@
-import { Gift } from "../types";
+import { Gift } from "../../types.tsx";
 
 type GiftItemProps = {
   gift: Gift;
@@ -9,7 +9,7 @@ type GiftItemProps = {
 function UpdatedGiftItem({ gift, isSaved, onFavoriteClick }: GiftItemProps) {
   return (
     <div className="relative flex flex-col flex-start mb-4">
-      <div className=" bg-[#F4E6DC] w-80 h-80 mx-auto mb-2 relative">
+      <div className="bg-beige w-80 h-80 mx-auto mb-2 relative">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill={isSaved ? "red" : "none"}
