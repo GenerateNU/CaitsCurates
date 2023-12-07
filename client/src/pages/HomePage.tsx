@@ -159,7 +159,7 @@ const HomePage = () => {
     <div className="bg-eggshell h-full text-white flex flex-col">
       <NavBar />
       <SearchBar updateHomePage={handleSearchChange} />
-      <img src={homeGiftsImage}/>
+      <img src={homeGiftsImage}  height="50"/>
       <div className="flex flex-col px-[3vw] xl:px-[13vw] mt-20">
         <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-6">
           {collections.map((collection, index) => (

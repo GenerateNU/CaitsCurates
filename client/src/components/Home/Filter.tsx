@@ -79,9 +79,9 @@ const Filter: React.FC<FilterProps> = ({
           {/* Dark overlay */}
           <div className="fixed top-0 left-0 w-full h-full bg-black opacity-50 z-10"></div>
           {/* Filter modal */}
-          <div className="absolute top-0 right-0 w-1/4 bg-white p-8 shadow-lg z-20 text-black overflow-y-auto max-h-screen">
+          <div className="absolute top-0 right-0 w-1/4 bg-eggshell p-8 shadow-lg z-20 text-black overflow-y-auto max-h-screen">
             <div className="flex justify-between">
-              <h2 className="mb-4 text-lg font-bold">Filter</h2>
+              <h2 className="mb-4 text-xl coffee font-bold font-seasons">Filter</h2>
               <div className="cursor-pointer" onClick={filterToggle}>
                 x
               </div>
@@ -104,9 +104,6 @@ const Filter: React.FC<FilterProps> = ({
               updateFilters={updateCategory}
             />
             <PriceSection title="By Price" updateFilters={updatePrices} />
-            <button className="bg-gray-400 mt-6 px-4 py-2 h-10 text-white rounded-md float-right">
-              Apply filters
-            </button>
           </div>
         </>
       )}
