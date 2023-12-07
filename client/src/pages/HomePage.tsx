@@ -6,8 +6,6 @@ import UpdatedGiftItem from "../components/Home/UpdatedGiftItem.tsx";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Gift, GiftCollection, Filters } from "../types.tsx";
-import homeGiftsImage from "../images/home_gifts_image.svg";
-import Footer from "../components/Home/Footer.tsx";
 
 const HomePage = () => {
   const exampleGifts = [
@@ -156,45 +154,60 @@ const HomePage = () => {
   };
 
   return (
-    <div className="bg-eggshell h-full text-white flex flex-col">
-      <NavBar />
-      <SearchBar updateHomePage={handleSearchChange} />
-      <img src={homeGiftsImage}/>
-      <div className="flex flex-col px-[3vw] xl:px-[13vw] mt-20">
-        <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-6">
-          {collections.map((collection, index) => (
-              <div
-                  key={index}
-                  className={"cursor-pointer"}
-                  onClick={() => setDisplayCollection(collection)}
-              >
-                <CollectionItem
-                    key={index}
-                    name={collection.CollectionName}
-                    collectionIndex={index}
-                    selected={collection === displayCollection}
-                />
-              </div>
-          ))}
+      <div className="bg-gray-100 h-full text-white flex flex-col">
+        <div className="ml-0">
+          <NavBar />
+          <SearchBar updateHomePage={handleSearchChange} />
         </div>
-        <GiftSortNavBar
+        <div className="w-full bg-gray-300 text-center py-9">
+          <h1 className="text-2xl text-black font-seasons">Essential Gifts</h1>
+          <h1 className="text-sm text-black font-proxima">Handpicked by Cait</h1>
+        </div>
+        <div className="flex flex-col items-center my-8">
+          <div className="overflow-x-auto w-full">
+            <div className="flex space-x-4">
+              {collections.map((collection, index) => (
+                  <div
+                      key={index}
+                      className={`cursor-pointer ${
+                          collection === displayCollection ? "font-bold" : ""
+                      }`}
+                      onClick={() => setDisplayCollection(collection)}
+                  >
+                    <CollectionItem
+                        key={index}
+                        name={collection.CollectionName}
+                        gifts={collection.Gifts}
+                    />
+                  </div>
+              ))}
+            </div>
+          </div>
+          <div className=" w-1000">
+          <GiftSortNavBar
           currentFilters={currentFilters}
-          setCurrentFilters={setCurrentFilters}
-          className="mt-20"
+             setCurrentFilters={setCurrentFilters}
         />
-        <div className="min-h-[19rem] grid grid-cols-1 gap-y-5 justify-items-center mb-40 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {gifts.map((gift, index) => {
-            const isSaved = gift.GiftCollections.some((collection: GiftCollection) => collection.CollectionName === "Favorites" && collection.CustomerID === customerID)
-
-              return (
-                <UpdatedGiftItem key={index} gift={gift} isSaved={isSaved} onFavoriteClick={handleFavoriteClick}/>
-              )}
-          )}
-        </div>
       </div>
-      <Footer />
+
+  <div
+      className="overflow-y-auto"
+      style={{ maxHeight: "290px", maxWidth: "1000px" }}
+  >
+    <div className="flex flex-wrap justify-between gap-4">
+      {gifts.map((gift, index) => {
+        const isSaved = gift.GiftCollections.some((collection: GiftCollection) => collection.CollectionName === "Favorites" && collection.CustomerID === customerID)
+
+          return (
+            <div key={index}>
+            <UpdatedGiftItem gift={gift}  isSaved={isSaved} onFavoriteClick={handleFavoriteClick}/>
+          </div>
+      )})}
     </div>
-  );
+  </div>
+</div>
+</div>
+);
 };
 export default HomePage;
 

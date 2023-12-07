@@ -19,13 +19,12 @@ export default {
         'coffee': '#32211e',
         'pink': '#dfb2aa',
         'dkpink': '#D08484',
-        'rose': '#A65A5A',
         'petalpink': '#F9DCD7',
         'red': '#bc2c35',
         'green': '#64765b',
         'dkgreen': '#273f2a',
         'evergreen': '#305749'
-      }
+      },
     },
   },
   plugins: [],
