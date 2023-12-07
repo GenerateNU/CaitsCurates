@@ -1,16 +1,21 @@
 import { useState } from "react";
 import {Filters} from "../../types.tsx";
 import Filter from "../Home/Filter.tsx";
+import filterIcon from "../../images/filter.svg";
+import sortIcon from "../../images/sort.svg";
+import downIcon from "../../images/chevron_down.svg";
 
 
 type GiftSortNavBarProps = {
   currentFilters: Filters;
   setCurrentFilters: React.Dispatch<React.SetStateAction<Filters>>;
+  className?: string;
 };
 
 const GiftSortNavbar: React.FC<GiftSortNavBarProps> = ({
   currentFilters,
   setCurrentFilters,
+  className
 }) => {
   const [activeButton, setActiveButton] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -35,16 +40,17 @@ const GiftSortNavbar: React.FC<GiftSortNavBarProps> = ({
   };
 
   const buttonStyle =
-    "px-4 py-2 text-black text-xs rounded-md bg-gray-100 border-gray-400";
-  const activeButtonStyle = "bg-gray-400";
+    "px-4 py-1 text-red font-proxima";
+  const activeButtonStyle = "bg-beige";
 
   return (
-    <div className="bg-gray-100 p-2">
+    <div className={`bg-eggshell py-4 ${className}`}>
       <div className="flex" style={{ maxWidth: "1440px" }}>
-        <div className="flex space-x-2 " style={{ marginRight: "680px" }}>
+        <div className="flex space-x-2 items-center">
+          <img src={filterIcon} className="h-6 w-6" onClick={handleFilterToggle} />
           <button
-            className={`${buttonStyle} ${
-              activeButton === "Shop" ? activeButtonStyle : ""
+            className={`${buttonStyle} text-sm font-bold ${
+              activeButton === "Shop" ? activeButtonStyle : "bg-eggshell"
             }`}
             onClick={() => handleButtonClick("Shop")}
           >
@@ -53,32 +59,20 @@ const GiftSortNavbar: React.FC<GiftSortNavBarProps> = ({
         </div>
 
         <div className="ml-auto flex items-center">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth="1.5"
-            stroke="black"
-            className="w-4 h-4"
-            onClick={handleFilterToggle}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z"
-            />
-          </svg>
+          <img src={sortIcon} className="h-6 w-6" />
           <div className="relative">
             <button
-              className={`${buttonStyle} ${
+              className={`${buttonStyle} text-2xl ${
                 activeButton === "SignUp" ? activeButtonStyle : ""
               }`}
               onClick={handleDropdownToggle}
             >
-              Sort By: {selectedFeature}
+              <span className="text-coffee text-2xl font-proxima"> Sort by: </span>
+              {selectedFeature}
+              <img src={downIcon} className="w-6 h-6 inline ml-6" />
             </button>
             {dropdownOpen && (
-              <div className="absolute mt-2 right-0 border border-gray-300 rounded-md bg-gray-100 text-black text-sm shadow-lg z-10">
+              <div className="absolute mt-2 right-0 border border-gray-300 rounded-md bg-gray-100 text-red text-sm shadow-lg z-10">
                 <ul>
                   <li
                     onClick={() => handleFeatureSelect("Featured")}
