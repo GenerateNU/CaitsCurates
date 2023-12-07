@@ -1,33 +1,40 @@
 import React, { useState } from "react";
 import ResponseCard from "./ResponseCard.tsx";
 import ResponseForm from "./ResponseForm.tsx";
-import { GiftRequest } from "../../types.tsx";
+import {Giftee, GiftRequest} from "../../types.tsx";
 
 const RequestCard: React.FC<GiftRequest> = ({
                                                 ID,
-                                                RecipientName,
-                                                RecipientAge,
-                                                RecipientInterests,
                                                 BudgetMin,
                                                 BudgetMax,
                                                 GiftResponse,
                                                 DateNeeded,
-                                            }: GiftRequest) => {
+                                                Comment
+                                            }: GiftRequest, { GifteeName,
+                                                Gender,
+                                                CustomerRelationship,
+                                                Age,
+                                                Colors,
+                                                Interests,} : Giftee) => {
     const [showForm, setShowForm] = useState(false);
     return (
         <div className="flex flex-col w-full">
             <h2 className="font-bold text-lg">
-                {RecipientName} ({new Date(DateNeeded).toLocaleDateString()})
+                {GifteeName} ({new Date(DateNeeded).toLocaleDateString()})
             </h2>
-            <div key={RecipientName} className="px-4 py-2 bg-slate-100">
-                <p>Recipient: {RecipientName}</p>
+            <div key={GifteeName} className="px-4 py-2 bg-slate-100">
+                <p>Recipient: {GifteeName}</p>
                 {!GiftResponse && (
                     <div>
-                        <p>Recipient age: {RecipientAge}</p>
-                        <p>Recipient interests: {RecipientInterests.join(", ")}</p>
+                        <p>Recipient age: {Age}</p>
+                        <p>Recipient interests: {Interests.join(", ")}</p>
+                        <p>Recipient colors: {Colors.join(", ")}</p>
+                        <p>Recipient relationship: {CustomerRelationship}</p>
+                        <p>Recipient gender: {Gender}</p>
                         <p>
                             Budget: ${BudgetMin} - ${BudgetMax}
                         </p>
+                        <p> Comment: {Comment}</p>
                         <p>Needed by: ({new Date(DateNeeded).toLocaleDateString()})</p>
                     </div>
                 )}

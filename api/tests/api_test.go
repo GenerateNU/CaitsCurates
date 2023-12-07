@@ -161,27 +161,21 @@ func TestGetCustomerGiftRequests(t *testing.T) {
 	var retrievedCustomer model.Customer
 	err = tx.First(&retrievedCustomer).Error
 	request := model.GiftRequest{
-		CustomerID:         retrievedCustomer.ID,
-		GiftResponse:       &giftResponse,
-		RecipientName:      "Friend",
-		RecipientAge:       25,
-		Occasion:           pq.StringArray{"Birthday", "Anniversary"},
-		RecipientInterests: pq.StringArray{"Reading", "Gaming"},
-		BudgetMax:          50,
-		BudgetMin:          15,
-		GifteeID:           testGiftee.ID,
-		DateNeeded:         time.Now(),
+		CustomerID:   retrievedCustomer.ID,
+		GiftResponse: &giftResponse,
+		Occasion:     pq.StringArray{"Birthday", "Anniversary"},
+		BudgetMax:    50,
+		BudgetMin:    15,
+		GifteeID:     testGiftee.ID,
+		DateNeeded:   time.Now(),
 	}
 	request2 := model.GiftRequest{
-		CustomerID:         retrievedCustomer.ID,
-		RecipientName:      "Timmy",
-		RecipientAge:       25,
-		Occasion:           pq.StringArray{"Birthday", "Anniversary"},
-		RecipientInterests: pq.StringArray{"Reading", "Gaming"},
-		BudgetMax:          50,
-		GifteeID:           testGiftee.ID,
-		BudgetMin:          15,
-		DateNeeded:         time.Now(),
+		CustomerID: retrievedCustomer.ID,
+		Occasion:   pq.StringArray{"Birthday", "Anniversary"},
+		BudgetMax:  50,
+		GifteeID:   testGiftee.ID,
+		BudgetMin:  15,
+		DateNeeded: time.Now(),
 	}
 	// Create the GiftRequest and call the endpoint
 	err = tx.Create(&request).Error

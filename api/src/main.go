@@ -38,59 +38,44 @@ func main() {
 		os.Exit(1)
 	}
 	// Auto migrate tables
-	err = db.AutoMigrate(model.User{}, model.Customer{}, model.GiftRequest{}, model.GiftCollection{}, model.GiftResponse{}, model.Admin{})
+	err = db.AutoMigrate(model.User{}, model.Customer{}, model.GiftRequest{}, model.GiftCollection{}, model.GiftResponse{}, model.Admin{}, model.Giftee{})
 
 	// Create GiftRequest
-	giftRequestTimmy := model.GiftRequest{
-		RecipientName:      "Timmy White",
-		RecipientAge:       15,
-		Occasion:           pq.StringArray{"Birthday"},
-		RecipientInterests: pq.StringArray{"Toys", "Halloween"},
-		BudgetMax:          60,
-		BudgetMin:          20,
-		DateNeeded:         time.Date(2023, time.November, 10, 0, 0, 0, 0, time.UTC),
+	gifteeTimmy := model.Giftee{
+		Model:                gorm.Model{},
+		GifteeName:           "Timmy",
+		CustomerID:           1,
+		Gender:               "Male",
+		CustomerRelationship: "Son",
+		Age:                  17,
+		Colors:               pq.StringArray{"Red", "Blue"},
+		Interests:            pq.StringArray{"Toys", "Monkey"},
 	}
-	giftRequestJoanne := model.GiftRequest{
-		RecipientName:      "Joanne Burgenson",
-		RecipientAge:       27,
-		Occasion:           pq.StringArray{"Housewarming Gift"},
-		RecipientInterests: pq.StringArray{"Decor", "Fall"},
-		BudgetMax:          120,
-		BudgetMin:          40,
-		DateNeeded:         time.Date(2023, time.November, 16, 0, 0, 0, 0, time.UTC),
-	}
-	giftRequestDaniel := model.GiftRequest{
-		RecipientName:      "Daniel Danielson",
-		RecipientAge:       60,
-		Occasion:           pq.StringArray{"Anniversary"},
-		RecipientInterests: pq.StringArray{"Animals", "Golf"},
-		BudgetMax:          180,
-		BudgetMin:          60,
-		DateNeeded:         time.Date(2023, time.December, 16, 0, 0, 0, 0, time.UTC),
-	}
-	giftRequestChrista := model.GiftRequest{
-		RecipientName:      "Christa Blue",
-		RecipientAge:       22,
-		Occasion:           pq.StringArray{"Graduating College"},
-		RecipientInterests: pq.StringArray{"Robots", "Jewelery", "Surfing"},
-		BudgetMax:          500,
-		BudgetMin:          200,
-		DateNeeded:         time.Date(2023, time.November, 1, 0, 0, 0, 0, time.UTC),
-	}
-	a := model.User{Email: "tommy@northeastern.edu", FirstName: "Tommy", LastName: "White", Password: "xxxxx"}
-	b := model.User{Email: "david@northeastern.edu", FirstName: "David", LastName: "Davidson", Password: "xxxxx"}
-	e := model.User{Email: "jordan@northeastern.edu", FirstName: "Jordan", LastName: "Daniels", Password: "xxxxx"}
-	d := model.User{Email: "lisa@northeastern.edu", FirstName: "Lisa", LastName: "Blue", Password: "xxxxx"}
 
-	customer1 := model.Customer{GiftRequests: []*model.GiftRequest{&giftRequestTimmy}, User: a}
-	customer2 := model.Customer{GiftRequests: []*model.GiftRequest{&giftRequestJoanne}, User: b}
-	customer3 := model.Customer{GiftRequests: []*model.GiftRequest{&giftRequestDaniel}, User: e}
-	customer4 := model.Customer{GiftRequests: []*model.GiftRequest{&giftRequestChrista}, User: d}
+	a := model.User{Email: "tommy@northeastern.edu", FirstName: "Tommy", LastName: "White", Password: "xxxxx"}
+	customer1 := model.Customer{User: a}
 
 	err = db.Create(&customer1).Error
-	err = db.Create(&customer2).Error
-	err = db.Create(&customer3).Error
-	err = db.Create(&customer4).Error
+	if err != nil {
+		panic(err)
+	}
+	err = db.Create(&gifteeTimmy).Error
+	if err != nil {
+		panic(err)
+	}
+	giftRequestTimmy := model.GiftRequest{
+		Occasion:   pq.StringArray{"Birthday"},
+		GifteeID:   gifteeTimmy.ID,
+		CustomerID: customer1.ID,
+		BudgetMax:  60,
+		BudgetMin:  20,
+		DateNeeded: time.Date(2023, time.December, 20, 0, 0, 0, 0, time.UTC),
+	}
+
+	err = db.Create(&giftRequestTimmy).Error
+	if err != nil {
+		panic(err)
+	}
 
 	toyGift1 := model.Gift{
 		Name:            "Robot Extreme",
@@ -99,8 +84,8 @@ func main() {
 		Description:     "Robot Toy With Laser Eyes",
 		Demographic:     "For kids",
 		GiftCollections: nil,
-		Occasion: 		 "Birthday",
-		Category: 		 pq.StringArray{"Fun"},
+		Occasion:        "Birthday",
+		Category:        pq.StringArray{"Fun"},
 	}
 	toyGift2 := model.Gift{
 		Name:            "Angry Teddy Bear",
@@ -109,8 +94,8 @@ func main() {
 		Description:     "A Teddy Bear Toy but Evil!",
 		Demographic:     "For kids",
 		GiftCollections: nil,
-		Occasion: 		 "New baby",
-		Category: 		 pq.StringArray{"Cooking", "Warm and cozy"},
+		Occasion:        "New baby",
+		Category:        pq.StringArray{"Cooking", "Warm and cozy"},
 	}
 	fallGift1 := model.Gift{
 		Name:            "Pumpkin Sweater",
@@ -135,7 +120,7 @@ func main() {
 		Link:            "link.Burger.com",
 		Description:     "Great for grill masters looking to up their game",
 		Demographic:     "For dad",
-		Category: 		 pq.StringArray{"Home", "Cooking"},
+		Category:        pq.StringArray{"Home", "Cooking"},
 		GiftCollections: nil,
 	}
 	randomGift2 := model.Gift{
