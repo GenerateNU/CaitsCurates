@@ -67,7 +67,7 @@ const GiftSortNavbar: React.FC<GiftSortNavBarProps> = ({
               }`}
               onClick={handleDropdownToggle}
             >
-              <span className="text-coffee text-2xl font-proxima"> Sort by: </span>
+              <span className="text-espresso text-2xl font-proxima"> Sort by: </span>
               {selectedFeature}
               <img src={downIcon} className="w-6 h-6 inline ml-6" />
             </button>

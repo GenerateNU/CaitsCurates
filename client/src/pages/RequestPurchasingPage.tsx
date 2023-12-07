@@ -5,7 +5,7 @@ import PurchaseThreeCredits from "../components/PurchaseThreeCredits";
 import PurchaseFiveCredits from "../components/PurchaseFiveCredits";
 import AccountSideBar from "../components/AccountSideBar";
 
-const RequestsPurchasingPage = () => {
+const RequestsPurchasing = () => {
   const [activeButton, setActiveButton] = useState("");
 
   const handleButtonClick = (buttonName: any) => {
@@ -17,11 +17,6 @@ const RequestsPurchasingPage = () => {
 
   return (
     <div className="flex flex-col h-screen bg-FFF9F4">
-      <Navbar />
-
-      <div className="flex flex-row h-screen">
-        <AccountSideBar />
-
         <div className="flex flex-col items-center flex-grow text-4xl" style={{ fontFamily: 'The Seasons', marginLeft:"20px" }}>
           <div>
             <div style={{ textAlign: 'left' }}>
@@ -59,8 +54,7 @@ const RequestsPurchasingPage = () => {
           </div>
         </div>
       </div>
-    </div>
   );
 };
 
-export default RequestsPurchasingPage;
+export default RequestsPurchasing;

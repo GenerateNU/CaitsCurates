@@ -7,10 +7,9 @@ import { AdminProvider } from "./Context/AdminContext.tsx";
 import GiftManagementPage from "./pages/GiftManagementPage.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
 import SignUpPage from "./pages/SignUpPage.tsx";
-import RequestsPurchasingPage from "./pages/RequestPurchasingPage.tsx";
 import RequestPurchaseSuccess from "./pages/RequestPurchaseSuccess.tsx";
 import ReturnHomePage from "./pages/ReturnHomePage.tsx";
-import GiftRequestsPage from "./pages/GiftRequestsPage.tsx";
+import ProfilePage from "./pages/ProfilePage.tsx";
 
 function App() {
   return (
@@ -51,13 +50,9 @@ function App() {
         />
         <Route path="/home/" element={<ReturnHomePage />} />
         <Route path="/signup/" element={<SignUpPage />} />
-        <Route
-          path="/purchase-requests/"
-          element={<RequestsPurchasingPage />}
-        />
         <Route path="/login/" element={<LoginPage />} />
         <Route path="/success/" element={<RequestPurchaseSuccess />} />
-        <Route path="/profile/requests/" element={<GiftRequestsPage />} />
+        <Route path="/profile/" element={<ProfilePage />} />
       </Routes>
     </Router>
   );

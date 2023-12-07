@@ -12,7 +12,7 @@ function CollectionItem({ name, collectionIndex, selected }: CollectionItemProps
   return (
     <div className="flex flex-col items-center">
       <img src={icon} className="h-40 w-40" />
-      <div className={`text-2xl font-seasons font-bold mt-3 ${selected ? "text-red" : "text-coffee"}`}>{name}</div>
+      <div className={`text-2xl font-seasons font-bold mt-3 ${selected ? "text-red" : "text-espresso"}`}>{name}</div>
     </div>
   );
 }

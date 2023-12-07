@@ -1,13 +1,13 @@
-import { useState } from 'react';
+import {  useState} from 'react';
+type AccountSideBarProps = {
+    activeComponent: string;
+    setActiveComponent: React.Dispatch<React.SetStateAction<string>>;
+};
 
-const AccountSideBar = () => {
+const AccountSideBar: React.FC<AccountSideBarProps> = ({ activeComponent, setActiveComponent }) => {
   const [isGiftingOpen, setIsGiftingOpen] = useState(false);
   const [isBudgetOpen, setIsBudgetOpen] = useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-  const [isPurchaseGiftsClicked, setIsPurchaseGiftsClicked] = useState(false);
-  const [isGifteesClicked, setIsGifteesClicked] = useState(false);
-  const [isGiftRequestHistoryClicked, setIsGiftRequestHistoryClicked] = useState(false);
-
   const toggleGifting = () => {
     setIsGiftingOpen(!isGiftingOpen);
   };
@@ -20,22 +20,8 @@ const AccountSideBar = () => {
     setIsCalendarOpen(!isCalendarOpen);
   };
 
-  const purchaseGifts = () => {
-    setIsPurchaseGiftsClicked(!isPurchaseGiftsClicked);
-};
-
-
-  const giftRequestHistory = () => {
-    setIsGiftRequestHistoryClicked(!isGiftRequestHistoryClicked);;
-  };
-
-  const viewGiftees = () => {
-    setIsGifteesClicked(!isGifteesClicked);;
-  };
-
-
   return (
-    <div className="flex flex-col bg-FBF2EB" style={{ width: '366px'}}>
+    <div className="flex flex-col bg-FBF2EB" style={{ width: '366px', height: "100vh"}}>
       <div style={{ fontFamily: 'The Seasons', fontSize: '36px', marginLeft: '40px', marginTop: "50px" }}>
         Account
         <div className="flex flex-row items-center" style={{ fontFamily: 'The Seasons', fontSize: '24px', marginTop: '50px' }}>
@@ -74,36 +60,36 @@ const AccountSideBar = () => {
             <div style={{marginTop: "10px"}}>
             <button
                 style={{
-                    background: isPurchaseGiftsClicked ? '#DFB2AA' : 'none',
+                    background: activeComponent == "purchaseGifts" ? '#DFB2AA' : 'none',
                     width: "265px",
-                    borderLeft: isPurchaseGiftsClicked ? '6px solid #A65A5A' : 'none',
-                    fontWeight: isPurchaseGiftsClicked ? 'bold' : 'normal',
+                    borderLeft: activeComponent == "purchaseGifts" ? '6px solid #A65A5A' : 'none',
+                    fontWeight: activeComponent == "purchaseGifts" ? 'bold' : 'normal',
                  }}
-                onClick={purchaseGifts} >
+                onClick={() => setActiveComponent("purchaseGifts")} >
                 Purchase Gift Requests
           </button>
                 </div>
             <div style={{marginTop: "10px"}}><button
                 style={{
-                    background: isGiftRequestHistoryClicked ? '#DFB2AA' : 'none',
+                    background: activeComponent == "requestHistory" ? '#DFB2AA' : 'none',
                     width: "265px",
-                    borderLeft: isGiftRequestHistoryClicked ? '6px solid #A65A5A' : 'none',
-                    fontWeight: isGiftRequestHistoryClicked ? 'bold' : 'normal',
+                    borderLeft: activeComponent == "requestHistory" ? '6px solid #A65A5A' : 'none',
+                    fontWeight: activeComponent == "requestHistory" ? 'bold' : 'normal',
                     paddingRight: '20px',
                  }}
-                onClick={giftRequestHistory} >
+                onClick={() => setActiveComponent("requestHistory")} >
                 Gift Request History
           </button></div>
             <div style={{marginTop: "10px"}}>
             <button
                 style={{
-                    background: isGifteesClicked ? '#DFB2AA' : 'none',
+                    background: activeComponent == "giftees" ? '#DFB2AA' : 'none',
                     width: "265px",
-                    borderLeft: isGifteesClicked ? '6px solid #A65A5A' : 'none',
-                    fontWeight: isGifteesClicked ? 'bold' : 'normal',
+                    borderLeft: activeComponent == "giftees" ? '6px solid #A65A5A' : 'none',
+                    fontWeight: activeComponent == "giftees" ? 'bold' : 'normal',
                     paddingRight: '105px',
                  }}
-                onClick={viewGiftees} >
+                onClick={() => setActiveComponent("giftees")} >
                 Giftees
           </button>
             </div>

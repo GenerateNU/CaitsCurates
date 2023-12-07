@@ -12,9 +12,9 @@ function UpdatedGiftItem({ gift, isSaved, onFavoriteClick }: GiftItemProps) {
       <div className="bg-gray-200 h-[15rem] mx-auto mb-2 relative">
       </div>
       <div className="relative">
-        <div className="text-base font-proxima text-drkbrown">{gift.Occasion}</div>
-        <div className=" w-[90%] text-2xl font-seasons text-coffee font-bold">{gift.Name}</div>
-        <div className="text-xs text-coffee font-proxima">${gift.Price}</div>
+        <div className="text-base font-proxima text-espresso">{gift.Occasion}</div>
+        <div className=" w-[90%] text-2xl font-seasons text-espresso font-bold">{gift.Name}</div>
+        <div className="text-xs text-espresso font-proxima">${gift.Price}</div>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill={isSaved ? "red" : "none"}
