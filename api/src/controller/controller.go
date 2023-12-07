@@ -55,7 +55,8 @@ func (pg *PgController) Serve() *gin.Engine {
 	r.GET("/requests/incomplete", func(c *gin.Context) {
 		gifts, err := pg.IncompleteRequests()
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, "Oops")
+			fmt.Println(err)
+			c.JSON(http.StatusInternalServerError, err)
 		}
 		c.JSON(http.StatusOK, gifts)
 	})

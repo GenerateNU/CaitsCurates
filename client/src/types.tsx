@@ -13,15 +13,15 @@ export interface Gift {
 export interface GiftRequest {
   ID: number;
   CustomerID: number;
+  GifteeID: number;
+  Giftee: Giftee;
   GiftResponseId: number | null;
-  RecipientName: string;
-  RecipientAge: number;
   Occasion: string[];
-  RecipientInterests: string[];
   BudgetMax: number;
   BudgetMin: number;
   GiftResponse: GiftResponse | null;
   DateNeeded: string;
+  Comment: string;
 }
 
 export interface GiftCollection {
@@ -52,6 +52,16 @@ export interface Customer {
   UserId: number;
 }
 
+export interface Giftee  {
+  GifteeName:           string;
+  CustomerID:           number;
+  Gender:               string;
+  CustomerRelationship: string;
+  Age:                   number;
+  Colors:                string[];
+  Interests:             string[];
+  GiftRequests:          GiftRequest[];
+}
 export interface Admin {
   ID: number;
   UserId: number;

@@ -18,18 +18,8 @@ func UpdateGiftRequestToDb(db *gorm.DB, inputRequest GiftRequest) (GiftRequest, 
 	}
 
 	updates := make(map[string]interface{})
-
-	if inputRequest.RecipientName != "" {
-		updates["RecipientName"] = inputRequest.RecipientName
-	}
-	if inputRequest.RecipientAge != 0 {
-		updates["RecipientAge"] = inputRequest.RecipientAge
-	}
 	if len(inputRequest.Occasion) > 0 {
 		updates["Occasion"] = inputRequest.Occasion
-	}
-	if len(inputRequest.RecipientInterests) > 0 {
-		updates["RecipientInterests"] = inputRequest.RecipientInterests
 	}
 	if inputRequest.BudgetMax != 0 {
 		updates["BudgetMax"] = inputRequest.BudgetMax
@@ -45,6 +35,9 @@ func UpdateGiftRequestToDb(db *gorm.DB, inputRequest GiftRequest) (GiftRequest, 
 	}
 	if inputRequest.GifteeID != 0 {
 		updates["GifteeID"] = inputRequest.GifteeID
+	}
+	if inputRequest.Comment != "" {
+		updates["Commnet"] = inputRequest.Comment
 	}
 
 	if err := db.Model(&updatedGiftRequest).Updates(updates).Error; err != nil {
@@ -275,7 +268,7 @@ func GetAllCustomerCollectionsFromDB(db *gorm.DB, id int64) ([]GiftCollection, e
 
 func GetAllCustomerRequestsFromDB(db *gorm.DB, id int64) ([]GiftRequest, error) {
 	var requests []GiftRequest
-	if err := db.Preload("GiftResponse").Preload("GiftResponse.GiftCollection").Preload("GiftResponse.GiftCollection.Gifts").Where("customer_id = ?", id).Find(&requests).Error; err != nil {
+	if err := db.Preload("GiftResponse").Preload("Giftee").Preload("GiftResponse.GiftCollection").Preload("GiftResponse.GiftCollection.Gifts").Where("customer_id = ?", id).Find(&requests).Error; err != nil {
 		return nil, err
 	}
 	return requests, nil

@@ -21,17 +21,16 @@ type Gift struct {
 
 type GiftRequest struct {
 	gorm.Model
-	CustomerID         uint
-	GiftResponseID     *uint
-	GifteeID		   uint
-	RecipientName      string
-	RecipientAge       uint
-	Occasion           pq.StringArray `gorm:"type:text[]"`
-	RecipientInterests pq.StringArray `gorm:"type:text[]"`
-	BudgetMax          uint
-	BudgetMin          uint
-	GiftResponse       *GiftResponse
-	DateNeeded         time.Time
+	CustomerID     uint
+	GiftResponseID *uint
+	GifteeID       uint
+	Giftee         Giftee
+	Occasion       pq.StringArray `gorm:"type:text[]"`
+	BudgetMax      uint
+	BudgetMin      uint
+	Comment        string
+	GiftResponse   *GiftResponse
+	DateNeeded     time.Time
 }
 
 type GiftCollection struct {
@@ -59,24 +58,23 @@ type User struct {
 
 type Customer struct {
 	gorm.Model
-	UserID          uint
-	User            User
+	UserID            uint
+	User              User
 	AvailableRequests uint
-	GiftCollections []*GiftCollection
-	GiftRequests    []*GiftRequest
-	Giftees 	    []*Giftee
+	GiftCollections   []*GiftCollection
+	GiftRequests      []*GiftRequest
+	Giftees           []*Giftee
 }
 
 type Giftee struct {
 	gorm.Model
-	GifteeName            string
-	CustomerID            uint
-	Gender                string
-	CustomerRelationship  string
-	Age                   uint
-	Colors                pq.StringArray `gorm:"type:text[]"`
-	Interests             pq.StringArray `gorm:"type:text[]"`
-	GiftRequests    	  []*GiftRequest
+	GifteeName           string
+	CustomerID           uint
+	Gender               string
+	CustomerRelationship string
+	Age                  uint
+	Colors               pq.StringArray `gorm:"type:text[]"`
+	Interests            pq.StringArray `gorm:"type:text[]"`
 }
 
 type Admin struct {
