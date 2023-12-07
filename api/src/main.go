@@ -4,10 +4,11 @@ import (
 	"CaitsCurates/backend/src/controller"
 	"CaitsCurates/backend/src/model"
 	"fmt"
-	"github.com/stripe/stripe-go/v76"
 	"log"
 	"os"
 	"time"
+
+	"github.com/stripe/stripe-go/v76"
 
 	"github.com/lib/pq"
 	"gorm.io/gorm/logger"
@@ -60,19 +61,6 @@ func main() {
 		panic(err)
 	}
 	err = db.Create(&gifteeTimmy).Error
-	if err != nil {
-		panic(err)
-	}
-	giftRequestTimmy := model.GiftRequest{
-		Occasion:   pq.StringArray{"Birthday"},
-		GifteeID:   gifteeTimmy.ID,
-		CustomerID: customer1.ID,
-		BudgetMax:  60,
-		BudgetMin:  20,
-		DateNeeded: time.Date(2023, time.December, 20, 0, 0, 0, 0, time.UTC),
-	}
-
-	err = db.Create(&giftRequestTimmy).Error
 	if err != nil {
 		panic(err)
 	}
@@ -187,6 +175,28 @@ func main() {
 	err = db.Create(&giftCollectionFavorites).Error
 	err = db.Create(&randomGift1).Error
 	err = db.Create(&randomGift2).Error
+
+	giftResponseTimmy := model.GiftResponse{
+		GiftCollection: giftCollectionDecor,
+		GiftCollectionID: 3,
+		CustomMessage: "Birthday decor for the elated Timmy",
+	}
+
+	giftRequestTimmy := model.GiftRequest{
+		Occasion:   pq.StringArray{"Birthday"},
+		GifteeID:   gifteeTimmy.ID,
+		CustomerID: customer1.ID,
+		BudgetMax:  60,
+		BudgetMin:  20,
+		DateNeeded: time.Date(2023, time.December, 20, 0, 0, 0, 0, time.UTC),
+		GiftResponse: &giftResponseTimmy,
+		GiftResponseID: &giftResponseTimmy.ID,
+	}
+
+	err = db.Create(&giftRequestTimmy).Error
+	if err != nil {
+		panic(err)
+	}
 
 	// Check for errors
 
