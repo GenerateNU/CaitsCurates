@@ -40,6 +40,7 @@ const GiftRequestsTable: React.FC<GiftRequestsProps> = ({ selectRow }) => {
     }).format(date);
   };
 
+
   return (
     <div>
       <h1 className="mt-2 font-seasons text-3xl text-espresso">Gifting</h1>
@@ -64,7 +65,7 @@ const GiftRequestsTable: React.FC<GiftRequestsProps> = ({ selectRow }) => {
             <tr
               key={item.ID}
               className={`cursor-pointer  ${
-                item.GiftResponseId !== null ? "bg-linen" : "bg-eggshell"
+                item.GiftResponseId != null ? "bg-linen" : "bg-eggshell"
               }`}
               onClick={() => handleClick(item)}
             >
@@ -76,7 +77,7 @@ const GiftRequestsTable: React.FC<GiftRequestsProps> = ({ selectRow }) => {
                 {formatDate(item.CreatedAt)}
               </td>
               <td className="py-2 px-4 border-b border-gray-300">
-                {item.GiftResponseId !== null ? "Complete" : "In Progress"}
+                {item.GiftResponseId != null ? "Complete" : "In Progress"}
               </td>
             </tr>
           ))}
