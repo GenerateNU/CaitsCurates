@@ -12,7 +12,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ updateHomePage }) => {
   };
 
   return (
-    <div className="bg-gray-100 p-4 w-full">
+    <div className="bg-eggshell p-4 w-full">
       <div className="flex items-center relative">
         <input
           type="text"
