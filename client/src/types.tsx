@@ -14,7 +14,7 @@ export interface GiftRequest {
   ID: number;
   CustomerID: number;
   GifteeID: number;
-  Giftee: Giftee;
+  Giftee: Giftee | null;
   GiftResponseId: number | null;
   Occasion: string[];
   BudgetMax: number;
@@ -23,6 +23,15 @@ export interface GiftRequest {
   DateNeeded: string;
   Comment: string;
   CreatedAt: string;
+}
+export interface GiftRequestProps {
+  CustomerID: number;
+  GifteeID: number;
+  Occasion: string[];
+  BudgetMax: number;
+  BudgetMin: number;
+  DateNeeded: Date;
+  Comment: string;
 }
 
 export interface GiftCollection {
