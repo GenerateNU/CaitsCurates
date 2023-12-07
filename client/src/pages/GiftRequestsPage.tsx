@@ -1,18 +1,30 @@
 import { useState } from "react";
 import GiftRequestCard from "../components/Profile/GiftRequestCard";
-import GiftRequests from "../components/Profile/GiftRequestsTable";
+import GiftRequestsTable from "../components/Profile/GiftRequestsTable";
 import { GiftRequest } from "../types";
+import Navbar from "../components/Home/NavBarUpdated";
 
 const GiftRequestsPage = () => {
   const [selectedRequest, setSelectedRequest] = useState<GiftRequest | null>(
     null
   );
 
-  {
-    selectedRequest ? <GiftRequestCard /> : <GiftRequests />;
-  }
+  return (
+    <div className=" bg-eggshell min-h-screen">
+      <Navbar />
 
-  return <div></div>;
+      <div className="mx-12">
+        {selectedRequest ? (
+          <GiftRequestCard
+            selectedRequest={selectedRequest}
+            clearSelected={setSelectedRequest}
+          />
+        ) : (
+          <GiftRequestsTable selectRow={setSelectedRequest} />
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default GiftRequestsPage;

@@ -1,44 +1,19 @@
 import { useEffect, useState } from "react";
-import { styled } from "@mui/material/styles";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
 import axios from "axios";
+import { GiftRequest } from "../../types";
 
-const StyledTableRow = styled(TableRow)(() => ({
-  "&:last-child td, &:last-child th": {
-    border: 0,
-  },
-}));
+type GiftRequestsProps = {
+  selectRow: React.Dispatch<React.SetStateAction<GiftRequest | null>>;
+};
 
-interface GiftResponse {
-  id: number;
-  giftCollectionID: number;
-  customMessage: string;
-}
-
-interface GiftRequest {
-  id: number;
-  giftResponseID: number | null;
-  recipientName: string;
-  giftResponse: GiftResponse | null;
-  dateSubmitted: string;
-}
-
-export default function GiftRequestsTable() {
-  const [selectedRequest, setSelectedRequest] = useState<GiftRequest | null>(
-    null
-  );
+const GiftRequestsTable: React.FC<GiftRequestsProps> = ({ selectRow }) => {
   const [requests, setRequests] = useState<GiftRequest[]>([]);
 
   const customerID = 1;
 
   const handleClick = (req: GiftRequest) => {
-    console.log(req.recipientName);
-    setSelectedRequest(req);
+    console.log(req);
+    selectRow(req);
   };
 
   useEffect(() => {
@@ -55,44 +30,60 @@ export default function GiftRequestsTable() {
     }
   };
 
+  const formatDate = (dateString: string) => {
+    var date = new Date(dateString);
+
+    return new Intl.DateTimeFormat("en-US", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(date);
+  };
+
   return (
     <div>
-      <div>
-        selected component:
-        <p>{selectedRequest?.recipientName}</p>
-      </div>
-      <TableContainer className="bg-eggshell cursor-pointer">
-        <Table aria-label="customized table">
-          <TableHead>
-            <TableRow>
-              <TableCell>Order Number</TableCell>
-              <TableCell>Name</TableCell>
-              <TableCell>Date Submitted</TableCell>
-              <TableCell>Status</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {requests.map((row) => (
-              <StyledTableRow
-                key={row.id}
-                onClick={() => handleClick(row)}
-                className={`${
-                  row.giftResponseID === null ? "bg-eggshell" : "bg-linen"
-                }`}
-              >
-                <TableCell component="th" scope="row">
-                  {row.id}
-                </TableCell>
-                <TableCell>{row.recipientName}</TableCell>
-                <TableCell>{row.dateSubmitted}</TableCell>
-                <TableCell>
-                  {row.giftResponseID ? "Complete" : "In Progress"}
-                </TableCell>
-              </StyledTableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <h1 className="mt-2 font-seasons text-3xl text-espresso">Gifting</h1>
+
+      <h2 className="mt-6 font-seasons text-2xl text-deeppink">
+        Gift Request History
+      </h2>
+
+      <table className="mt-4 font-proxima bg-eggshell border border-gray-300 text-winered">
+        <thead>
+          <tr>
+            <th className="py-2 px-4 font-semibold text-left ">Order Number</th>
+            <th className="py-2 px-4 font-semibold text-left ">Name</th>
+            <th className="py-2 px-4 font-semibold text-left">
+              Date Submitted
+            </th>
+            <th className="py-2 px-4 font-semibold text-left">Status</th>
+          </tr>
+        </thead>
+        <tbody className="text-espresso">
+          {requests.map((item) => (
+            <tr
+              key={item.ID}
+              className={`cursor-pointer  ${
+                item.GiftResponseId !== null ? "bg-linen" : "bg-eggshell"
+              }`}
+              onClick={() => handleClick(item)}
+            >
+              <td className="py-2 px-4 border-b border-gray-300">{item.ID}</td>
+              <td className="py-2 px-4 border-b border-gray-300">
+                {item.Giftee.GifteeName}
+              </td>
+              <td className="py-2 px-4 border-b border-gray-300">
+                {formatDate(item.CreatedAt)}
+              </td>
+              <td className="py-2 px-4 border-b border-gray-300">
+                {item.GiftResponseId !== null ? "Complete" : "In Progress"}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
-}
+};
+
+export default GiftRequestsTable;

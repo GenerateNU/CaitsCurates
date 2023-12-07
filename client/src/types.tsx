@@ -22,6 +22,7 @@ export interface GiftRequest {
   GiftResponse: GiftResponse | null;
   DateNeeded: string;
   Comment: string;
+  CreatedAt: string;
 }
 
 export interface GiftCollection {
@@ -52,15 +53,15 @@ export interface Customer {
   UserId: number;
 }
 
-export interface Giftee  {
-  GifteeName:           string;
-  CustomerID:           number;
-  Gender:               string;
+export interface Giftee {
+  GifteeName: string;
+  CustomerID: number;
+  Gender: string;
   CustomerRelationship: string;
-  Age:                   number;
-  Colors:                string[];
-  Interests:             string[];
-  GiftRequests:          GiftRequest[];
+  Age: number;
+  Colors: string[];
+  Interests: string[];
+  GiftRequests: GiftRequest[];
 }
 export interface Admin {
   ID: number;
