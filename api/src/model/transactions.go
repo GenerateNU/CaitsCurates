@@ -11,6 +11,14 @@ func WriteRequestToDb(db *gorm.DB, inputRequest GiftRequest) (GiftRequest, error
 	}
 	return inputRequest, nil
 }
+func GetCustomerFromDb(db *gorm.DB, id int64) (Customer, error) {
+	var customerRetrieved Customer
+	if err := db.Where("id = ?", id).Preload("Giftees").Preload("GiftRequests").Preload("GiftCollections").First(&customerRetrieved).Error; err != nil {
+		return Customer{}, err
+	}
+	return customerRetrieved, nil
+}
+
 func UpdateGiftRequestToDb(db *gorm.DB, inputRequest GiftRequest) (GiftRequest, error) {
 	var updatedGiftRequest GiftRequest
 	if err := db.Where("id = ?", inputRequest.ID).First(&updatedGiftRequest).Error; err != nil {

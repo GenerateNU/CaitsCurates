@@ -64,6 +64,16 @@ func (pg *PgController) Serve() *gin.Engine {
 		}
 		c.JSON(http.StatusOK, gifts)
 	})
+	r.GET("/customer/:id", func(c *gin.Context) {
+		id := c.Param("id")
+		intId, err := strconv.Atoi(id)
+		customer, err := pg.GetCustomer(int64(intId))
+		if err != nil {
+			fmt.Println(err)
+			c.JSON(http.StatusInternalServerError, err)
+		}
+		c.JSON(http.StatusOK, customer)
+	})
 	r.POST("/create-checkout-session", pg.CreateStripeCheckoutSession)
 
 	// Get complete gift requests

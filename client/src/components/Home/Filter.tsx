@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import {Filters} from "../../types.tsx";
 import FilterSection from "./FilterSection.tsx";
 import PriceSection from "../PriceSection.tsx";
@@ -41,8 +41,10 @@ type FilterProps = {
 const Filter: React.FC<FilterProps> = ({
   isOpen,
   filterToggle,
+    currentFilters,
   setCurrentFilters,
 }) => {
+  const [resetFilter, setResetFilter] = useState(false);
   const updateOccasion = (item: string) => {
     setCurrentFilters((prevFilters: Filters) => ({
       ...prevFilters,
@@ -71,39 +73,62 @@ const Filter: React.FC<FilterProps> = ({
       maxPrice: max,
     }));
   };
+  const clearFilters = () => {
+    setCurrentFilters(() => ({
+      demographic: "",
+      minPrice: 0,
+      maxPrice: 1000,
+      category: "",
+      occasion: "",
+    }));
+    setResetFilter(true);
+    setTimeout(() => setResetFilter(false), 0);
+  };
 
   return (
-    <div>
+      <div>
       {isOpen && (
         <>
           {/* Dark overlay */}
           <div className="fixed top-0 left-0 w-full h-full bg-black opacity-50 z-10"></div>
           {/* Filter modal */}
-          <div className="absolute top-0 right-0 w-1/4 bg-eggshell p-8 shadow-lg z-20 text-black overflow-y-auto max-h-screen">
+          <div className="fixed top-0 right-0 w-1/4 bg-eggshell p-8 shadow-lg z-20 text-black overflow-y-auto max-h-screen">
             <div className="flex justify-between">
-              <h2 className="mb-4 text-xl coffee font-bold font-seasons">Filter</h2>
+              <h2 className="mb-4 text-2xl text-espresso font-bold font-seasons">Filter</h2>
               <div className="cursor-pointer" onClick={filterToggle}>
                 x
               </div>
             </div>
-
             {/* Filter sections */}
             <FilterSection
               title="By Occasion"
               items={occasions}
+              reset={resetFilter}
+              currentFilters={currentFilters}
               updateFilters={updateOccasion}
             />
             <FilterSection
               title="By Recipient"
               items={recipients}
+              reset={resetFilter}
+              currentFilters={currentFilters}
               updateFilters={updateDemographic}
             />
             <FilterSection
               title="By Category"
               items={category}
+              reset={resetFilter}
+              currentFilters={currentFilters}
               updateFilters={updateCategory}
             />
-            <PriceSection title="By Price" updateFilters={updatePrices} />
+            <PriceSection title="By Price"
+                          reset={resetFilter}
+                          currentFilters = {currentFilters}
+                          updateFilters={updatePrices} />
+            <button className="mt-4 bg-beige text-winered font-bold py-2 px-4"
+            onClick={clearFilters}>
+              Clear Filters
+            </button>
           </div>
         </>
       )}

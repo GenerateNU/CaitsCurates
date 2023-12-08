@@ -78,6 +78,8 @@ export interface Admin {
   UserId: number;
 }
 
+export type FilterKey = keyof Filters;
+
 export interface Filters {
   minPrice: number;
   maxPrice: number;

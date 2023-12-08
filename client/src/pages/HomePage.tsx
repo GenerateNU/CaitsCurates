@@ -10,86 +10,10 @@ import homeGiftsImage from "../images/home_gifts_image.svg";
 import Footer from "../components/Home/Footer.tsx";
 
 const HomePage = () => {
-  const exampleGifts = [
-    {
-      ID: 1,
-      Name: "Customized Jewelry",
-      Price: 100,
-      Link: "https://example.com/customized-jewelry",
-      Occasion: "Anniversary",
-      Description:
-        "A personalized piece of jewelry to celebrate your special day.",
-      Demographic: "Adults",
-      GiftCollections: [],
-      Category: ["Jewelry", "Personalized"],
-    },
-    {
-      ID: 2,
-      Name: "Tech Gadgets Set",
-      Price: 150,
-      Link: "https://example.com/tech-gadgets-set",
-      Occasion: "Birthday",
-      Description:
-        "A bundle of cutting-edge tech gadgets for the tech enthusiast in your life.",
-      Demographic: "Tech Enthusiasts",
-      GiftCollections: [],
-      Category: ["Tech", "Gadgets"],
-    },
-    {
-      ID: 3,
-      Name: "Spa Day Experience",
-      Price: 80,
-      Link: "https://example.com/spa-day-experience",
-      Occasion: "Relaxation",
-      Description: "Treat your loved one to a rejuvenating spa day experience.",
-      Demographic: "All Ages",
-      GiftCollections: [],
-      Category: ["Wellness", "Experience"],
-    },
-    {
-      ID: 4,
-      Name: "Cooking Class Voucher",
-      Price: 60,
-      Link: "https://example.com/cooking-class-voucher",
-      Occasion: "Cooking Enthusiast",
-      Description: "A voucher for a fun and educational cooking class.",
-      Demographic: "Cooking Enthusiasts",
-      GiftCollections: [],
-      Category: ["Experience", "Cooking"],
-    },
-    {
-      ID: 5,
-      Name: "Book Lover's Subscription Box",
-      Price: 30,
-      Link: "https://example.com/book-lovers-subscription",
-      Occasion: "Bookworm's Delight",
-      Description:
-        "A monthly subscription box filled with curated books and literary goodies.",
-      Demographic: "Book Lovers",
-      GiftCollections: [],
-      Category: ["Books", "Subscription"],
-    },
-  ];
-
-  const exampleCustomer = {
-    ID: 1,
-    UserId: 1,
-  };
-
-  const exampleGiftCollection = {
-    ID: 1,
-    CustomerID: 1,
-    Customer: exampleCustomer,
-    CollectionName: "Default",
-    Gifts: exampleGifts,
-  };
-
   const customerID = 1;
-  const [collections, setCollections] = useState<GiftCollection[]>([]);
-  const [displayCollection, setDisplayCollection] = useState<GiftCollection>(
-    exampleGiftCollection
-  );
-  const [gifts, setGifts] = useState(exampleGifts);
+  const [collections, setCollections] = useState<GiftCollection[]>();
+  const [displayCollection, setDisplayCollection] = useState<GiftCollection>();
+  const [gifts, setGifts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentFilters, setCurrentFilters] = useState<Filters>({
     minPrice: 0,
@@ -98,7 +22,23 @@ const HomePage = () => {
     demographic: "",
     category: "",
   });
+  const [giftPageStart, setGiftPageStart] = useState(0);
+  const [giftPageEnd, setGiftPageEnd] = useState(16);
+  const [pageNumber, setPageNumber] = useState(1);
+  const [selectedFeature, setSelectedFeature] = useState(true);
+  const handleNext = () => {
+    if (gifts.length / 16 <= pageNumber) return;
+    setGiftPageStart(giftPageStart + 16);
+    setGiftPageEnd(giftPageEnd + 16);
+    setPageNumber(pageNumber + 1);
+  };
 
+  const handlePrevious = () => {
+    if (giftPageStart === 0) return;
+    setGiftPageStart(giftPageStart - 16);
+    setGiftPageEnd(giftPageEnd - 16);
+    setPageNumber(pageNumber - 1);
+  };
   useEffect(() => {
     getCollection();
     getGifts();
@@ -112,6 +52,7 @@ const HomePage = () => {
     try {
       const response = await axios.get(`/api/collections/${customerID}`);
       setCollections(response.data);
+      setDisplayCollection(response.data[0])
       return response.data;
     } catch (error) {
       console.error("An error occurred while fetching the collection:", error);
@@ -119,6 +60,9 @@ const HomePage = () => {
   };
 
   const getGifts = async () => {
+    if (displayCollection == undefined){
+      return
+    }
     try {
       const response = await axios.get(`/api/search/${displayCollection.ID}`, {
         params: {
@@ -136,6 +80,9 @@ const HomePage = () => {
     }
   };
   const handleFavoriteClick = async (gift: Gift, isSaved: boolean) => {
+    if (displayCollection == undefined){
+      return
+    }
     const baseUrl = isSaved ? "/api/removeCustomerGiftCollection" : "/api/addCustomerGiftCollection"
     try {
       await axios.post(`${baseUrl}/Favorites/${customerID}`, gift)
@@ -154,15 +101,19 @@ const HomePage = () => {
   const handleSearchChange = (e: string) => {
     setSearchTerm(e);
   };
+  const sortedGifts: Gift[] = gifts.sort((a: Gift, b: Gift) => selectedFeature ? a.Price - b.Price : b.Price - a.Price);
+
 
   return (
     <div className="bg-eggshell h-full text-white flex flex-col">
-      <NavBar />
-      <SearchBar updateHomePage={handleSearchChange} />
-      <img src={homeGiftsImage}  height="50"/>
-      <div className="flex flex-col px-[3vw] xl:px-[13vw] mt-20">
+      <div className="sticky top-0 z-10 bg-eggshell">
+        <NavBar />
+        <SearchBar updateHomePage={handleSearchChange} />
+      </div>
+      <img src={homeGiftsImage}  height="50" alt="home"/>
+      <div className="flex flex-col px-[10vw] xl:px-[15vw] mt-20">
         <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-6">
-          {collections.map((collection, index) => (
+          {collections?.map((collection, index) => (
               <div
                   key={index}
                   className={"cursor-pointer"}
@@ -180,16 +131,32 @@ const HomePage = () => {
         <GiftSortNavBar
           currentFilters={currentFilters}
           setCurrentFilters={setCurrentFilters}
+          selectedFeature={selectedFeature}
+          setSelectedFeature={setSelectedFeature}
           className="mt-20"
         />
         <div className="min-h-[19rem] grid grid-cols-1 gap-y-5 justify-items-center mb-40 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {gifts.map((gift, index) => {
+          {sortedGifts.map((gift: Gift, index) => {
             const isSaved = gift.GiftCollections.some((collection: GiftCollection) => collection.CollectionName === "Favorites" && collection.CustomerID === customerID)
-
               return (
                 <UpdatedGiftItem key={index} gift={gift} isSaved={isSaved} onFavoriteClick={handleFavoriteClick}/>
               )}
-          )}
+          )})
+        </div>
+        <div className="relative mx-auto mb-10 text-xl flex flex-row justify-center  w-full">
+          <button
+              className=" text-red  font-bold rounded-l px-2"
+              onClick={handlePrevious}
+          >
+            {`<`}
+          </button>
+          <p className="text-espresso font-bold">{pageNumber}</p>
+          <button
+              className="text-red font-bold rounded-r px-2"
+              onClick={handleNext}
+          >
+            {`>`}
+          </button>
         </div>
       </div>
       <Footer />

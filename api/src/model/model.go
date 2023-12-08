@@ -20,6 +20,7 @@ type Model interface {
 	CompleteRequests() ([]GiftRequest, error)
 	UpdateGiftRequest(GiftRequest) (GiftRequest, error)
 	GetGift(int64) (Gift, error)
+	GetCustomer(int64) (Customer, error)
 	GetAllGifts() ([]Gift, error)
 	AddGift(Gift) (Gift, error)
 	UpdateGift(int64, Gift) (Gift, error)
@@ -42,6 +43,14 @@ type Model interface {
 	UpdateCustomerAvailableRequests(int64, int64) (Customer, error)
 }
 
+func (m *PgModel) GetCustomer(id int64) (Customer, error) {
+	customerRetrieved, err := GetCustomerFromDb(m.Conn, id)
+	if err != nil {
+		return Customer{}, err
+	}
+
+	return customerRetrieved, nil
+}
 func (m *PgModel) AddRequest(inputRequest GiftRequest) (GiftRequest, error) {
 
 	createdRequest, err := WriteRequestToDb(m.Conn, inputRequest)

@@ -11,7 +11,7 @@ interface ModalScreenTwoProps {
 }
 
 const ModalScreenTwo: React.FC<ModalScreenTwoProps> = ({ isOpen, onClose, children }) => {
-
+  const [showModalFour, setShowModalFour] = useState(false);
   const [showModalThree, setShowModalThree] = useState(false);
   const [showModalOne, setShowModalOne] = useState(false);
 
