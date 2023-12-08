@@ -12,6 +12,9 @@ const Navbar = () => {
     if (buttonName === "Profile") {
       navigate("/profile")
     }
+    if(buttonName === "About") {
+        navigate("/about")
+    }
       if (buttonName === "Shop") {
           navigate("/")
       }
@@ -54,9 +57,9 @@ const Navbar = () => {
             </button>
             <button
                 className={`${buttonStyle} ${
-                    activeButton === "More" ? activeButtonStyle : ""
+                    activeButton === "About" ? activeButtonStyle : ""
                 }`}
-                onClick={() => handleButtonClick("More")}
+                onClick={() => handleButtonClick("About")}
             >
               About
             </button>

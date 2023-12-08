@@ -48,7 +48,7 @@ function App() {
             </AdminProvider>
           }
         />
-        <Route path="/home/" element={<ReturnHomePage />} />
+        <Route path="/about/" element={<ReturnHomePage />} />
         <Route path="/signup/" element={<SignUpPage />} />
         <Route path="/login/" element={<LoginPage />} />
         <Route path="/success/" element={<RequestPurchaseSuccess />} />
