@@ -31,7 +31,7 @@ const GiftRequestCard: React.FC<GiftRequestCardProps> = ({
           <h1 className="text-2xl text-black font-seasons">
             Request #{selectedRequest.ID}
           </h1>
-          {selectedRequest.GiftResponseId == null ? (
+          {selectedRequest.GiftResponseID == null ? (
               <svg
                   width="132"
                   height="27"
@@ -68,7 +68,7 @@ const GiftRequestCard: React.FC<GiftRequestCardProps> = ({
             Gift Suggestions
           </h1>
 
-          {selectedRequest.GiftResponseId != null ? (
+          {selectedRequest.GiftResponseID != null ? (
               <table className="mt-4 font-proxima bg-linen  text-winered">
                 <thead className="border border-b-winered text-lg">
                 <tr>

@@ -65,7 +65,7 @@ const GiftRequestsTable: React.FC<GiftRequestsProps> = ({ selectRow }) => {
             <tr
               key={item.ID}
               className={`cursor-pointer  ${
-                item.GiftResponseId != null ? "bg-linen" : "bg-eggshell"
+                item.GiftResponseID != null ? "bg-linen" : "bg-eggshell"
               }`}
               onClick={() => handleClick(item)}
             >
@@ -77,7 +77,7 @@ const GiftRequestsTable: React.FC<GiftRequestsProps> = ({ selectRow }) => {
                 {formatDate(item.CreatedAt)}
               </td>
               <td className="py-2 px-4 border-b border-gray-300">
-                {item.GiftResponseId != null ? "Complete" : "In Progress"}
+                {item.GiftResponseID != null ? "Complete" : "In Progress"}
               </td>
             </tr>
           ))}

@@ -16,7 +16,7 @@ export interface GiftRequest {
   CustomerID: number;
   GifteeID: number;
   Giftee: Giftee | null;
-  GiftResponseId: number | null;
+  GiftResponseID: number | null;
   Occasion: string[];
   BudgetMax: number;
   BudgetMin: number;
