@@ -48,9 +48,9 @@ const GiftSortNavbar: React.FC<GiftSortNavBarProps> = ({
 
   return (
     <div className={`bg-eggshell py-4 ${className}`}>
-      <div className="flex" style={{ maxWidth: "1440px" }}>
+      <div className="flex " >
         <div className="flex space-x-2 items-center">
-          <img src={filterIcon} className="h-6 w-6" onClick={handleFilterToggle}  alt={"filter"}/>
+          <img src={filterIcon} className="h-9 w-9" onClick={handleFilterToggle}  alt={"filter"}/>
         </div>
           <Filter
             isOpen={filterOpen}

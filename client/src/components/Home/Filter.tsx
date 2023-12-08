@@ -29,6 +29,7 @@ const occasions = [
   "New baby",
   "Thinking of you",
   "Thank you",
+    "Christmas",
 ];
 
 type FilterProps = {
