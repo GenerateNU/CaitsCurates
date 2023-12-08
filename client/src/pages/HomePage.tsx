@@ -128,7 +128,7 @@ const HomePage = () => {
               </div>
           ))}
         </div>
-        <div className="max-w-7xl ">
+        <div className="max-w-7xl min-w-7xl">
         <GiftSortNavBar
           currentFilters={currentFilters}
           setCurrentFilters={setCurrentFilters}
@@ -137,12 +137,19 @@ const HomePage = () => {
           className="mt-20"
         />
         <div className="min-h-[19rem] grid grid-cols-1 gap-10 justify-items-center mb-40 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {sortedGifts.map((gift: Gift, index) => {
+          {sortedGifts.length === 0 ? (
+              <div className="col-span-full text-center text-xl text-red">
+                No gifts available.
+              </div>
+          ) : (
+          sortedGifts.map((gift: Gift, index) => {
             const isSaved = gift.GiftCollections.some((collection: GiftCollection) => collection.CollectionName === "Favorites" && collection.CustomerID === customerID)
               return (
                 <UpdatedGiftItem key={index} gift={gift} isSaved={isSaved} onFavoriteClick={handleFavoriteClick}/>
-              )}
-          )})
+              );
+          })
+          )
+          }
         </div>
         </div>
         <div className="relative mx-auto mb-10 text-xl flex flex-row justify-center  w-full">

@@ -58,7 +58,7 @@ const GiftSortNavbar: React.FC<GiftSortNavBarProps> = ({
             currentFilters={currentFilters}
             setCurrentFilters={setCurrentFilters}
           />
-        <div className="ml-4 flex flex-wrap gap-4">
+        <div className="flex flex-wrap items-left mr-10 gap-4">
             {Object.entries(currentFilters).map(([key, value]) => {
               if (value === "") return null;
               const filterKey = key as FilterKey;
