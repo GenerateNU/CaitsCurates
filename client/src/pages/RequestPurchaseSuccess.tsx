@@ -1,19 +1,15 @@
 
-import AccountSideBar from "../components/AccountSideBar";
 import SampleOrderSummary from "../components/SampleOrderSummary";
-import Navbar from "../components/Home/NavBarUpdated";
+import {useNavigate} from "react-router-dom";
 
 const RequestPurchaseSuccess = () => {
 
     const submitRequestButtonStyle = "px-4 py-2 text-FFF9F4 text-s bg-273F2A rounded-md";
     const startShoppingButtonStyle = "px-4 py-2 text-273F2A text-s bg-FFF9F4 rounded-md";
-
+    const navigate = useNavigate();
     return (
-        <div className="flex flex-col h-screen bg-FFF9F4">
-        <Navbar />
-  
+
         <div className="flex flex-row h-screen">
-          <AccountSideBar />
           <div className="flex flex-col items-center flex-grow text-4xl" style={{ fontFamily: 'The Seasons', marginLeft:"20px" }}>
           <div>
             <div style={{ textAlign: 'left' }}>
@@ -28,12 +24,14 @@ const RequestPurchaseSuccess = () => {
             <button
                 className={`${submitRequestButtonStyle}`}
                 style={{ width: "412px", height: "50px", fontSize: "18px" }}
+                onClick={() => navigate('/')}
               >
                 Submit a Request
               </button>
               <button
                 className={`${startShoppingButtonStyle}`}
                 style={{ width: "412px", height: "50px", fontSize: "18px", border: '2px solid #273F2A', }}
+                onClick={() => navigate('/')}
               >
                 Start Shopping
               </button>
@@ -44,7 +42,6 @@ const RequestPurchaseSuccess = () => {
             </div>
             </div>
           </div>
-        </div>
       );
 };
 

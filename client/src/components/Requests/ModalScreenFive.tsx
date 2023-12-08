@@ -46,7 +46,7 @@ const ModalScreenFive: React.FC<ModalScreenFiveProps> = ({ isOpen, onClose, chil
     };
     const updateAvailableRequests = async () => {
         try {
-            const response = await axios.put(`/api/customer/${giftRequest.CustomerID}?requests=-1`);
+            const response = await axios.put(`/api/customer/1/-1`);
             return response.data;
         } catch (error) {
             console.log("An error when occured while updating Available Requests");
@@ -77,7 +77,7 @@ const ModalScreenFive: React.FC<ModalScreenFiveProps> = ({ isOpen, onClose, chil
                 ) : (
                     <>
                         {showModalFinal ? (
-                            <ModalScreenFinal isOpen={isOpen} onClose={onClose} children={children} />
+                            <ModalScreenFinal isOpen={isOpen} onClose={onClose} children={children} date = {giftRequest.DateNeeded} />
                         ) : (
                             <>
                                 <div className="flex ml-10 items-center mt-10">

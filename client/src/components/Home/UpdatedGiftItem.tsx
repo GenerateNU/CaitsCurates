@@ -9,8 +9,15 @@ type GiftItemProps = {
 function UpdatedGiftItem({ gift, isSaved, onFavoriteClick }: GiftItemProps) {
   return (
     <div className="w-[15rem] flex-col bg-eggshell flex-start">
-      <div className="bg-gray-200 h-[15rem] mx-auto mb-2 relative">
-      </div>
+        <div className="bg-gray-100 h-[15rem] w-[15rem] mx-auto mb-2 relative">
+            {gift.ImageLink ? (
+                <img src={gift.ImageLink} alt={gift.Name} className="w-full h-full object-cover" />
+            ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                    {/* You can add content or text here if needed */}
+                </div>
+            )}
+        </div>
       <div className="relative">
         <div className="text-base font-proxima text-espresso">{gift.Occasion}</div>
         <div className=" w-[90%] text-2xl font-seasons text-espresso font-bold">{gift.Name}</div>
@@ -24,6 +31,9 @@ function UpdatedGiftItem({ gift, isSaved, onFavoriteClick }: GiftItemProps) {
           className="w-6 h-6 absolute top-0 right-0"
           onClick={() => onFavoriteClick(gift, isSaved)}
         >
+            {gift.ImageLink && (
+                <img src={gift.ImageLink} alt={gift.Name} style={{ width: '100px', height: '100px' }} />
+            )}
           <path
             strokeLinecap="round"
             strokeLinejoin="round"

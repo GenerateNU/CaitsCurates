@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage";
-import RequestsPage from "./pages/RequestsPage";
+import RequestsPage from "./pages/RequestsPage.tsx";
 import CheckoutPage from "./pages/CheckoutPage.tsx";
 import CollectionPage from "./pages/CollectionsPage";
 import { AdminProvider } from "./Context/AdminContext.tsx";

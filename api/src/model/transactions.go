@@ -112,6 +112,9 @@ func UpdateGiftToDb(db *gorm.DB, id int64, inputGift Gift) (Gift, error) {
 	if inputGift.Name != "" {
 		updates["Name"] = inputGift.Name
 	}
+	if inputGift.ImageLink != "" {
+		updates["ImageLink"] = inputGift.ImageLink
+	}
 	if inputGift.Price != 0 {
 		updates["Price"] = inputGift.Price
 	}

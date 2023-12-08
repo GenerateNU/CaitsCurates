@@ -7,6 +7,7 @@ export interface Gift {
   Description: string;
   Demographic: string;
   GiftCollections: GiftCollection[];
+  ImageLink: string;
   Category: string[];
 }
 

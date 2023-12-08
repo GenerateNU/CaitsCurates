@@ -1,6 +1,6 @@
 import  { useState } from 'react';
-import RequestPurchasingPage from "./RequestPurchasingPage.tsx";
-import GiftRequestsPage from "./GiftRequestsPage.tsx";
+import RequestPurchasingPage from "../components/Requests/RequestPurchasing.tsx";
+import GiftRequests from "../components/Requests/GiftRequests.tsx";
 import AccountSideBar from "../components/AccountSideBar.tsx";
 import Navbar from "../components/Home/NavBarUpdated.tsx";
 
@@ -18,7 +18,7 @@ const ProfilePage = () => {
                 </div>
                 <div style={{ flex: 1 }}>
                     {activeComponent === 'purchaseGifts' && <RequestPurchasingPage />}
-                    {activeComponent === 'requestHistory' && <GiftRequestsPage />}
+                    {activeComponent === 'requestHistory' && <GiftRequests />}
                 </div>
             </div>
         </div>
