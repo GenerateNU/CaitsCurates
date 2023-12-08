@@ -64,6 +64,7 @@ export interface Customer {
 }
 
 export interface Giftee {
+  ID: number;
   GifteeName: string;
   CustomerID: number;
   Gender: string;

@@ -30,7 +30,8 @@ const GiftItem = (props: GiftProps) => {
                     {giftElements}
                 </div>
                 <p>Description: {props.gift.Description}</p>
-                <p>Description: {props.gift.Occasion}</p>
+                <p>Occasion: {props.gift.Occasion}</p>
+                <p>Image Link: <a href={props.gift.ImageLink}>link</a></p>
             </div>
 
                 <div className='w-1/12 flex flex-row space-x-2'>

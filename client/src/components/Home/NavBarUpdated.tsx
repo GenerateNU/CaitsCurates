@@ -10,10 +10,13 @@ const Navbar = () => {
   const handleButtonClick = (buttonName: any) => {
     setActiveButton(buttonName);
     if (buttonName === "Profile") {
-      navigate("profile")
+      navigate("/profile")
     }
       if (buttonName === "Shop") {
           navigate("/")
+      }
+      if (buttonName ==="Admin") {
+          navigate("/gifts")
       }
     if (buttonName === "Request") {
       setIsRequestModalOpen(true);
@@ -57,6 +60,14 @@ const Navbar = () => {
             >
               About
             </button>
+              <button
+                  className={`${buttonStyle} ${
+                      activeButton === "Admin" ? activeButtonStyle : ""
+                  }`}
+                  onClick={() => handleButtonClick("Admin")}
+              >
+                  Admin
+              </button>
           </div>
           <div className="flex items-center justify-center flex-grow">
             <img

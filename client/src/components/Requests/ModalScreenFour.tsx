@@ -5,7 +5,6 @@ import ModalScreenFive from './ModalScreenFive.tsx';
 import ModalX from '../../images/modal_x_out.svg';
 import OccasionDropdown from '../Admin/OccasionDropdown.tsx';
 import DateTextBox from '../Admin/DateTextBox.tsx';
-import BudgetSlider from '../Admin/BudgetSlider.tsx';
 import {GiftRequestProps} from '../../types.tsx'
 
 interface ModalScreenFourProps {
@@ -109,7 +108,6 @@ const ModalScreenFour: React.FC<ModalScreenFourProps> = ({ isOpen, onClose, chil
                             />
 
                             <h2 className='text-2xl text-A65A5A font-seasons ml-4 mt-6 font-bold leading-7'>Price Range</h2>
-                            <BudgetSlider maxBudget={giftRequest.BudgetMax} minBudget={giftRequest.BudgetMin}/>
                             <div className='flex flex-row justify-between mt-3 ml-4'>
                               <div>
                                 <span className='text-2xl font-bold leading-7 text-B79D94 font-seasons mr-1'>$</span>

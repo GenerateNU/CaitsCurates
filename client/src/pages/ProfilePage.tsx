@@ -10,7 +10,9 @@ const ProfilePage = () => {
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+            <div className="sticky top-0 z-10 bg-eggshell">
             <Navbar />
+            </div>
 
             <div style={{ display: 'flex', flex: 1 }}>
                 <div>
