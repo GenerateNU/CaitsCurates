@@ -7,6 +7,7 @@ export interface Gift {
   Description: string;
   Demographic: string;
   GiftCollections: GiftCollection[];
+  ImageLink: string;
   Category: string[];
 }
 
@@ -15,7 +16,7 @@ export interface GiftRequest {
   CustomerID: number;
   GifteeID: number;
   Giftee: Giftee | null;
-  GiftResponseId: number | null;
+  GiftResponseID: number | null;
   Occasion: string[];
   BudgetMax: number;
   BudgetMin: number;
@@ -63,6 +64,7 @@ export interface Customer {
 }
 
 export interface Giftee {
+  ID: number;
   GifteeName: string;
   CustomerID: number;
   Gender: string;
@@ -76,6 +78,8 @@ export interface Admin {
   ID: number;
   UserId: number;
 }
+
+export type FilterKey = keyof Filters;
 
 export interface Filters {
   minPrice: number;

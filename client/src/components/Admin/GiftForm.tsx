@@ -115,6 +115,7 @@ const GiftForm: React.FC<Props> = ({ initialGift = defaultGift, mode, onGiftChan
                     <option value="New baby">New baby</option>
                     <option value="Thinking of you">Thinking of you</option>
                     <option value="Thank you">Thank you</option>
+                    <option value="Christmas">Christmas</option>
                 </select>
             </div>
             <div className="mb-4">
@@ -156,6 +157,7 @@ const GiftForm: React.FC<Props> = ({ initialGift = defaultGift, mode, onGiftChan
                     <option value="Kitchen & bar">Kitchen & bar</option>
                     <option value="Warm and cozy">Warm and cozy</option>
                     <option value="Outdoors">Outdoors</option>
+
                 </select>
             </div>
             <div className="mb-4">
@@ -180,6 +182,19 @@ const GiftForm: React.FC<Props> = ({ initialGift = defaultGift, mode, onGiftChan
                     id="link"
                     name="Link"
                     value={gift.Link}
+                    onChange={handleInputChange}
+                    className="mt-1 p-2 w-full border-2 border-gray-300 rounded-md"
+                />
+            </div>
+            <div className="mb-4">
+                <label htmlFor="imageLink" className="block text-sm font-medium text-gray-700">
+                    Image link:
+                </label>
+                <input
+                    type="text"
+                    id="imageLink"
+                    name="ImageLink"
+                    value={gift.ImageLink}
                     onChange={handleInputChange}
                     className="mt-1 p-2 w-full border-2 border-gray-300 rounded-md"
                 />

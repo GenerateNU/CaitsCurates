@@ -23,9 +23,11 @@ type PgController struct {
 }
 
 func (pg *PgController) CreateStripeCheckoutSession(c *gin.Context) {
+	// TODO add webhook for security
 	print(stripe.Key)
-	domain := "http://localhost:4242"
+	domain := "http://localhost:5173"
 	params := &stripe.CheckoutSessionParams{
+		ClientReferenceID: stripe.String("1"),
 		LineItems: []*stripe.CheckoutSessionLineItemParams{
 			{
 				// Provide the exact Price ID (for example, pr_1234) of the product you want to sell
@@ -34,12 +36,14 @@ func (pg *PgController) CreateStripeCheckoutSession(c *gin.Context) {
 			},
 		},
 		Mode:       stripe.String(string(stripe.CheckoutSessionModePayment)),
-		SuccessURL: stripe.String(domain + "/success"),
-		CancelURL:  stripe.String(domain + "/cancel"),
+		SuccessURL: stripe.String(domain + "/profile/?checkout=success"),
+		CancelURL:  stripe.String(domain + "/profile"),
 	}
-
+	_, err := pg.UpdateCustomerAvailableRequests(int64(1), int64(1))
+	if err != nil {
+		panic("Checkout failed")
+	}
 	s, err := session.New(params)
-
 	if err != nil {
 		log.Printf("session.New: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -59,6 +63,16 @@ func (pg *PgController) Serve() *gin.Engine {
 			c.JSON(http.StatusInternalServerError, err)
 		}
 		c.JSON(http.StatusOK, gifts)
+	})
+	r.GET("/customer/:id", func(c *gin.Context) {
+		id := c.Param("id")
+		intId, err := strconv.Atoi(id)
+		customer, err := pg.GetCustomer(int64(intId))
+		if err != nil {
+			fmt.Println(err)
+			c.JSON(http.StatusInternalServerError, err)
+		}
+		c.JSON(http.StatusOK, customer)
 	})
 	r.POST("/create-checkout-session", pg.CreateStripeCheckoutSession)
 
@@ -531,7 +545,7 @@ func (pg *PgController) Serve() *gin.Engine {
 		c.JSON(http.StatusNoContent, "Deleted Giftee")
 	})
 	// Update AvailableRequests based on Customer ID
-	r.PUT("customer/:id", func(c *gin.Context) {
+	r.PUT("/customer/:id/:requests", func(c *gin.Context) {
 
 		// Get Customer ID
 		customerID, err := strconv.Atoi(c.Param("id"))
@@ -540,8 +554,7 @@ func (pg *PgController) Serve() *gin.Engine {
 		}
 
 		// Get request amount
-		updatedRequests := c.Query("requests")
-		requests, err := strconv.Atoi(updatedRequests)
+		requests, err := strconv.Atoi(c.Param("requests"))
 		if err != nil {
 			panic(err)
 		}

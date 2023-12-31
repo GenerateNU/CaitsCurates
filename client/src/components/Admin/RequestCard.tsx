@@ -9,28 +9,24 @@ const RequestCard: React.FC<GiftRequest> = ({
                                                 BudgetMax,
                                                 GiftResponse,
                                                 DateNeeded,
-                                                Comment
-                                            }: GiftRequest, { GifteeName,
-                                                Gender,
-                                                CustomerRelationship,
-                                                Age,
-                                                Colors,
-                                                Interests,} : Giftee) => {
+                                                Comment,
+                                                Giftee
+                                            }: GiftRequest) => {
     const [showForm, setShowForm] = useState(false);
     return (
         <div className="flex flex-col w-full">
             <h2 className="font-bold text-lg">
-                {GifteeName} ({new Date(DateNeeded).toLocaleDateString()})
+                {Giftee?.GifteeName} ({new Date(DateNeeded).toLocaleDateString()})
             </h2>
-            <div key={GifteeName} className="px-4 py-2 bg-slate-100">
-                <p>Recipient: {GifteeName}</p>
+            <div key={Giftee?.GifteeName} className="px-4 py-2 bg-slate-100">
+                <p>Recipient: {Giftee?.GifteeName}</p>
                 {!GiftResponse && (
                     <div>
-                        <p>Recipient age: {Age}</p>
-                        <p>Recipient interests: {Interests.join(", ")}</p>
-                        <p>Recipient colors: {Colors.join(", ")}</p>
-                        <p>Recipient relationship: {CustomerRelationship}</p>
-                        <p>Recipient gender: {Gender}</p>
+                        <p>Age: {Giftee?.Age}</p>
+                        <p>Interests: {Giftee?.Interests.join(", ")}</p>
+                        <p>Colors: {Giftee?.Colors.join(", ")}</p>
+                        <p>Relationship: {Giftee?.CustomerRelationship}</p>
+                        <p>Gender: {Giftee?.Gender}</p>
                         <p>
                             Budget: ${BudgetMin} - ${BudgetMax}
                         </p>

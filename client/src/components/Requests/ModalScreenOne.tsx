@@ -1,7 +1,6 @@
 import React, { ReactNode, useState } from 'react';
 import CaitPhoto from '../../images/modal_cait.svg';
 import ModalScreenTwo from './ModalScreenTwo.tsx';
-import axios from 'axios';
 
 interface ModalProps {
   isOpen: boolean;
@@ -21,13 +20,6 @@ const ModalScreenOne: React.FC<ModalProps> = ({ isOpen, onClose, children }) => 
   };
 
   // Endpoint
-  const getAvailableRequests = async () => {
-    try {
-      return;
-    } catch (error) {
-      console.log("An error when occured while getting Available Requests");
-    }
-  };
 
   const buttonStyle = "px-4 py-2 text-FFF9F4 text-s bg-273F2A rounded-md";
   const activeButtonStyle = "bg-273F2A";

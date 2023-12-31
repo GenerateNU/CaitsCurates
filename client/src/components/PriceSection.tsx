@@ -1,20 +1,39 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
+import {Filters} from "../types.tsx";
 
 const priceRanges = [25, 50, 100, 500];
 
 type PriceSectionProps = {
   title: string;
   updateFilters: (min: number, max: number) => void;
+  reset: boolean;
+  currentFilters: Filters
 };
 
 const PriceSection: React.FC<PriceSectionProps> = ({
   title,
   updateFilters,
+    reset,
+    currentFilters,
+
 }) => {
   const [sectionOpen, setSectionOpen] = useState(false);
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(1000);
-
+  useEffect(() => {
+    if (currentFilters?.minPrice !== undefined) {
+      setMinPrice(currentFilters.minPrice);
+    }
+    if (currentFilters?.maxPrice !== undefined) {
+      setMaxPrice(currentFilters.maxPrice);
+    }
+  }, [title, currentFilters]);
+  useEffect(() => {
+    if (reset) {
+      setMinPrice(0);
+      setMaxPrice(1000);
+    }
+  }, [reset]);
   const toggle = () => {
     setSectionOpen(!sectionOpen);
   };
@@ -27,7 +46,7 @@ const PriceSection: React.FC<PriceSectionProps> = ({
 
   return (
     <>
-      <hr className="h-px my-2 bg-gray-500 border-0" />
+      <hr className="h-px my-2 bg-espresso border-0" />
       <div className="flex justify-between cursor-pointer" onClick={toggle}>
         <h2 className="text-lg font-proxima my-2">{title}</h2>
         <div className="my-2" onClick={toggle}>

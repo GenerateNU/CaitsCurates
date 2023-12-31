@@ -43,7 +43,7 @@ const LoginForm = <T extends LoginInputs>({formData, initialState, onSubmit}: Pr
         onSubmit={handleSubmit}
     >
         <div className="text-4xl mt-4 font-seasons font-bold"> {formData.title} </div>
-        <div className="text-base text-drkbrown mt-4 font-proxima"> {formData.subText} </div>
+        <div className="text-base text-espresso mt-4 font-proxima"> {formData.subText} </div>
         {formData.inputs.map((props, index) => {
             const [field, value] = Object.entries(formState)[index];
             return (
@@ -58,7 +58,7 @@ const LoginForm = <T extends LoginInputs>({formData, initialState, onSubmit}: Pr
             )
         }
         )}
-        <div className="mt-5 text-base text-coffee font-proxima">
+        <div className="mt-5 text-base text-espresso font-proxima">
             <span> {formData.additionalText} </span>
             <Link 
                 className="underline"

@@ -4,19 +4,20 @@ import CaitThumbnail2 from "../images/cait_thumbnail_2.svg";
 import CaitThumbnail3 from "../images/cait_thumbnail_3.svg";
 import Or from "../images/or.svg";
 import Navbar from "../components/Home/NavBarUpdated";
+import {useNavigate} from "react-router-dom";
 
 const ReturnHomePage = () => {
-
+    const navigate = useNavigate();
     const handleShoppingClick = () => {
-        // handle click
+        navigate('/')
     }
 
     const handleBrowsingClick = () => {
-        // handle click
+        navigate('/')
     }
 
     const handleRequestsClick = () => {
-        // handle click
+        navigate('/')
     }
     
     return (
